@@ -77,6 +77,89 @@ class CampusBuddyGraph:
 
         return sorted(list(buddies))
 
+    def recommend_buddies_ranked(self, student):
+        """
+        Recommends buddies ranked by Jaccard similarity score.
+        Jaccard(A, B) = |interests_A & interests_B| / |interests_A | interests_B|
+
+        Returns a list of (buddy_name, jaccard_score, shared_interests) tuples,
+        sorted by score descending (most compatible first).
+
+        Example return: [("小红", 0.67, ["篮球", "Python"]), ...]
+        """
+        start = self.node("student", student)
+        s_interests = {
+            n for n in self.graph[start] if n.startswith("interest:")
+        }
+
+        buddy_scores = {}
+
+        for interest in s_interests:
+            for neighbor in self.graph[interest]:
+                if not neighbor.startswith("student:") or neighbor == start:
+                    continue
+                buddy_name = neighbor.removeprefix("student:")
+                if buddy_name in buddy_scores:
+                    continue  # Already computed for this buddy
+
+                b_interests = {
+                    n for n in self.graph[neighbor] if n.startswith("interest:")
+                }
+                intersection = s_interests & b_interests
+                union = s_interests | b_interests
+
+                if not union:
+                    jaccard = 0.0
+                else:
+                    jaccard = len(intersection) / len(union)
+
+                shared_names = sorted(
+                    i.removeprefix("interest:") for i in intersection
+                )
+                buddy_scores[buddy_name] = (jaccard, shared_names)
+
+        # Sort by Jaccard score descending, then by name for stable ordering
+        ranked = sorted(
+            [(name, score, shared) for name, (score, shared) in buddy_scores.items()],
+            key=lambda x: (-x[1], x[0])
+        )
+        return ranked
+
+    def find_path(self, student_a, student_b):
+        """
+        Finds the shortest path (BFS) between two student nodes in the graph.
+        Demonstrates the "six degrees of separation" concept.
+
+        Returns a list of node keys representing the path from student_a to
+        student_b (e.g. ['student:小明', 'interest:篮球', 'student:小红']).
+        Returns None if no path exists between the two students.
+        """
+        start = self.node("student", student_a)
+        end = self.node("student", student_b)
+
+        if start not in self.graph or end not in self.graph:
+            return None
+        if start == end:
+            return [start]
+
+        # BFS with path tracking
+        queue = deque([(start, [start])])
+        visited = {start}
+
+        while queue:
+            current, path = queue.popleft()
+
+            for neighbor in self.graph[current]:
+                if neighbor in visited:
+                    continue
+                new_path = path + [neighbor]
+                if neighbor == end:
+                    return new_path
+                visited.add(neighbor)
+                queue.append((neighbor, new_path))
+
+        return None  # No path found (disconnected graph)
+
     def connected_components(self):
         """
         Finds all connected components (isolated communities) in the campus graph.

@@ -15,9 +15,9 @@ def generate_data():
     
     interests = sports_interests + arts_interests + tech_interests + social_interests
 
-    # Generate 1,500 unique student names
+    # Generate 1,499 unique student names
     students = set()
-    while len(students) < 1500:
+    while len(students) < 1499:
         if random.random() > 0.3:
             name = random.choice(surnames) + random.choice(given_names) + random.choice(given_names)
         else:

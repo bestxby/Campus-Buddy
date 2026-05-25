@@ -1,7 +1,13 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [vue()],
-  base: './', // Ensures assets are loaded correctly on GitHub Pages
+  base: './', // Ensures assets load correctly on GitHub Pages
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+    },
+  },
 });
