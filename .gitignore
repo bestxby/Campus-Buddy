@@ -1,0 +1,21 @@
+# Python caches
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+
+# Node.js dependencies & builds
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Editor directories
+.vscode/
+.idea/
+.DS_Store
+
+# Local Mock Database files (large CSVs)
+data/*.csv
+frontend/public/graph_data.json
