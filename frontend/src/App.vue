@@ -12,32 +12,30 @@
       <form @submit.prevent="submitRegistration" class="login-form">
         <!-- Basic Info -->
         <div class="form-split-row">
-          <!-- Left Column: Name & Student ID stacked -->
+          <!-- Left Column: Name -->
           <div class="form-left-col">
             <div class="form-group">
               <label class="label-bold">👤 请输入您的姓名 (Your Name)</label>
               <input v-model="regForm.name" placeholder="请输入姓名或代号..." required />
             </div>
-            <div class="form-group">
-              <label class="label-bold">🆔 请输入您的学号 (Student ID)</label>
-              <input v-model="regForm.studentId" placeholder="请输入您的学号..." required />
-            </div>
           </div>
           
           <!-- Right Column: Avatar picker -->
           <div class="form-right-col">
-            <label class="label-bold">🤖 选择您的头像 (Avatar)</label>
-            <div class="avatar-picker-grid">
-              <button 
-                v-for="av in avatarOptions" 
-                :key="av" 
-                type="button"
-                class="avatar-picker-btn"
-                :class="{ 'avatar-active': regForm.avatar === av }"
-                @click="regForm.avatar = av"
-              >
-                {{ av }}
-              </button>
+            <div class="form-group">
+              <label class="label-bold">🤖 选择您的头像 (Avatar)</label>
+              <div class="avatar-picker-grid">
+                <button 
+                  v-for="av in avatarOptions" 
+                  :key="av" 
+                  type="button"
+                  class="avatar-picker-btn"
+                  :class="{ 'avatar-active': regForm.avatar === av }"
+                  @click="regForm.avatar = av"
+                >
+                  {{ av }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -50,7 +48,6 @@
             <div class="live-info-preview">
               <div class="live-name-preview">
                 {{ regForm.name || '等待输入姓名...' }}
-                <span v-if="regForm.studentId" class="live-id-badge">#{{ regForm.studentId }}</span>
               </div>
               <div class="live-persona-preview" :class="previewPersonaClass">{{ previewPersona }}</div>
             </div>
@@ -148,65 +145,89 @@
   <div v-else class="dashboard">
     <!-- Left Sidebar: Graph Info & Live Actions -->
     <aside class="sidebar" :style="{ width: sidebarWidth + 'px' }">
-      <div class="logo">
-        <span class="icon">🧭</span>
-        <h1>Campus Buddy</h1>
+      <!-- ═══ LOGO BANNER ═══ -->
+      <div class="sidebar-logo-banner">
+        <div class="sidebar-logo-icon">🧭</div>
+        <div class="sidebar-logo-text">
+          <div class="sidebar-logo-title">Campus Buddy</div>
+          <div class="sidebar-logo-sub">校园社交智能推荐系统</div>
+        </div>
       </div>
 
-      <!-- Current User Profile Card -->
-      <div class="profile-panel card glow-orange">
-        <div class="profile-header">
-          <h3>👤 我的主页 (My Profile)</h3>
-          <button @click="logout" class="logout-btn">注销</button>
+      <!-- ═══ USER PROFILE CARD ═══ -->
+      <div class="profile-card">
+        <!-- Avatar + Name block -->
+        <div class="profile-card-top">
+          <div class="profile-avatar-wrap">
+            <span class="profile-avatar-big">{{ currentUserAvatar || '🧭' }}</span>
+            <div class="profile-avatar-ring"></div>
+          </div>
+          <div class="profile-card-meta">
+            <div class="profile-name">{{ currentUser }}</div>
+            <div class="profile-persona-badge" :class="personaBadgeClass">{{ userPersona }}</div>
+          </div>
+          <button @click="logout" class="logout-btn" title="注销">⏻</button>
         </div>
-        <div class="profile-info">
-          <div class="info-avatar-row">
-            <span class="profile-avatar">{{ currentUserAvatar || '🧭' }}</span>
-            <div class="profile-texts">
-              <div class="info-row">
-                <span>姓名:</span>
-                <span class="text-orange font-bold">{{ currentUser }}</span>
-              </div>
-              <div v-if="currentUserId" class="info-row">
-                <span>学号:</span>
-                <span class="text-secondary font-bold">{{ currentUserId }}</span>
-              </div>
-              <div class="info-row">
-                <span>兴趣画像:</span>
-                <span class="text-cyan font-bold">{{ userPersona }}</span>
-              </div>
+
+        <!-- Interest tags strip -->
+        <div class="profile-interests-strip" v-if="userInterestTags.length">
+          <span v-for="tag in userInterestTags.slice(0, 6)" :key="tag" class="profile-interest-chip">{{ tag }}</span>
+          <span v-if="userInterestTags.length > 6" class="profile-interest-chip chip-more">+{{ userInterestTags.length - 6 }}</span>
+        </div>
+
+        <!-- Domain distribution bars -->
+        <div class="domain-bars">
+          <div class="domain-bar-row" v-for="d in domainDistribution" :key="d.label">
+            <span class="domain-bar-label">{{ d.icon }} {{ d.label }}</span>
+            <div class="domain-bar-track">
+              <div class="domain-bar-fill" :style="{ width: d.pct + '%', background: d.color }"></div>
+            </div>
+            <span class="domain-bar-count" :style="{ color: d.color }">{{ d.count }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ STATS GRID ═══ -->
+      <div class="stats-grid-panel">
+        <div class="stats-grid-title">📡 图谱规模 (Graph Scale)</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-icon" style="color: #ffb74d">👥</div>
+            <div class="stat-card-val" style="color: #ffb74d">{{ stats.studentsCount }}</div>
+            <div class="stat-card-label">学生节点</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon" style="color: #22d3ee">🏷️</div>
+            <div class="stat-card-val" style="color: #22d3ee">{{ stats.interestsCount }}</div>
+            <div class="stat-card-label">兴趣类型</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon" style="color: #a78bfa">🎉</div>
+            <div class="stat-card-val" style="color: #a78bfa">{{ stats.activitiesCount }}</div>
+            <div class="stat-card-label">活动数量</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon" style="color: #34d399">🔗</div>
+            <div class="stat-card-val" style="color: #34d399">{{ stats.componentsCount }}</div>
+            <div class="stat-card-label">连通社区</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SIGNED-UP ACTIVITIES TIMELINE ═══ -->
+      <div class="activities-timeline-panel">
+        <div class="timeline-title">✅ 已报名活动</div>
+        <div v-if="signedUpActivities.length" class="timeline-list">
+          <div v-for="(act, idx) in signedUpActivities" :key="act" class="timeline-item">
+            <div class="timeline-dot" :style="{ animationDelay: idx * 0.08 + 's' }"></div>
+            <div class="timeline-content">
+              <span class="timeline-act-name">{{ act }}</span>
             </div>
           </div>
         </div>
-        
-        <div class="registered-list">
-          <h4>已报名的活动 (Signed Up):</h4>
-          <ul v-if="signedUpActivities.length">
-            <li v-for="act in signedUpActivities" :key="act" class="signed-item">
-              ✅ {{ act }}
-            </li>
-          </ul>
-          <p v-else class="empty-list-msg">尚未报名任何活动。</p>
-        </div>
-      </div>
-
-      <div class="stats-panel card">
-        <h3>📊 图结构分析 (Scale Stats)</h3>
-        <div class="stat-row">
-          <span>学生总数 (Students)</span>
-          <span class="stat-val text-orange">{{ stats.studentsCount }}</span>
-        </div>
-        <div class="stat-row">
-          <span>兴趣类型 (Interests)</span>
-          <span class="stat-val text-cyan">{{ stats.interestsCount }}</span>
-        </div>
-        <div class="stat-row">
-          <span>活动数量 (Activities)</span>
-          <span class="stat-val text-orange">{{ stats.activitiesCount }}</span>
-        </div>
-        <div class="stat-row">
-          <span>连通社区 (Communities)</span>
-          <span class="stat-val text-cyan">{{ stats.componentsCount }}</span>
+        <div v-else class="timeline-empty">
+          <span class="timeline-empty-icon">🌱</span>
+          <span>还没有报名任何活动，去探索吧！</span>
         </div>
       </div>
 
@@ -459,7 +480,7 @@
               
               <div class="limit-slider-group">
                 <span class="slider-label">👥 推荐搭子限额: {{ topBuddiesLimit }}人</span>
-                <input type="range" min="1" max="40" step="1" v-model.number="topBuddiesLimit" class="neon-slider" />
+                <input type="range" min="0" max="40" step="1" v-model.number="topBuddiesLimit" class="neon-slider" />
               </div>
             </div>
             
@@ -514,9 +535,7 @@ const stats = reactive({
 });
 
 
-
-// 50 Interests categorized
-// 30 Interests categorized
+// Interest categories (30 tags across 4 domains)
 const interestCategories = {
   sports: ["篮球", "足球", "羽毛球", "网球", "游泳", "乒乓球", "排球"],
   arts: ["摄影", "读书", "电影", "音乐", "绘画", "棋类", "桌游", "书法"],
@@ -526,14 +545,12 @@ const interestCategories = {
 
 // Registration overlay
 const currentUser = ref<string | null>(null);
-const currentUserId = ref<string | null>(null);
 const currentUserAvatar = ref<string>('🚀');
 const userPersona = ref<string>('未知');
 const signedUpActivities = ref<string[]>([]);
 
 const regForm = reactive({
   name: '',
-  studentId: '',
   avatar: '🚀',
   selectedInterests: [] as string[]
 });
@@ -541,9 +558,8 @@ const regForm = reactive({
 // Replaced soccer ball '⚽' with gamepad '🎮', added headphones '🎧' & brain '🧠', removed first '👾'
 const avatarOptions = ['🚀', '💻', '🎨', '🎮', '🧭', '🎧', '🧠'];
 
-// Resizable layout widths
+// Resizable sidebar width
 const sidebarWidth = ref(330);
-const resultsWidth = ref(450);
 
 // Canvas rendering state
 const isCanvasRendered = ref(false);
@@ -601,28 +617,12 @@ const startSidebarResize = (e: MouseEvent) => {
   document.body.style.userSelect = 'none';
 };
 
-const startResultsResize = (e: MouseEvent) => {
-  activeResizer = 'results';
-  startX = e.clientX;
-  startWidth = resultsWidth.value;
-  document.addEventListener('mousemove', onMouseMove);
-  document.addEventListener('mouseup', onMouseUp);
-  document.body.style.userSelect = 'none';
-};
-
 const onMouseMove = (e: MouseEvent) => {
   if (!activeResizer) return;
   const deltaX = e.clientX - startX;
   if (activeResizer === 'sidebar') {
     const newWidth = startWidth + deltaX;
-    if (newWidth >= 250 && newWidth <= 450) {
-      sidebarWidth.value = newWidth;
-    }
-  } else if (activeResizer === 'results') {
-    const newWidth = startWidth + deltaX;
-    if (newWidth >= 300 && newWidth <= 800) {
-      resultsWidth.value = newWidth;
-    }
+    if (newWidth >= 250 && newWidth <= 450) sidebarWidth.value = newWidth;
   }
 };
 
@@ -631,7 +631,6 @@ const onMouseUp = () => {
   document.removeEventListener('mousemove', onMouseMove);
   document.removeEventListener('mouseup', onMouseUp);
   document.body.style.userSelect = '';
-  drawGraph();
 };
 
 const searchQuery = ref('');
@@ -642,36 +641,29 @@ const activeStudent = ref<string | null>(null);
 const matchedFriends = computed(() => {
   const query = searchFriendQuery.value.trim().toLowerCase();
   if (!query) return [];
-  
-  const results = [];
+
+  const activeNode = nodeKey('student', activeStudent.value || '');
+  const selfInterests = new Set(getNodeInterests(activeNode));
+
+  const results: { name: string; sharedCount: number; sharedInterests: string[] }[] = [];
   for (const node of graph.value.keys()) {
-    if (node.startsWith('student:')) {
-      const name = node.replace('student:', '');
-      if (name === activeStudent.value) continue;
-      
-      if (name.toLowerCase().includes(query)) {
-        const sNode = nodeKey('student', activeStudent.value || '');
-        const oNode = nodeKey('student', name);
-        const sInterests = Array.from(graph.value.get(sNode) || []).filter(i => i.startsWith('interest:'));
-        const oInterests = Array.from(graph.value.get(oNode) || []).filter(i => i.startsWith('interest:'));
-        const shared = sInterests.filter(x => oInterests.includes(x)).map(x => x.replace('interest:', ''));
-        
-        results.push({
-          name,
-          sharedCount: shared.length,
-          sharedInterests: shared
-        });
-      }
-    }
+    if (!node.startsWith('student:')) continue;
+    const name = node.slice('student:'.length);
+    if (name === activeStudent.value) continue;
+    if (!name.toLowerCase().includes(query)) continue;
+
+    const shared = getNodeInterests(node)
+      .filter(i => selfInterests.has(i))
+      .map(i => i.replace('interest:', ''));
+    results.push({ name, sharedCount: shared.length, sharedInterests: shared });
   }
-  
-  results.sort((a, b) => {
-    if (b.sharedCount !== a.sharedCount) {
-      return b.sharedCount - a.sharedCount;
-    }
-    return a.name.localeCompare(b.name);
-  });
-  
+
+  results.sort((a, b) =>
+    b.sharedCount !== a.sharedCount
+      ? b.sharedCount - a.sharedCount
+      : a.name.localeCompare(b.name)
+  );
+
   return results.slice(0, 30);
 });
 
@@ -712,17 +704,7 @@ const resetZoom = () => {
 // Live Preview Persona Card computed helpers
 const previewPersona = computed(() => {
   if (regForm.selectedInterests.length === 0) return '待生成画像...';
-  
-  const sportsCount = regForm.selectedInterests.filter(x => interestCategories.sports.includes(x)).length;
-  const techCount = regForm.selectedInterests.filter(x => interestCategories.tech.includes(x)).length;
-  const artsCount = regForm.selectedInterests.filter(x => interestCategories.arts.includes(x)).length;
-  const socialCount = regForm.selectedInterests.filter(x => interestCategories.social.includes(x)).length;
-
-  const max = Math.max(sportsCount, techCount, artsCount, socialCount);
-  if (max === techCount) return '科技极客 (Tech Geek)';
-  if (max === sportsCount) return '运动健将 (Sports Fan)';
-  if (max === artsCount) return '文艺青年 (Creative Artist)';
-  return '社交达人 (Social Hub)';
+  return computePersona(regForm.selectedInterests);
 });
 
 const previewPersonaClass = computed(() => {
@@ -733,10 +715,57 @@ const previewPersonaClass = computed(() => {
   return 'text-green';
 });
 
+// Sidebar: current user's interest tags (recovered from localStorage on login)
+const userInterestTags = computed((): string[] => {
+  if (!currentUser.value) return [];
+  const sNode = `student:${currentUser.value}`;
+  return Array.from(graph.value.get(sNode) || [])
+    .filter(n => n.startsWith('interest:'))
+    .map(n => n.replace('interest:', ''));
+});
+
+// Sidebar: domain distribution bar chart data
+const domainDistribution = computed(() => {
+  const tags = userInterestTags.value;
+  const total = tags.length || 1;
+  return [
+    { label: '运动', icon: '⚽', count: tags.filter(t => interestCategories.sports.includes(t)).length, color: '#22d3ee' },
+    { label: '艺术', icon: '🎨', count: tags.filter(t => interestCategories.arts.includes(t)).length, color: '#f472b6' },
+    { label: '科技', icon: '💻', count: tags.filter(t => interestCategories.tech.includes(t)).length, color: '#ffb74d' },
+    { label: '社交', icon: '🤝', count: tags.filter(t => interestCategories.social.includes(t)).length, color: '#34d399' },
+  ].map(d => ({ ...d, pct: Math.round((d.count / total) * 100) }));
+});
+
+// Sidebar: persona badge CSS class
+const personaBadgeClass = computed(() => {
+  const p = userPersona.value;
+  if (p.includes('Tech')) return 'badge-orange';
+  if (p.includes('Sports')) return 'badge-cyan';
+  if (p.includes('Creative')) return 'badge-pink';
+  return 'badge-green';
+});
+
+// Shared helper: get interest nodes adjacent to a graph node (as raw 'interest:X' strings)
+const getNodeInterests = (nodeId: string): string[] =>
+  Array.from(graph.value.get(nodeId) || []).filter(n => n.startsWith('interest:'));
+
+// Shared helper: compute persona label from an interest selection array
+const computePersona = (interests: string[]): string => {
+  const sportsCount = interests.filter(x => interestCategories.sports.includes(x)).length;
+  const techCount   = interests.filter(x => interestCategories.tech.includes(x)).length;
+  const artsCount   = interests.filter(x => interestCategories.arts.includes(x)).length;
+  const socialCount = interests.filter(x => interestCategories.social.includes(x)).length;
+  const max = Math.max(sportsCount, techCount, artsCount, socialCount);
+  if (max === techCount)   return '科技极客 (Tech Geek)';
+  if (max === sportsCount) return '运动健将 (Sports Fan)';
+  if (max === artsCount)   return '文艺青年 (Creative Artist)';
+  return '社交达人 (Social Hub)';
+};
+
 // Node Key Formatter
 const nodeKey = (kind: string, name: string) => `${kind}:${name}`;
 
-// Active filter interest name (e.g. "全部", "Python", etc.)
+// Active filter interest name
 const activeFilter = ref('全部');
 
 // Dynamic filter tabs (current student's interests)
@@ -779,19 +808,18 @@ const isGroupExpanded = (interestName: string) => {
 };
 
 // Buddies registered for a given activity
-const getBuddiesForActivity = (studentName: string, activityName: string) => {
+const getBuddiesForActivity = (studentName: string, activityName: string): string[] => {
   const actNode = nodeKey('activity', activityName);
-  
-  // Get all students registered for this activity
-  const registeredStudents = Array.from(graph.value.get(actNode) || [])
-    .filter(n => n.startsWith('student:'))
-    .map(n => n.replace('student:', ''));
-  
-  // Get all buddies of this student
-  const studentBuddies = recommendations.buddies;
-  
-  // Return intersection
-  return registeredStudents.filter(b => studentBuddies.includes(b));
+  const actNeighbors = graph.value.get(actNode) || new Set<string>();
+  const buddySet = new Set(recommendations.buddies);
+  const result: string[] = [];
+  for (const n of actNeighbors) {
+    if (n.startsWith('student:')) {
+      const name = n.slice('student:'.length);
+      if (buddySet.has(name)) result.push(name);
+    }
+  }
+  return result;
 };
 
 // Toggle tags in overlay questionnaire
@@ -882,19 +910,12 @@ const runRecommendations = (student: string) => {
   recommendations.buddies = Array.from(matchedBuddies).sort();
 };
 
-// Retrieve shared interest between two nodes
-const getSharedInterest = (student: string, other: string, otherType: 'student' | 'activity') => {
-  const sNode = nodeKey('student', student);
-  const oNode = nodeKey(otherType, other);
-  
-  const sInterests = Array.from(graph.value.get(sNode) || []).filter(i => i.startsWith('interest:'));
-  const oInterests = Array.from(graph.value.get(oNode) || []).filter(i => i.startsWith('interest:'));
-  
-  const intersection = sInterests.filter(x => oInterests.includes(x));
-  if (intersection.length > 0) {
-    return intersection[0].replace('interest:', '');
-  }
-  return '';
+// Retrieve first shared interest label between two nodes
+const getSharedInterest = (student: string, other: string, otherType: 'student' | 'activity'): string => {
+  const sInterests = getNodeInterests(nodeKey('student', student));
+  const oInterests = new Set(getNodeInterests(nodeKey(otherType, other)));
+  const match = sInterests.find(x => oInterests.has(x));
+  return match ? match.replace('interest:', '') : '';
 };
 
 // Login and questionnaire submission
@@ -906,30 +927,14 @@ const submitRegistration = () => {
   currentUser.value = name;
   localStorage.setItem('campus_buddy_user', name);
   
-  // Set student ID if provided
-  const studentId = regForm.studentId.trim();
-  if (studentId) {
-    currentUserId.value = studentId;
-    localStorage.setItem('campus_buddy_student_id', studentId);
-  }
-
   // Set avatar
   currentUserAvatar.value = regForm.avatar;
   localStorage.setItem('campus_buddy_avatar', regForm.avatar);
 
-  // Setup user persona based on major selection count
-  const sportsCount = regForm.selectedInterests.filter(x => interestCategories.sports.includes(x)).length;
-  const techCount = regForm.selectedInterests.filter(x => interestCategories.tech.includes(x)).length;
-  const artsCount = regForm.selectedInterests.filter(x => interestCategories.arts.includes(x)).length;
-  const socialCount = regForm.selectedInterests.filter(x => interestCategories.social.includes(x)).length;
-
-  const max = Math.max(sportsCount, techCount, artsCount, socialCount);
-  if (max === techCount) userPersona.value = '科技极客 (Tech Geek)';
-  else if (max === sportsCount) userPersona.value = '运动健将 (Sports Fan)';
-  else if (max === artsCount) userPersona.value = '文艺青年 (Creative Artist)';
-  else userPersona.value = '社交达人 (Social Hub)';
-  
-  localStorage.setItem('campus_buddy_persona', userPersona.value);
+  // Setup user persona
+  const personaLabel = computePersona(regForm.selectedInterests);
+  userPersona.value = personaLabel;
+  localStorage.setItem('campus_buddy_persona', personaLabel);
 
   // Save interests to localStorage and add to graph
   localStorage.setItem('campus_buddy_interests', JSON.stringify(regForm.selectedInterests));
@@ -949,13 +954,11 @@ const submitRegistration = () => {
 const logout = () => {
   localStorage.clear();
   currentUser.value = null;
-  currentUserId.value = null;
-  currentUserAvatar.value = '🧭';
+  currentUserAvatar.value = '🚀';
   userPersona.value = '未知';
   signedUpActivities.value = [];
   regForm.selectedInterests = [];
   regForm.name = '';
-  regForm.studentId = '';
   regForm.avatar = '🚀';
   clearSearch();
   // Reload base graph
@@ -1022,11 +1025,7 @@ const loadMockData = async () => {
       currentUserAvatar.value = localStorage.getItem('campus_buddy_avatar') || '🧭';
       userPersona.value = localStorage.getItem('campus_buddy_persona') || '普通同学';
       
-      const savedId = localStorage.getItem('campus_buddy_student_id');
-      if (savedId) {
-        currentUserId.value = savedId;
-        regForm.studentId = savedId;
-      }
+
       
       const savedInterests = JSON.parse(localStorage.getItem('campus_buddy_interests') || '[]');
       const sNode = nodeKey('student', savedUser);
@@ -1088,8 +1087,6 @@ const clearSearch = () => {
   showUpdatePrompt.value = false;
 };
 
-
-
 // Watch active student changes to update visualization and reset filter
 watch(activeStudent, () => {
   activeFilter.value = '全部';
@@ -1146,7 +1143,7 @@ const drawGraph = () => {
           addedNodes.add(neighbor);
           nodesToDraw.push({ id: neighbor, type: 'activity', name: name });
         }
-        linksToDraw.push({ source: focalNode, target: neighbor });
+        linksToDraw.push({ source: focalNode, target: neighbor, type: 'registration-active' });
         continue;
       }
       
@@ -1259,6 +1256,7 @@ const drawGraph = () => {
     .enter()
     .append('line')
     .attr('stroke', (d: any) => {
+      if (d.type === 'registration-active') return 'rgba(74, 222, 128, 0.9)'; // Bright green for direct signups!
       if (d.type === 'registration') return 'rgba(253, 151, 31, 0.45)';
       const sType = typeof d.source === 'object' ? d.source.type : (d.source.startsWith('student:') ? 'student' : (d.source.startsWith('activity:') ? 'activity' : 'interest'));
       const tType = typeof d.target === 'object' ? d.target.type : (d.target.startsWith('student:') ? 'student' : (d.target.startsWith('activity:') ? 'activity' : 'interest'));
@@ -1268,10 +1266,12 @@ const drawGraph = () => {
       return 'rgba(255, 255, 255, 0.08)';
     })
     .attr('stroke-dasharray', (d: any) => {
+      if (d.type === 'registration-active') return '4,4'; // Dashed line for active signup
       if (d.type === 'registration') return '3,3';
       return null;
     })
     .attr('stroke-width', (d: any) => {
+      if (d.type === 'registration-active') return 2.5; // Thicker for active registration
       if (d.type === 'registration') return 1.5;
       const sType = typeof d.source === 'object' ? d.source.type : (d.source.startsWith('student:') ? 'student' : (d.source.startsWith('activity:') ? 'activity' : 'interest'));
       const tType = typeof d.target === 'object' ? d.target.type : (d.target.startsWith('student:') ? 'student' : (d.target.startsWith('activity:') ? 'activity' : 'interest'));
@@ -1367,12 +1367,16 @@ const drawGraph = () => {
           const aInterests = Array.from(graph.value.get(aNode) || []).filter(i => i.startsWith('interest:'));
           const shared = sInterests.filter(x => aInterests.includes(x)).map(x => x.replace('interest:', ''));
           
-          const isReg = signedUpActivities.value.includes(d.name);
-          let details = `【活动推荐】基于您的兴趣「${shared.join('、')}」向您匹配推荐。`;
-          if (isReg) {
-            details += ` 您已成功报名此活动，已建立直接人脉连结！`;
+          const hasReg = graph.value.get(sNode)?.has(aNode);
+          let details = `【活动推荐】基于该同学的兴趣「${shared.join('、')}」向其匹配推荐。`;
+          if (hasReg) {
+            details = `【已报名活动】${activeStudent.value === currentUser.value ? '您' : activeStudent.value}已成功报名此活动，在图上以绿色虚线直接连接。`;
           } else {
-            details += ` 您尚未报名该活动，一键报名后可在图中建立连结！`;
+            if (activeStudent.value === currentUser.value) {
+              details = `【活动推荐】基于您的兴趣「${shared.join('、')}」向您匹配推荐。您尚未报名该活动，一键报名后可在图中建立绿色连接！`;
+            } else {
+              details = `【活动推荐】基于该同学的兴趣「${shared.join('、')}」向其匹配推荐。目前尚未报名该活动。`;
+            }
           }
           
           hoveredConnectionDetail.value = {
@@ -1428,10 +1432,22 @@ const drawGraph = () => {
       if (d.id === nodeKey('student', activeStudent.value || '')) return '#ec4899'; // Selected student: vibrant neon pink/rose
       if (d.type === 'student') return '#fd971f'; // Sublime Orange
       if (d.type === 'interest') return '#3b82f6'; // Deep blue
+      if (d.type === 'activity') {
+        const studentKey = nodeKey('student', activeStudent.value || '');
+        if (graph.value.get(studentKey)?.has(d.id)) {
+          return '#4ade80'; // Bright neon green for signed-up activities!
+        }
+      }
       return '#06b6d4'; // Cyan
     })
     .attr('stroke', (d) => {
       if (d.id === nodeKey('student', activeStudent.value || '')) return '#facc15'; // Yellow neon halo
+      if (d.type === 'activity') {
+        const studentKey = nodeKey('student', activeStudent.value || '');
+        if (graph.value.get(studentKey)?.has(d.id)) {
+          return '#22c55e'; // Darker green outline for signed-up activity
+        }
+      }
       return '#0f172a';
     })
     .attr('stroke-width', (d) => {
@@ -1440,6 +1456,12 @@ const drawGraph = () => {
     })
     .attr('class', (d) => {
       if (d.id === nodeKey('student', activeStudent.value || '')) return 'node-focal-pulse';
+      if (d.type === 'activity') {
+        const studentKey = nodeKey('student', activeStudent.value || '');
+        if (graph.value.get(studentKey)?.has(d.id)) {
+          return 'glow-green';
+        }
+      }
       return d.type === 'interest' ? 'glow-cyan' : 'glow-orange';
     })
     .style('cursor', 'pointer');
@@ -1618,31 +1640,64 @@ onMounted(() => {
   background-color: var(--bg-color);
 }
 
+/* ══════════════════════════════════════════
+   SIDEBAR - Logo Banner
+══════════════════════════════════════════ */
 .sidebar {
   width: 330px;
-  background-color: var(--panel-bg);
-  border-right: 1px solid var(--border-color);
-  padding: 24px;
+  background: linear-gradient(180deg, #0e1422 0%, #0b0f19 100%);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
   box-sizing: border-box;
   overflow-y: auto;
 }
 
-.logo {
+.sidebar-logo-banner {
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 20px 20px 18px;
+  background: linear-gradient(135deg, rgba(253,151,31,0.12) 0%, rgba(6,182,212,0.06) 100%);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  overflow: hidden;
 }
-.logo h1 {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0;
-  letter-spacing: -0.5px;
+.sidebar-logo-banner::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -20px;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(253,151,31,0.15) 0%, transparent 70%);
+  pointer-events: none;
 }
-.logo .icon {
-  font-size: 24px;
+.sidebar-logo-icon {
+  font-size: 32px;
+  filter: drop-shadow(0 0 12px rgba(253,151,31,0.5));
+  animation: floatIcon 3s ease-in-out infinite;
+}
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.sidebar-logo-title {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  background: linear-gradient(90deg, #ffb74d, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.sidebar-logo-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 2px;
+  letter-spacing: 0.3px;
 }
 
 .card {
@@ -1652,99 +1707,317 @@ onMounted(() => {
   padding: 16px;
 }
 
-/* Profile Panel Styles */
-.profile-panel {
-  background-color: rgba(253, 151, 31, 0.02);
+/* ══════════════════════════════════════════
+   SIDEBAR - Profile Card
+══════════════════════════════════════════ */
+.profile-card {
+  margin: 14px 14px 0;
+  background: linear-gradient(135deg, rgba(253,151,31,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid rgba(253,151,31,0.2);
+  border-radius: 14px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
 }
-.profile-header {
+.profile-card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle, rgba(253,151,31,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Avatar + Name row */
+.profile-card-top {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 12px;
 }
-.profile-header h3 {
-  font-size: 13px;
-  margin: 0;
-  color: var(--accent-orange);
+.profile-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
 }
+.profile-avatar-big {
+  font-size: 36px;
+  line-height: 1;
+  display: block;
+  filter: drop-shadow(0 0 10px rgba(253,151,31,0.4));
+}
+.profile-avatar-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, rgba(253,151,31,0.6), rgba(6,182,212,0.4)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  animation: spinRing 4s linear infinite;
+}
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.profile-card-meta {
+  flex: 1;
+  min-width: 0;
+}
+.profile-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffb74d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.profile-persona-badge {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+.badge-orange { background: rgba(253,151,31,0.15); color: #ffb74d; border: 1px solid rgba(253,151,31,0.3); }
+.badge-cyan   { background: rgba(6,182,212,0.12);  color: #22d3ee; border: 1px solid rgba(6,182,212,0.3); }
+.badge-pink   { background: rgba(244,114,182,0.12);color: #f472b6; border: 1px solid rgba(244,114,182,0.3); }
+.badge-green  { background: rgba(52,211,153,0.12); color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
+
+/* Power / logout button */
 .logout-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 11px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  color: rgba(239,68,68,0.6);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
 }
 .logout-btn:hover {
+  background: rgba(239,68,68,0.18);
   color: #ef4444;
+  border-color: rgba(239,68,68,0.5);
+  box-shadow: 0 0 10px rgba(239,68,68,0.2);
 }
-.profile-info {
+
+/* Interest chips strip */
+.profile-interests-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.profile-interest-chip {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  transition: all 0.2s;
+}
+.profile-interest-chip:hover {
+  background: rgba(253,151,31,0.1);
+  border-color: rgba(253,151,31,0.3);
+  color: #ffb74d;
+}
+.chip-more {
+  background: rgba(253,151,31,0.08);
+  border-color: rgba(253,151,31,0.2);
+  color: #ffb74d;
+}
+
+/* Domain distribution bars */
+.domain-bars {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 12px;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 10px;
-  margin-bottom: 10px;
+  gap: 7px;
 }
-.info-row {
+.domain-bar-row {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 7px;
 }
-.font-bold {
-  font-weight: bold;
+.domain-bar-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  width: 40px;
+  flex-shrink: 0;
 }
-.registered-list h4 {
-  font-size: 11px;
-  margin: 0 0 6px 0;
-  color: var(--text-secondary);
+.domain-bar-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 3px;
+  overflow: hidden;
 }
-.registered-list ul {
-  margin: 0;
-  padding-left: 14px;
+.domain-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 6px currentColor;
 }
-.signed-item {
-  font-size: 11px;
-  margin-bottom: 4px;
-  list-style: none;
-}
-.empty-list-msg {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-.stats-panel h3, .register-panel h3 {
-  font-size: 13px;
-  margin-top: 0;
-  margin-bottom: 12px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.sandbox-desc {
-  font-size: 11px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  margin: 0 0 12px 0;
-}
-
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  margin-bottom: 6px;
-}
-.stat-row:last-child {
-  margin-bottom: 0;
-}
-
-.stat-val {
+.domain-bar-count {
+  font-size: 10px;
+  font-weight: 700;
   font-family: monospace;
-  font-weight: bold;
+  width: 14px;
+  text-align: right;
+  flex-shrink: 0;
 }
+
+/* ══════════════════════════════════════════
+   SIDEBAR - Stats Grid
+══════════════════════════════════════════ */
+.stats-grid-panel {
+  margin: 14px 14px 0;
+  background: rgba(255,255,255,0.015);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 14px;
+}
+.stats-grid-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 12px;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.stat-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.2s;
+  cursor: default;
+}
+.stat-card:hover {
+  background: rgba(255,255,255,0.06);
+  transform: translateY(-1px);
+}
+.stat-card-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+.stat-card-val {
+  font-size: 20px;
+  font-weight: 800;
+  font-family: 'Inter', monospace;
+  line-height: 1.1;
+}
+.stat-card-label {
+  font-size: 9px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════
+   SIDEBAR - Activities Timeline
+══════════════════════════════════════════ */
+.activities-timeline-panel {
+  margin: 14px 14px 14px;
+  background: rgba(255,255,255,0.015);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 14px;
+  flex: 1;
+}
+.timeline-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 12px;
+}
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  position: relative;
+  padding-bottom: 10px;
+}
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+.timeline-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 12px;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(52,211,153,0.3), transparent);
+}
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px rgba(52,211,153,0.5);
+  flex-shrink: 0;
+  margin-top: 2px;
+  animation: pulseDot 2s ease-in-out infinite;
+}
+@keyframes pulseDot {
+  0%, 100% { box-shadow: 0 0 6px rgba(52,211,153,0.4); }
+  50%       { box-shadow: 0 0 14px rgba(52,211,153,0.7); }
+}
+.timeline-content {
+  flex: 1;
+}
+.timeline-act-name {
+  font-size: 11px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.4;
+}
+.timeline-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 0;
+  color: rgba(255,255,255,0.25);
+  font-size: 11px;
+  text-align: center;
+}
+.timeline-empty-icon {
+  font-size: 24px;
+  opacity: 0.5;
+}
+
+/* ══════════════════════════════════════════
+   Kept utility classes
+══════════════════════════════════════════ */
 .text-orange { color: #ffb74d; }
-.text-cyan { color: #22d3ee; }
+.text-cyan   { color: #22d3ee; }
+.font-bold   { font-weight: bold; }
+.info-row    { display: flex; justify-content: space-between; }
 
 .divider {
   border: 0;
@@ -2304,7 +2577,7 @@ onMounted(() => {
   margin-bottom: 14px;
 }
 .form-left-col {
-  flex: 1.1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;

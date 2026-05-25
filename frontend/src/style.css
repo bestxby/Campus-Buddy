@@ -49,6 +49,9 @@ body {
 .glow-cyan {
   box-shadow: 0 0 15px var(--accent-cyan-glow);
 }
+.glow-green {
+  box-shadow: 0 0 15px rgba(74, 222, 128, 0.15);
+}
 
 /* Animation classes */
 .fade-in {
