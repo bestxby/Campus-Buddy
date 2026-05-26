@@ -1,0 +1,8 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SearchHeader.vue > renders correctly matches snapshot 1`] = `
+"<header data-v-754b8d8b="" class="header card">
+  <div data-v-754b8d8b="" class="search-box"><span data-v-754b8d8b="" class="search-icon">🔍</span><input data-v-754b8d8b="" placeholder="输入同学姓名进行实时两步推荐 (输入您的姓名或 小明)..."></div><!-- Autocomplete dropdown -->
+  <!--v-if-->
+</header>"
+`;

@@ -1,9 +1,11 @@
-import { logService, type LogEntry as ServiceLogEntry } from '@/services/LogService'
+import { useLogStore } from '@/stores/log'
+import { computed } from 'vue'
+import type { LogEntry } from '@/types'
 
-export type LogEntry = ServiceLogEntry
+export type { LogEntry }
 
-export const logs = logService.logs
+export const logs = computed(() => useLogStore().logs)
 
 export const addLog = (type: 'info' | 'action' | 'warning', message: string): void => {
-  logService.addLog(type, message)
+  useLogStore().addLog(type, message)
 }

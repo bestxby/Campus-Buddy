@@ -10,6 +10,13 @@
             <p>了解校园活动的报名热度。报名人数少于 5 人提示需多关注，多于 18 人为极高人气。针对需要多加关注的冷门活动，系统可以检索对该主题感兴趣但尚未知晓或未报名的同学，帮助管理员定向发送活动邀请，丰富其课外生活。</p>
           </div>
         </div>
+        <button 
+          @click="emit('create-activity')"
+          class="btn btn-xs btn-primary header-action-btn"
+          style="margin-left: auto;"
+        >
+          ➕ 发布新活动
+        </button>
       </div>
     </div>
     
@@ -69,6 +76,10 @@
 import { ref, computed } from 'vue'
 import { graph } from '@/composables/useGraph'
 import ActivityPromoPanel from './ActivityPromoPanel.vue'
+
+const emit = defineEmits<{
+  'create-activity': []
+}>()
 
 const selectedActivityForPromo = ref<string | null>(null)
 

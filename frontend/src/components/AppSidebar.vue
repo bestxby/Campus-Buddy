@@ -24,6 +24,7 @@
       v-if="currentUserRole === 'admin'"
       @logout="emit('logout')"
       @open-graph="(forceGlobal) => emit('open-graph', forceGlobal)"
+      @create-activity="emit('create-activity')"
     />
 
     <!-- Signed-up Activities Timeline Component (compact) - Student Only -->
@@ -56,7 +57,8 @@ import SidebarTimeline from '@/components/sidebar/SidebarTimeline.vue'
 const props = defineProps<{ width: number }>()
 const emit  = defineEmits<{ 
   logout: [],
-  'open-graph': [forceGlobal?: boolean]
+  'open-graph': [forceGlobal?: boolean],
+  'create-activity': []
 }>()
 </script>
 

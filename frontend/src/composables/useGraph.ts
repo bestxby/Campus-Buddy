@@ -1,27 +1,40 @@
-import { graphService } from '@/services/GraphService'
+import { useGraphStore } from '@/stores/graph'
+import { computed } from 'vue'
 import type { GraphStats, PathResult } from '@/types'
+import { findPath as pureFindPath, nodeKey as pureNodeKey } from '@/utils/graph-algorithms'
 
-export const graph = graphService.graph
+export const graph = computed(() => useGraphStore().graph)
 
-export const stats = graphService.stats
+export const stats = computed(() => useGraphStore().stats)
 
 export const nodeKey = (kind: string, name: string): string =>
-  graphService.nodeKey(kind, name)
+  pureNodeKey(kind, name)
 
-export const getNodeInterests = (nodeId: string): string[] =>
-  graphService.getNodeInterests(nodeId)
+export const getNodeInterests = (nodeId: string): string[] => {
+  const store = useGraphStore()
+  return Array.from(store.graph.get(nodeId) ?? []).filter(n => n.startsWith('interest:'))
+}
 
 export const addEdge = (u: string, v: string): void => {
-  graphService.addEdge(u, v)
+  useGraphStore().addEdge(u, v)
 }
 
 export const updateStats = (): void => {
-  graphService.updateStats()
+  useGraphStore().updateStats()
 }
 
 export const findPath = (studentA: string, studentB: string): PathResult | null =>
-  graphService.findPath(studentA, studentB)
+  pureFindPath(useGraphStore().graph, studentA, studentB)
 
 export const loadGraphData = async (): Promise<void> => {
-  await graphService.loadGraphData()
+  await useGraphStore().loadGraphData()
 }
+
+export const addActivity = (name: string, interests: string[]): void => {
+  useGraphStore().addActivity(name, interests)
+}
+
+export const deleteActivity = (name: string): void => {
+  useGraphStore().deleteActivity(name)
+}
+

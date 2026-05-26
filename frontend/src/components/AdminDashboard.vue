@@ -6,7 +6,7 @@
       <PopularInterestsCard />
 
       <!-- Grid Card 2: Activity Saturation Diagnostics & Precision Promo -->
-      <ActivitySaturationCard />
+      <ActivitySaturationCard @create-activity="emit('create-activity')" />
 
       <!-- Grid Card 3: Centrality Insights - Degree Centrality -->
       <DegreeCentralityCard />
@@ -28,6 +28,10 @@
 
 <script setup lang="ts">
 import { watch, onMounted } from 'vue'
+
+const emit = defineEmits<{
+  'create-activity': []
+}>()
 import { stats, graph } from '@/composables/useGraph'
 import { topSocialStudents, isolatedCount } from '@/composables/useGraphInsights'
 import { activeStudent } from '@/composables/useRecommendations'

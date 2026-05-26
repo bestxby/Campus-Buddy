@@ -4,7 +4,12 @@
 
   <!-- Main dashboard -->
   <div v-else class="dashboard">
-    <AppSidebar :width="sidebarWidth" @logout="onLogout" @open-graph="openGraph" />
+    <AppSidebar 
+      :width="sidebarWidth" 
+      @logout="onLogout" 
+      @open-graph="openGraph" 
+      @create-activity="showCreateActivity = true"
+    />
     <div class="layout-splitter vertical-splitter" @mousedown="startSidebarResize" />
 
     <main class="main-content">
@@ -20,7 +25,7 @@
       <div class="content-grid">
         <!-- Welcome screen / Admin Dashboard (no student selected) -->
         <template v-if="!activeStudent">
-          <AdminDashboard v-if="currentUserRole === 'admin'" />
+          <AdminDashboard v-if="currentUserRole === 'admin'" @create-activity="showCreateActivity = true" />
           <div v-else class="card welcome-card fade-in">
             <h2>👋 欢迎，{{ currentUser }}！</h2>
             <p>
@@ -67,6 +72,13 @@
 
     <!-- Fullscreen D3 Graph Modal -->
     <GraphModal ref="graphModalRef" />
+
+    <!-- Create Activity Modal -->
+    <CreateActivityModal 
+      :visible="showCreateActivity" 
+      @close="showCreateActivity = false"
+      @created="onActivityCreated"
+    />
   </div>
 </template>
 
@@ -78,10 +90,13 @@ import ActivityList  from '@/components/ActivityList.vue'
 import BuddyList     from '@/components/BuddyList.vue'
 import GraphModal    from '@/components/GraphModal.vue'
 import AdminDashboard from '@/components/AdminDashboard.vue'
+import CreateActivityModal from '@/components/admin/CreateActivityModal.vue'
 
 import { loadGraphData, updateStats } from '@/composables/useGraph'
 import { currentUser, restoreSession, currentUserRole } from '@/composables/useAuth'
 import { activeStudent, selectStudent, clearSearch } from '@/composables/useRecommendations'
+
+const showCreateActivity = ref(false)
 
 // ─── Graph Modal ───────────────────────────────────────────────────────────────
 const graphModalRef = ref<InstanceType<typeof GraphModal> | null>(null)
@@ -91,6 +106,12 @@ const openGraph     = (forceGlobal?: any) => {
 }
 
 // ─── Event handlers ────────────────────────────────────────────────────────────
+const onActivityCreated = () => {
+  if (graphModalRef.value) {
+    graphModalRef.value.redraw()
+  }
+}
+
 const onRegistered = () => {
   if (currentUser.value && currentUserRole.value !== 'admin') {
     selectStudent(currentUser.value)

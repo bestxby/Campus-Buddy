@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { graphService } from './GraphService'
+import { useGraphStore } from '@/stores/graph'
 
 export interface CentralityResult {
   name: string
@@ -29,7 +29,7 @@ export class GraphAnalyticsService {
 
   private constructor() {
     // Register recalculation callback to break circular dependencies!
-    graphService.registerOnStatsUpdate(() => {
+    useGraphStore().registerOnStatsUpdate(() => {
       this.recalculateGraphInsights()
     })
   }
@@ -43,7 +43,7 @@ export class GraphAnalyticsService {
 
   private calculateDegreeCentrality(): CentralityResult[] {
     const list: CentralityResult[] = []
-    const graph = graphService.graph.value
+    const graph = useGraphStore().graph
     for (const [node, neighbors] of graph.entries()) {
       if (node.startsWith('student:')) {
         const name = node.split(':')[1]
@@ -55,7 +55,7 @@ export class GraphAnalyticsService {
   }
 
   private calculateBetweennessCentrality(sampleSize = 50): CentralityResult[] {
-    const graph = graphService.graph.value
+    const graph = useGraphStore().graph
     const students = Array.from(graph.keys()).filter(n => n.startsWith('student:'))
     if (students.length === 0) return []
 
@@ -114,7 +114,7 @@ export class GraphAnalyticsService {
 
   private countIsolatedStudents(): number {
     let count = 0
-    const graph = graphService.graph.value
+    const graph = useGraphStore().graph
     for (const [node, neighbors] of graph.entries()) {
       if (node.startsWith('student:') && node !== 'student:系统管理员' && neighbors.size === 0) {
         count++
@@ -125,7 +125,7 @@ export class GraphAnalyticsService {
 
   private calculateIcebreakingPotential(): IcebreakingStat[] {
     const list: IcebreakingStat[] = []
-    const graph = graphService.graph.value
+    const graph = useGraphStore().graph
 
     for (const [node, neighbors] of graph.entries()) {
       if (!node.startsWith('activity:')) continue
@@ -189,7 +189,7 @@ export class GraphAnalyticsService {
       this.isolatedCount.value      = this.countIsolatedStudents()
 
       const list: InterestStat[] = []
-      const graph = graphService.graph.value
+      const graph = useGraphStore().graph
       for (const [node, neighbors] of graph.entries()) {
         if (node.startsWith('interest:')) {
           const name = node.slice('interest:'.length)

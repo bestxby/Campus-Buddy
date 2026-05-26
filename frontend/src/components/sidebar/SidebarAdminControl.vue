@@ -36,6 +36,22 @@
           </div>
           <span class="action-arrow">➔</span>
         </div>
+
+        <!-- 发布新活动卡片 (可点击) -->
+        <div 
+          @click="triggerCreateActivity" 
+          class="control-card action-card" 
+          style="--control-color: #34d399"
+        >
+          <div class="control-card-content">
+            <div class="control-card-header">
+              <span class="control-icon">➕</span>
+              <span class="control-label">发布校园新活动</span>
+            </div>
+            <span class="action-hint">创建新活动并设置相关兴趣圈标签</span>
+          </div>
+          <span class="action-arrow">➔</span>
+        </div>
       </div>
     </div>
 
@@ -104,7 +120,8 @@ const closeSuggestions = () => {
 
 const emit = defineEmits<{
   logout: [],
-  'open-graph': [forceGlobal?: boolean]
+  'open-graph': [forceGlobal?: boolean],
+  'create-activity': []
 }>()
 
 const triggerOpenGlobalGraph = () => {
@@ -113,6 +130,10 @@ const triggerOpenGlobalGraph = () => {
 
 const triggerOpenIndividualGraph = () => {
   emit('open-graph', false)
+}
+
+const triggerCreateActivity = () => {
+  emit('create-activity')
 }
 
 const triggerResetGraph = async () => {
