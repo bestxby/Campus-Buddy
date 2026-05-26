@@ -1,7 +1,7 @@
 <template>
   <div class="card result-card">
     <div class="result-card-header">
-      <h3>🌐 全校所有活动 (All Campus Activities)</h3>
+      <h3>🌐 全校所有活动</h3>
     </div>
 
     <div class="all-activities-container">
@@ -24,17 +24,18 @@
             :class="{ 'card-signed': isSignedUp(act.name) }"
           >
             <div class="activity-card-header-row">
-              <span class="activity-card-icon">🎉</span>
-              <h4 class="activity-card-title" :title="act.name">{{ act.name }}</h4>
-            </div>
-            
-            <div class="activity-card-tags">
-              <span 
-                v-for="tag in act.interests" 
-                :key="tag" 
-                class="activity-tag-chip"
-                :class="getTagClass(tag)"
-              ># {{ tag }}</span>
+              <div class="header-left">
+                <span class="activity-card-icon">🎉</span>
+                <h4 class="activity-card-title" :title="act.name">{{ act.name }}</h4>
+              </div>
+              <div class="activity-card-tags-right">
+                <span 
+                  v-for="tag in act.interests" 
+                  :key="tag" 
+                  class="activity-tag-chip"
+                  :class="getTagClass(tag)"
+                ># {{ tag }}</span>
+              </div>
             </div>
 
             <div class="activity-card-footer">
@@ -92,12 +93,10 @@ const handleSignUp = (activity: string) => {
 }
 
 const handleCancelSignUp = (activity: string) => {
-  if (confirm(`确定要取消报名活动【${activity}】吗？`)) {
-    cancelSignUpForActivity(activity)
-    addLog('action', `【取消报名】学生【${currentUser.value}】取消报名了活动【${activity}】`)
-    addLog('info', `推荐系统重算：已移除【${currentUser.value}】在社交图谱中的报名连线，关联推荐权重更新中...`)
-    emit('cancelled', activity)
-  }
+  cancelSignUpForActivity(activity)
+  addLog('action', `【取消报名】学生【${currentUser.value}】取消报名了活动【${activity}】`)
+  addLog('info', `推荐系统重算：已移除【${currentUser.value}】在社交图谱中的报名连线，关联推荐权重更新中...`)
+  emit('cancelled', activity)
 }
 
 const allActivities = computed(() => {
@@ -206,8 +205,24 @@ const getTagClass = (tag: string) => {
 }
 .activity-card-header-row {
   display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+.header-left {
+  display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+.activity-card-tags-right {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 .activity-card-icon {
   font-size: 14px;

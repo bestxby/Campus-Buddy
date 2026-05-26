@@ -1,7 +1,7 @@
 <template>
   <div class="card result-card">
     <div class="result-card-header">
-      <h3>🎯 智能推荐活动 (Recommended)</h3>
+      <h3>🎯 智能推荐活动</h3>
     </div>
 
     <!-- Interest Filter Tabs -->
@@ -26,10 +26,15 @@
         >
           <!-- Activity Title & Header -->
           <div class="activity-card-header-row">
-            <span class="activity-card-icon">🎯</span>
-            <div class="activity-title-area">
+            <div class="header-left">
+              <span class="activity-card-icon">🎯</span>
               <h4 class="activity-card-title" :title="act.name">{{ act.name }}</h4>
-              <span class="interest-source-badge">关联兴趣: {{ act.matchingInterest }}</span>
+            </div>
+            <div class="activity-card-tags-right">
+              <span 
+                class="activity-tag-chip"
+                :class="getTagClass(act.matchingInterest)"
+              ># {{ act.matchingInterest }}</span>
             </div>
           </div>
 
@@ -44,15 +49,7 @@
             </div>
           </div>
 
-          <!-- Matching domain chips -->
-          <div class="activity-card-tags" v-if="act.interests.length">
-            <span 
-              v-for="tag in act.interests" 
-              :key="tag" 
-              class="activity-tag-chip"
-              :class="getTagClass(tag)"
-            ># {{ tag }}</span>
-          </div>
+
 
           <!-- Buddy recommendation explanation -->
           <div class="match-reason" :class="act.buddiesSigned.length > 0 ? 'reason-buddies' : 'reason-interest'">
@@ -121,12 +118,10 @@ const handleSignUp = (activity: string) => {
 }
 
 const handleCancelSignUp = (activity: string) => {
-  if (confirm(`确定要取消报名活动【${activity}】吗？`)) {
-    cancelSignUpForActivity(activity)
-    addLog('action', `【取消报名】学生【${currentUser.value}】取消报名了活动【${activity}】`)
-    addLog('info', `推荐系统重算：已移除【${currentUser.value}】在社交图谱中的报名连线，关联推荐权重更新中...`)
-    emit('cancelled', activity)
-  }
+  cancelSignUpForActivity(activity)
+  addLog('action', `【取消报名】学生【${currentUser.value}】取消报名了活动【${activity}】`)
+  addLog('info', `推荐系统重算：已移除【${currentUser.value}】在社交图谱中的报名连线，关联推荐权重更新中...`)
+  emit('cancelled', activity)
 }
 
 // Build helper computed properties to gather activity tags, registration count, and buddies
@@ -227,7 +222,27 @@ const getTagClass = (tag: string) => {
   background: linear-gradient(135deg, rgba(74, 222, 128, 0.015) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
 }
 
-.activity-card-header-row { display: flex; align-items: center; gap: 8px; }
+.activity-card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+.activity-card-tags-right {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
 .activity-card-icon { font-size: 14px; }
 .activity-title-area { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .activity-card-title {
@@ -252,10 +267,10 @@ const getTagClass = (tag: string) => {
   white-space: nowrap;
 }
 .flow-step { display: inline-flex; align-items: center; gap: 4px; }
-.flow-node { font-size: 9px; padding: 2px 5px; border-radius: 4px; font-weight: 600; max-width: 100px; overflow: hidden; text-overflow: ellipsis; }
-.node-student { background-color: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2); color: #e9d5ff; }
-.node-interest { background-color: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #93c5fd; }
-.node-activity { background-color: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); color: #99f6e4; }
+.flow-node { font-size: 9px; padding: 2px 5px; border-radius: 4px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.node-student { background-color: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2); color: #e9d5ff; max-width: 80px; }
+.node-interest { background-color: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #93c5fd; max-width: 100px; }
+.node-activity { background-color: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); color: #99f6e4; max-width: none; }
 .flow-arrow { font-size: 8px; color: rgba(255,255,255,0.3); font-weight: bold; }
 
 .activity-card-tags { display: flex; flex-wrap: wrap; gap: 4px; }

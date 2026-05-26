@@ -17,8 +17,7 @@
       <!-- Read-only Banner (Student Only) -->
       <header v-if="currentUserRole !== 'admin'" class="card student-header-banner">
         <div class="student-header-title">
-          <span class="header-badge badge-orange">👤 学生看板</span>
-          <h2>个人社交推荐看板 (Personal Social Recommendation Dashboard)</h2>
+          <h2>个人社交推荐看板</h2>
         </div>
       </header>
 
@@ -53,7 +52,7 @@
           >
             <div class="student-card-content">
               <span class="btn-icon">🌌</span>
-              <span class="btn-text-content">查看我的关系网络拓扑图 (View My Relationship Network Topology)</span>
+              <span class="btn-text-content">查看我的关系网络拓扑图</span>
             </div>
             <span class="btn-arrow">➔</span>
           </div>

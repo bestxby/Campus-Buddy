@@ -1,8 +1,9 @@
 import { useRecommendationStore } from '@/stores/recommendation'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { BuddyResult, MatchedFriend, PathResult } from '@/types'
 import { useGraphStore } from '@/stores/graph'
 import { nodeKey } from '@/composables/useGraph'
+import { useAuthStore } from '@/stores/auth'
 
 // Domain state delegates to Pinia store with writable computed for pathResult
 export const pathResult = computed<PathResult | null>({
@@ -127,3 +128,20 @@ export const matchedFriends = computed((): MatchedFriend[] => {
   )
   return results.slice(0, 30)
 })
+
+watch(
+  () => {
+    try {
+      return useAuthStore().signedUpActivities
+    } catch {
+      return []
+    }
+  },
+  () => {
+    if (activeStudent.value) {
+      runRecommendations(activeStudent.value)
+    }
+  },
+  { deep: true }
+)
+
