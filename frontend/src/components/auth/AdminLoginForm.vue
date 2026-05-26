@@ -1,7 +1,7 @@
 <template>
   <div class="admin-form-section">
     <div class="form-group" style="margin-top: 15px;">
-      <label class="label-bold">🔑 请输入管理员安全密码</label>
+      <label class="label-bold">🛡️ 请输入管理员安全密码</label>
       <input
         type="password"
         v-model="adminPassword"
@@ -18,7 +18,7 @@
       class="btn btn-secondary glow-cyan" 
       style="width: 100%; padding: 12px; margin-top: 24px; font-weight: 700;"
     >
-      🔑 验证并进入管理员面板
+      ✅ 验证并进入管理员面板
     </button>
   </div>
 </template>

@@ -4,13 +4,13 @@
     <div class="form-split-row">
       <div class="form-left-col">
         <div class="form-group">
-          <label class="label-bold">👤 请输入您的姓名 (Your Name)</label>
+          <label class="label-bold">👤 请输入您的姓名</label>
           <input v-model="regForm.name" placeholder="请输入姓名或代号..." required />
         </div>
       </div>
       <div class="form-right-col">
         <div class="form-group">
-          <label class="label-bold">🤖 选择您的头像 (Avatar)</label>
+          <label class="label-bold">🤖 选择您的头像</label>
           <div class="avatar-picker-grid">
             <button
               v-for="av in AVATAR_OPTIONS"
@@ -27,7 +27,7 @@
 
     <!-- Live Persona Preview -->
     <div class="live-identity-card">
-      <h4>🆔 实时社交画像预览 (Live Persona Card)</h4>
+      <h4>🆔 实时社交画像预览</h4>
       <div class="live-card-body">
         <div class="live-avatar-preview">{{ regForm.avatar }}</div>
         <div class="live-info-preview">
@@ -42,12 +42,12 @@
     </div>
 
     <hr class="divider" />
-    <h3 class="section-title">🎯 勾选您的兴趣标签 (Select Your Interests - MultiSelect)</h3>
+    <h3 class="section-title">🎯 勾选您的兴趣标签</h3>
 
     <!-- Categorised Interest Pickers -->
     <div class="interests-picker-container">
       <div class="picker-section">
-        <h5>⚽ 体育运动 (Sports)</h5>
+        <h5>⚽ 体育运动</h5>
         <div class="tags-grid">
           <span
             v-for="item in INTEREST_CATEGORIES.sports"
@@ -59,7 +59,7 @@
         </div>
       </div>
       <div class="picker-section">
-        <h5>🎨 文化艺术 (Arts &amp; Hobbies)</h5>
+        <h5>🎨 文化艺术</h5>
         <div class="tags-grid">
           <span
             v-for="item in INTEREST_CATEGORIES.arts"
@@ -71,7 +71,7 @@
         </div>
       </div>
       <div class="picker-section">
-        <h5>💻 极客技术 (Tech)</h5>
+        <h5>💻 极客技术</h5>
         <div class="tags-grid">
           <span
             v-for="item in INTEREST_CATEGORIES.tech"
@@ -83,7 +83,7 @@
         </div>
       </div>
       <div class="picker-section">
-        <h5>🤝 志愿社交 (Social &amp; Others)</h5>
+        <h5>🤝 志愿社交</h5>
         <div class="tags-grid">
           <span
             v-for="item in INTEREST_CATEGORIES.social"

@@ -16,12 +16,9 @@
       :class="activeTab === 'student' ? 'glow-orange student-card-width' : 'glow-cyan admin-card-width'"
     >
       <div class="logo">
-        <span class="icon">{{ activeTab === 'student' ? '🧭' : '🔑' }}</span>
+        <span class="icon">{{ activeTab === 'student' ? '🧭' : '🛡️' }}</span>
         <h1>{{ activeTab === 'student' ? 'Campus Buddy 校园社交图谱与活动搭子推荐' : '管理员安全认证' }}</h1>
       </div>
-      <p v-if="activeTab === 'student'" class="subtitle">
-        基于图论社交推荐，建立个人画像并织入校园 1,500+ 关系网中，通过双跳 BFS 寻路与 Jaccard 相似度算法，为您匹配最契合的搭子与活动。
-      </p>
 
       <!-- Role Tab Toggles -->
       <div class="login-tabs">
@@ -39,7 +36,7 @@
           :class="{ 'tab-active-admin': activeTab === 'admin' }"
           @click="activeTab = 'admin'"
         >
-          🔑 管理员控制台
+          🛡️ 管理员控制台
         </button>
       </div>
 
