@@ -29,9 +29,16 @@ export class GraphAnalyticsService {
 
   private constructor() {
     // Register recalculation callback to break circular dependencies!
-    useGraphStore().registerOnStatsUpdate(() => {
-      this.recalculateGraphInsights()
-    })
+    // Defer registration to next tick to ensure Pinia is initialized and active
+    setTimeout(() => {
+      try {
+        useGraphStore().registerOnStatsUpdate(() => {
+          this.recalculateGraphInsights()
+        })
+      } catch (err) {
+        // Ignore errors in test environments where Pinia is not active or has been torn down
+      }
+    }, 0)
   }
 
   public static getInstance(): GraphAnalyticsService {

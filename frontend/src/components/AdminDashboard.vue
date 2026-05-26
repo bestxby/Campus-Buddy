@@ -28,10 +28,6 @@
 
 <script setup lang="ts">
 import { watch, onMounted } from 'vue'
-
-const emit = defineEmits<{
-  'create-activity': []
-}>()
 import { stats, graph } from '@/composables/useGraph'
 import { topSocialStudents, isolatedCount } from '@/composables/useGraphInsights'
 import { activeStudent } from '@/composables/useRecommendations'
@@ -45,6 +41,10 @@ import PopularInterestsCard from '@/components/admin/PopularInterestsCard.vue'
 import SystemLogsCard from '@/components/admin/SystemLogsCard.vue'
 import BetweennessCentralityCard from '@/components/admin/BetweennessCentralityCard.vue'
 import IcebreakingPotentialCard from '@/components/admin/IcebreakingPotentialCard.vue'
+
+const emit = defineEmits<{
+  'create-activity': []
+}>()
 
 // Seed initial logs
 onMounted(() => {
