@@ -199,27 +199,28 @@ const getTagClass = (tag: string) => {
 .tab-active { background-color: rgba(253,151,31,0.12) !important; border-color: rgba(253,151,31,0.4) !important; color: #ffb74d !important; box-shadow: 0 0 10px rgba(253,151,31,0.15); }
 
 .activities-scroll-area { flex: 1; overflow-y: auto; padding-right: 4px; }
-.activities-grid { display: flex; flex-direction: column; gap: 10px; }
+.activities-grid { display: flex; flex-direction: column; gap: 12px; }
 
 .activity-card-item {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.005) 0%, rgba(255, 255, 255, 0.015) 100%) !important;
-  border: 1px solid var(--border-color) !important;
-  padding: 12px 14px !important;
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding: 14px 16px !important;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  transition: all 0.25s ease;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
 }
 .activity-card-item:hover {
-  border-color: rgba(253, 151, 31, 0.25) !important;
-  background: linear-gradient(135deg, rgba(253, 151, 31, 0.02) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: rgba(253, 151, 31, 0.45) !important;
+  background: linear-gradient(135deg, rgba(253, 151, 31, 0.04) 0%, rgba(30, 41, 59, 0.55) 100%) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 15px rgba(253, 151, 31, 0.12);
+  transform: translateY(-2px);
 }
 .activity-card-item.card-signed {
   border-color: rgba(74, 222, 128, 0.2) !important;
-  background: linear-gradient(135deg, rgba(74, 222, 128, 0.015) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.015) 0%, rgba(15, 23, 42, 0.6) 100%) !important;
 }
 
 .activity-card-header-row {
@@ -246,32 +247,32 @@ const getTagClass = (tag: string) => {
 .activity-card-icon { font-size: 14px; }
 .activity-title-area { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .activity-card-title {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   margin: 0;
   color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  line-height: 1.4;
 }
 .interest-source-badge { font-size: 9px; color: rgba(253,151,31,0.7); font-weight: 600; margin-top: 1px; }
 
 /* Network Flow Path Visualization */
 .network-flow-path {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  border-radius: 4px;
-  padding: 6px;
-  margin: 2px 0;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 4px 0;
+  display: flex;
+  align-items: center;
   overflow-x: auto;
-  white-space: nowrap;
 }
 .flow-step { display: inline-flex; align-items: center; gap: 4px; }
-.flow-node { font-size: 9px; padding: 2px 5px; border-radius: 4px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
-.node-student { background-color: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2); color: #e9d5ff; max-width: 80px; }
-.node-interest { background-color: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #93c5fd; max-width: 100px; }
-.node-activity { background-color: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); color: #99f6e4; max-width: none; }
-.flow-arrow { font-size: 8px; color: rgba(255,255,255,0.3); font-weight: bold; }
+.flow-node { font-size: 10.5px; padding: 3px 8px; border-radius: 6px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.node-student { background-color: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.25); color: #c084fc; max-width: 80px; }
+.node-interest { background-color: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); color: #60a5fa; max-width: 100px; }
+.node-activity { background-color: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.25); color: #22d3ee; max-width: none; }
+.flow-arrow { font-size: 11px; color: #ffb74d; font-weight: 900; margin: 0 4px; text-shadow: 0 0 8px rgba(253, 151, 31, 0.4); }
 
 .activity-card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .activity-tag-chip { font-size: 8.5px; padding: 1.5px 5px; border-radius: 4px; font-weight: bold; }
@@ -280,10 +281,25 @@ const getTagClass = (tag: string) => {
 .tag-tech { background: rgba(255, 183, 77, 0.06); border: 1px solid rgba(255, 183, 77, 0.15); color: #ffb74d; }
 .tag-social { background: rgba(52, 211, 153, 0.06); border: 1px solid rgba(52, 211, 153, 0.15); color: #34d399; }
 
-.match-reason { padding-left: 6px; border-left: 2px solid rgba(255,255,255,0.1); margin: 2px 0; }
-.reason-buddies { border-left-color: rgba(253,151,31,0.5); }
-.reason-interest { border-left-color: rgba(6,182,212,0.4); }
-.reason-text { font-size: 9.5px; display: inline-block; }
+.match-reason {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-left: 3px solid rgba(6, 182, 212, 0.4);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 2px 0;
+}
+.reason-buddies {
+  border-left-color: #ffb74d;
+  background: rgba(253, 151, 31, 0.02);
+  border-color: rgba(253, 151, 31, 0.08);
+}
+.reason-interest {
+  border-left-color: #22d3ee;
+  background: rgba(6, 182, 212, 0.02);
+  border-color: rgba(6, 182, 212, 0.08);
+}
+.reason-text { font-size: 9.5px; display: inline-block; font-weight: 500; }
 .text-orange-light { color: #ffb74d; }
 .text-cyan-light { color: rgba(34,211,238,0.75); }
 
