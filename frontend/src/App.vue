@@ -60,7 +60,10 @@
 
           <div class="recommendations-row">
             <div class="rec-split-col">
-              <ActivityList />
+              <RecommendedActivities />
+            </div>
+            <div class="rec-split-col">
+              <AllActivities />
             </div>
             <div class="rec-split-col">
               <BuddyList @open-graph-highlight="openGraph" />
@@ -86,7 +89,8 @@
 import { ref, watch, onMounted } from 'vue'
 import LoginOverlay  from '@/components/LoginOverlay.vue'
 import AppSidebar    from '@/components/AppSidebar.vue'
-import ActivityList  from '@/components/ActivityList.vue'
+import RecommendedActivities from '@/components/RecommendedActivities.vue'
+import AllActivities from '@/components/AllActivities.vue'
 import BuddyList     from '@/components/BuddyList.vue'
 import GraphModal    from '@/components/GraphModal.vue'
 import AdminDashboard from '@/components/AdminDashboard.vue'

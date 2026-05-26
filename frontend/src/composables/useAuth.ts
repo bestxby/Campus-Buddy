@@ -41,5 +41,9 @@ export const signUpForActivity = (activity: string): void => {
   useAuthStore().signUpForActivity(activity)
 }
 
+export const cancelSignUpForActivity = (activity: string): void => {
+  useAuthStore().cancelSignUpForActivity(activity)
+}
+
 export const isSignedUp = (activity: string): boolean =>
   useAuthStore().isSignedUp(activity)

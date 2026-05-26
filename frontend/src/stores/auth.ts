@@ -177,6 +177,25 @@ export const useAuthStore = defineStore('auth', () => {
     graphStore.updateStats()
   }
 
+  function cancelSignUpForActivity(activity: string): void {
+    if (!currentUser.value) return
+    const graphStore = useGraphStore()
+    const sNode = `student:${currentUser.value}`
+    const actNode = `activity:${activity}`
+    if (graphStore.graph.has(sNode)) {
+      graphStore.graph.get(sNode)!.delete(actNode)
+    }
+    if (graphStore.graph.has(actNode)) {
+      graphStore.graph.get(actNode)!.delete(sNode)
+    }
+    const idx = signedUpActivities.value.indexOf(activity)
+    if (idx > -1) {
+      signedUpActivities.value.splice(idx, 1)
+      localStorage.setItem('campus_buddy_signups', JSON.stringify(signedUpActivities.value))
+    }
+    graphStore.updateStats()
+  }
+
   function isSignedUp(activity: string): boolean {
     return signedUpActivities.value.includes(activity)
   }
@@ -200,6 +219,7 @@ export const useAuthStore = defineStore('auth', () => {
     restoreSession,
     logout,
     signUpForActivity,
+    cancelSignUpForActivity,
     isSignedUp,
   }
 })
