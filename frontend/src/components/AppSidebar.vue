@@ -16,8 +16,8 @@
     <!-- Profile Card Component -->
     <SidebarProfile @logout="emit('logout')" />
 
-    <!-- Stats Grid Component (compact) -->
-    <SidebarStats />
+    <!-- Stats Grid Component (compact) - Admin Only -->
+    <SidebarStats v-if="currentUserRole === 'admin'" />
 
     <!-- Admin Control & Search Panel (Admin Only) -->
     <SidebarAdminControl 
