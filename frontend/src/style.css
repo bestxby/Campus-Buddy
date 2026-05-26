@@ -114,3 +114,77 @@ body {
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ─── Global Info Tooltip System ───────────────────────────────────────── */
+.title-with-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.info-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.info-icon {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  transition: all 0.2s ease;
+  user-select: none;
+  display: inline-block;
+}
+.info-icon:hover {
+  color: #ffb74d;
+  text-shadow: 0 0 6px rgba(253, 151, 31, 0.6);
+}
+.tooltip-content {
+  position: absolute;
+  top: 130%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  width: 250px;
+  background: rgba(15, 23, 42, 0.98);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 15px rgba(253, 151, 31, 0.1);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 9.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+  text-align: left;
+}
+.tooltip-content h4 {
+  margin: 0 0 4px 0;
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+.info-tooltip-wrapper:hover .tooltip-content {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Alignments for tooltip boundary safety */
+.tooltip-content.left-align {
+  left: 0;
+  transform: translateY(-4px);
+}
+.info-tooltip-wrapper:hover .tooltip-content.left-align {
+  transform: translateY(0);
+}
+.tooltip-content.right-align {
+  right: 0;
+  left: auto;
+  transform: translateY(-4px);
+}
+.info-tooltip-wrapper:hover .tooltip-content.right-align {
+  transform: translateY(0);
+}
+

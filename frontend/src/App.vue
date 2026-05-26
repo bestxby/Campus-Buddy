@@ -4,14 +4,13 @@
 
   <!-- Main dashboard -->
   <div v-else class="dashboard">
-    <AppSidebar :width="sidebarWidth" @logout="onLogout" />
+    <AppSidebar :width="sidebarWidth" @logout="onLogout" @open-graph="openGraph" />
     <div class="layout-splitter vertical-splitter" @mousedown="startSidebarResize" />
 
     <main class="main-content">
-      <!-- Search Header (Admin Only) -->
-      <SearchHeader v-if="currentUserRole === 'admin'" />
+
       <!-- Read-only Banner (Student Only) -->
-      <header v-else class="card student-header-banner">
+      <header v-if="currentUserRole !== 'admin'" class="card student-header-banner">
         <div class="student-header-title">
           <span class="header-badge badge-orange">👤 学生看板</span>
           <h2>个人社交推荐看板 (Personal Social Recommendation Dashboard)</h2>
@@ -19,28 +18,25 @@
       </header>
 
       <div class="content-grid">
-        <!-- Welcome screen (no student selected) -->
-        <div v-if="!activeStudent" class="card welcome-card fade-in">
-          <h2>👋 欢迎，{{ currentUser }}！</h2>
-          <p v-if="currentUserRole === 'admin'">
-            作为系统管理员，您可以使用顶部的搜索栏输入或选择同学姓名，调取其双跳聚焦关系网络，并进行图论社交推荐与匹配分析。
-          </p>
-          <p v-else>
-            系统已分析您的多选兴趣并与 1,500+ 的校园图网络合并。点击下方按钮即可开启您的画像分析与社交推荐匹配。
-          </p>
-          <button v-if="currentUserRole !== 'admin'" @click="selectStudent(currentUser!)" class="btn glow-orange select-self-btn">
-            查看我的匹配推荐
-          </button>
-          <div class="tip-box">
-            <strong>💡 D3.js 力导向画布提示：</strong>
-            <p v-if="currentUserRole === 'admin'">
-              选中特定同学后，点击“查看关系网络拓扑图”即可开启力导向图可视化。支持跨界人脉最短路径查找与高亮。在管理员模式下，您可以在拓扑图中直接点击其他同学节点，无缝下钻切换其视图。
+        <!-- Welcome screen / Admin Dashboard (no student selected) -->
+        <template v-if="!activeStudent">
+          <AdminDashboard v-if="currentUserRole === 'admin'" />
+          <div v-else class="card welcome-card fade-in">
+            <h2>👋 欢迎，{{ currentUser }}！</h2>
+            <p>
+              系统已分析您的多选兴趣并与 1,500+ 的校园图网络合并。点击下方按钮即可开启您的画像分析与社交推荐匹配。
             </p>
-            <p v-else>
-              右侧画布将渲染您的专属<b>二步关系子图 (Focal Subgraph)</b>，支持拖拽节点和滚动缩放，悬停节点可高亮连接路径。
-            </p>
+            <button @click="selectStudent(currentUser!)" class="btn glow-orange select-self-btn">
+              查看我的匹配推荐
+            </button>
+            <div class="tip-box">
+              <strong>💡 D3.js 力导向画布提示：</strong>
+              <p>
+                右侧画布将渲染您的专属<b>二步关系子图 (Focal Subgraph)</b>，支持拖拽节点和滚动缩放，悬停节点可高亮连接路径。
+              </p>
+            </div>
           </div>
-        </div>
+        </template>
 
         <!-- Recommendations panel -->
         <div v-else class="recommendations fade-in">
@@ -55,17 +51,6 @@
               <span class="btn-text-content">查看我的关系网络拓扑图 (View My Relationship Network Topology)</span>
             </div>
             <span class="btn-arrow">➔</span>
-          </div>
-
-          <!-- Admin Entry: Name header + Actions (view graph, clear search) -->
-          <div v-else class="active-profile card glow-orange">
-            <h2>👤 当前选中: <span class="highlight">{{ activeStudent }}</span></h2>
-            <div class="profile-actions">
-              <button @click="openGraph" class="btn btn-xs btn-secondary glow-cyan">
-                🌌 查看关系网络拓扑图
-              </button>
-              <button @click="clearSearch" class="btn-text">清除搜索</button>
-            </div>
           </div>
 
           <div class="recommendations-row">
@@ -89,10 +74,10 @@
 import { ref, watch, onMounted } from 'vue'
 import LoginOverlay  from '@/components/LoginOverlay.vue'
 import AppSidebar    from '@/components/AppSidebar.vue'
-import SearchHeader  from '@/components/SearchHeader.vue'
 import ActivityList  from '@/components/ActivityList.vue'
 import BuddyList     from '@/components/BuddyList.vue'
 import GraphModal    from '@/components/GraphModal.vue'
+import AdminDashboard from '@/components/AdminDashboard.vue'
 
 import { loadGraphData, updateStats } from '@/composables/useGraph'
 import { currentUser, restoreSession, currentUserRole } from '@/composables/useAuth'
@@ -100,10 +85,19 @@ import { activeStudent, selectStudent, clearSearch } from '@/composables/useReco
 
 // ─── Graph Modal ───────────────────────────────────────────────────────────────
 const graphModalRef = ref<InstanceType<typeof GraphModal> | null>(null)
-const openGraph     = () => graphModalRef.value?.open()
+const openGraph     = (forceGlobal?: any) => {
+  const isGlobal = typeof forceGlobal === 'boolean' ? forceGlobal : undefined
+  graphModalRef.value?.open(isGlobal)
+}
 
 // ─── Event handlers ────────────────────────────────────────────────────────────
-const onRegistered = () => { if (currentUser.value) selectStudent(currentUser.value) }
+const onRegistered = () => {
+  if (currentUser.value && currentUserRole.value !== 'admin') {
+    selectStudent(currentUser.value)
+  } else {
+    clearSearch()
+  }
+}
 const onLogout     = () => clearSearch()
 
 // Reset update prompt whenever the viewed student changes
@@ -111,6 +105,8 @@ const onLogout     = () => clearSearch()
 watch([currentUser, currentUserRole], ([user, role]) => {
   if (role === 'student' && user) {
     selectStudent(user)
+  } else {
+    clearSearch()
   }
 }, { immediate: true })
 
@@ -148,7 +144,11 @@ onMounted(async () => {
   await loadGraphData()
   restoreSession()
   updateStats()
-  if (currentUser.value) selectStudent(currentUser.value)
+  if (currentUser.value && currentUserRole.value !== 'admin') {
+    selectStudent(currentUser.value)
+  } else {
+    clearSearch()
+  }
 })
 </script>
 

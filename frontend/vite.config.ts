@@ -10,4 +10,17 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
+  build: {
+    // ✅ OPTIMIZED: Split d3 (~500KB) into its own vendor chunk.
+    // Browsers can cache d3 independently; only app code changes on each deploy.
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'd3-vendor': ['d3'],
+        },
+      },
+    },
+  },
 });
+

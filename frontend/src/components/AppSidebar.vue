@@ -6,101 +6,28 @@
       <div class="sidebar-logo-text">
         <div class="sidebar-logo-title">Campus Buddy</div>
         <div class="sidebar-logo-sub">校园社交智能推荐系统</div>
+        <div v-if="currentUserRole === 'admin'" class="admin-dashboard-title-badge">
+          <span class="pulse-dot">📡</span>
+          <span>系统大数据中心化管理看板</span>
+        </div>
       </div>
     </a>
 
-    <!-- Profile Card -->
-    <div class="profile-card">
-      <div class="profile-card-top">
-        <div class="profile-avatar-wrap">
-          <span class="profile-avatar-big">{{ currentUserAvatar || '🧭' }}</span>
-          <div class="profile-avatar-ring"></div>
-        </div>
-        <div class="profile-card-meta">
-          <div class="profile-name">{{ currentUser }}</div>
-          <div class="profile-persona-badge" :class="personaBadgeClass">{{ userPersona }}</div>
-        </div>
-        <button @click="handleLogout" class="logout-btn" title="注销">⏻</button>
-      </div>
+    <!-- Profile Card Component -->
+    <SidebarProfile @logout="emit('logout')" />
 
-      <!-- All interest tags (no limit) -->
-      <div class="profile-interests-strip" v-if="userInterestTags.length">
-        <span v-for="tag in userInterestTags" :key="tag" class="profile-interest-chip"># {{ tag }}</span>
-      </div>
-      <div v-else class="interests-empty">暂无兴趣标签</div>
-    </div>
+    <!-- Stats Grid Component (compact) -->
+    <SidebarStats />
 
-    <!-- Stats Grid (compact) -->
-    <div class="stats-grid-panel">
-      <div class="stats-grid-title">📡 图谱规模</div>
-      <div class="stats-grid">
-        <div class="stat-card" style="--stat-color: #ffb74d">
-          <div class="stat-card-label">👥 学生节点</div>
-          <div class="stat-card-val" style="color:#ffb74d">{{ stats.studentsCount }}</div>
-        </div>
-        <div class="stat-card" style="--stat-color: #22d3ee">
-          <div class="stat-card-label">🏷️ 兴趣类型</div>
-          <div class="stat-card-val" style="color:#22d3ee">{{ stats.interestsCount }}</div>
-        </div>
-        <div class="stat-card" style="--stat-color: #a78bfa">
-          <div class="stat-card-label">🎉 活动数量</div>
-          <div class="stat-card-val" style="color:#a78bfa">{{ stats.activitiesCount }}</div>
-        </div>
-        <div class="stat-card" style="--stat-color: #34d399">
-          <div class="stat-card-label">🔗 连通社区</div>
-          <div class="stat-card-val" style="color:#34d399">{{ stats.componentsCount }}</div>
-        </div>
-      </div>
-    </div>
+    <!-- Admin Control & Search Panel (Admin Only) -->
+    <SidebarAdminControl 
+      v-if="currentUserRole === 'admin'"
+      @logout="emit('logout')"
+      @open-graph="(forceGlobal) => emit('open-graph', forceGlobal)"
+    />
 
-    <!-- Graph Insights Panel (Degree & Betweenness Centrality) (Admin Only) -->
-    <div v-if="currentUserRole === 'admin'" class="stats-grid-panel insights-panel">
-      <div class="stats-grid-title">📊 图谱图论洞察</div>
-      
-      <!-- Top Social Hubs (Degree Centrality) -->
-      <div class="insight-section">
-        <div class="insight-section-title">👑 校园社交达人 (度中心性)</div>
-        <div class="insight-list">
-          <div v-for="(item, idx) in topSocialStudents" :key="item.name" class="insight-item">
-            <span class="insight-rank">#{{ idx + 1 }}</span>
-            <span class="insight-name">👤 {{ item.name }}</span>
-            <span class="insight-score">{{ item.score }} 个连结</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Top Bridges (Betweenness Centrality) -->
-      <div class="insight-section">
-        <div class="insight-section-title">🌉 跨界人脉桥梁 (中介中心性)</div>
-        <div class="insight-list">
-          <div v-for="(item, idx) in bridgeStudents" :key="item.name" class="insight-item">
-            <span class="insight-rank">#{{ idx + 1 }}</span>
-            <span class="insight-name">👤 {{ item.name }}</span>
-            <span class="insight-score">Fq: {{ item.score }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Isolated Count -->
-      <div class="insight-isolated-row">
-        <span>🧭 待拓展社交圈的孤立同学：</span>
-        <span class="isolated-badge" :class="{ 'has-isolated': isolatedCount > 0 }">
-          {{ isolatedCount }} 人
-        </span>
-      </div>
-    </div>
-
-    <!-- Signed-up Activities Timeline (compact) -->
-    <div class="activities-timeline-panel">
-      <div class="timeline-title">✅ 已报名活动</div>
-      <div v-if="signedUpActivities.length" class="timeline-list">
-        <div v-for="(act, idx) in signedUpActivities" :key="act" class="timeline-item">
-          <div class="timeline-dot" :style="{ animationDelay: idx * 0.08 + 's' }"></div>
-          <span class="timeline-act-name">{{ act }}</span>
-        </div>
-      </div>
-      <div v-else class="timeline-empty">🌱 还没有报名任何活动</div>
-    </div>
+    <!-- Signed-up Activities Timeline Component (compact) - Student Only -->
+    <SidebarTimeline v-if="currentUserRole !== 'admin'" />
 
     <!-- Footer: Author info -->
     <a href="https://github.com/bestxby" target="_blank" rel="noopener" class="sidebar-footer" title="访问作者 GitHub 主页">
@@ -120,18 +47,17 @@
 </template>
 
 <script setup lang="ts">
-import { currentUser, currentUserAvatar, userPersona, personaBadgeClass,
-         userInterestTags, signedUpActivities, logout, currentUserRole } from '@/composables/useAuth'
-import { stats } from '@/composables/useGraph'
-import { topSocialStudents, bridgeStudents, isolatedCount } from '@/composables/useGraphInsights'
+import { currentUserRole } from '@/composables/useAuth'
+import SidebarProfile from '@/components/sidebar/SidebarProfile.vue'
+import SidebarAdminControl from '@/components/sidebar/SidebarAdminControl.vue'
+import SidebarStats from '@/components/sidebar/SidebarStats.vue'
+import SidebarTimeline from '@/components/sidebar/SidebarTimeline.vue'
 
 const props = defineProps<{ width: number }>()
-const emit  = defineEmits<{ logout: [] }>()
-
-const handleLogout = async () => {
-  await logout()
-  emit('logout')
-}
+const emit  = defineEmits<{ 
+  logout: [],
+  'open-graph': [forceGlobal?: boolean]
+}>()
 </script>
 
 <style scoped>
@@ -141,6 +67,7 @@ const handleLogout = async () => {
   display: flex; flex-direction: column;
   box-sizing: border-box; overflow-y: auto;
   flex-shrink: 0;
+  height: 100%;
 }
 
 /* ─── Logo Banner ─────────────────────────────────────────── */
@@ -166,95 +93,41 @@ const handleLogout = async () => {
 @keyframes floatIcon { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 .sidebar-logo-title { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; background: linear-gradient(90deg, #ffb74d, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .sidebar-logo-sub { font-size: 9px; color: rgba(255,255,255,0.35); margin-top: 2px; letter-spacing: 0.3px; }
-
-/* ─── Profile Card ────────────────────────────────────────── */
-.profile-card {
-  margin: 10px 10px 0;
-  background: linear-gradient(135deg, rgba(253,151,31,0.06) 0%, rgba(255,255,255,0.02) 100%);
-  border: 1px solid rgba(253,151,31,0.2); border-radius: 12px; padding: 10px;
-  position: relative; overflow: hidden; flex-shrink: 0;
-}
-.profile-card::after { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: radial-gradient(circle, rgba(253,151,31,0.1) 0%, transparent 70%); pointer-events: none; }
-.profile-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.profile-avatar-wrap { position: relative; flex-shrink: 0; }
-.profile-avatar-big { font-size: 30px; line-height: 1; display: block; filter: drop-shadow(0 0 8px rgba(253,151,31,0.4)); }
-.profile-avatar-ring { position: absolute; inset: -3px; border-radius: 50%; border: 2px solid transparent; background: linear-gradient(135deg, rgba(253,151,31,0.6), rgba(6,182,212,0.4)) border-box; -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); -webkit-mask-composite: destination-out; mask-composite: exclude; animation: spinRing 4s linear infinite; }
-@keyframes spinRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.profile-card-meta { flex: 1; min-width: 0; }
-.profile-name { font-size: 14px; font-weight: 700; color: #ffb74d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.profile-persona-badge { display: inline-block; margin-top: 3px; font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 20px; letter-spacing: 0.3px; }
-.logout-btn { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: rgba(239,68,68,0.6); border-radius: 6px; width: 26px; height: 26px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
-.logout-btn:hover { background: rgba(239,68,68,0.18); color: #ef4444; border-color: rgba(239,68,68,0.5); box-shadow: 0 0 8px rgba(239,68,68,0.2); }
-
-/* Interest chips — show ALL tags, no "+N more" */
-.profile-interests-strip { display: flex; flex-wrap: wrap; gap: 4px; }
-.profile-interest-chip { font-size: 10px; padding: 2px 8px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.55); transition: all 0.2s; }
-.profile-interest-chip:hover { background: rgba(253,151,31,0.1); border-color: rgba(253,151,31,0.3); color: #ffb74d; }
-.interests-empty { font-size: 10px; color: rgba(255,255,255,0.25); font-style: italic; }
-
-/* ─── Stats Grid (compact) ────────────────────────────────── */
-.stats-grid-panel { margin: 10px 10px 0; background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; flex-shrink: 0; }
-.stats-grid-title { font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 8px; }
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.stat-card {
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 8px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  padding-left: 12px;
-}
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; bottom: 0;
-  width: 3px;
-  background: var(--stat-color);
-  opacity: 0.6;
-  transition: all 0.25s ease;
-}
-.stat-card:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.09);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-.stat-card:hover::before {
-  opacity: 1;
-  width: 4px;
-}
-.stat-card-val {
-  font-size: 19px;
-  font-weight: 800;
-  font-family: Consolas, "SF Mono", Monaco, monospace;
-  line-height: 1.2;
-  letter-spacing: -0.2px;
-}
-.stat-card-label {
-  font-size: 9.5px;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.2px;
-  display: flex;
+.admin-dashboard-title-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 3px 6px;
+  background: rgba(253, 151, 31, 0.08);
+  border: 1px solid rgba(253, 151, 31, 0.25);
+  border-radius: 4px;
+  color: #ffb74d;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  animation: borderGlow 3s infinite ease-in-out;
+  text-align: left;
 }
-
-/* ─── Timeline (compact) ──────────────────────────────────── */
-.activities-timeline-panel { margin: 10px 10px 0; background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; flex: 1; min-height: 0; overflow-y: auto; }
-.timeline-title { font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 8px; }
-.timeline-list { display: flex; flex-direction: column; gap: 0; }
-.timeline-item { display: flex; align-items: center; gap: 8px; position: relative; padding-bottom: 7px; }
-.timeline-item:last-child { padding-bottom: 0; }
-.timeline-item:not(:last-child)::after { content: ''; position: absolute; left: 4px; top: 10px; bottom: 0; width: 1px; background: linear-gradient(180deg, rgba(52,211,153,0.3), transparent); }
-.timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 6px rgba(52,211,153,0.5); flex-shrink: 0; animation: pulseDot 2s ease-in-out infinite; }
-@keyframes pulseDot { 0%,100% { box-shadow: 0 0 5px rgba(52,211,153,0.4); } 50% { box-shadow: 0 0 10px rgba(52,211,153,0.7); } }
-.timeline-act-name { font-size: 10px; color: rgba(255,255,255,0.7); line-height: 1.3; }
-.timeline-empty { font-size: 10px; color: rgba(255,255,255,0.25); text-align: center; padding: 8px 0; }
+.pulse-dot {
+  font-size: 10px;
+  display: inline-block;
+  animation: pulseScale 2s infinite ease-in-out;
+}
+@keyframes borderGlow {
+  0%, 100% {
+    border-color: rgba(253, 151, 31, 0.2);
+    box-shadow: 0 0 4px rgba(253, 151, 31, 0.05);
+  }
+  50% {
+    border-color: rgba(253, 151, 31, 0.4);
+    box-shadow: 0 0 10px rgba(253, 151, 31, 0.15);
+  }
+}
+@keyframes pulseScale {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
 
 /* ─── Footer ──────────────────────────────────────────────── */
 .sidebar-footer {
@@ -362,79 +235,5 @@ const handleLogout = async () => {
 
 .sidebar-footer:hover .author-sub {
   color: rgba(255,255,255,0.7);
-}
-
-/* ─── Graph Insights Panel ────────────────────────────────── */
-.insights-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.insight-section {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.insight-section-title {
-  font-size: 9.5px;
-  font-weight: 700;
-  color: var(--accent-orange);
-  letter-spacing: 0.3px;
-  text-align: left;
-}
-.insight-list {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  background: rgba(0,0,0,0.12);
-  border: 1px solid rgba(255,255,255,0.03);
-  border-radius: 6px;
-  padding: 6px 8px;
-}
-.insight-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 10.5px;
-  color: var(--text-primary);
-}
-.insight-rank {
-  font-weight: 800;
-  color: var(--text-secondary);
-  font-family: monospace;
-  width: 20px;
-}
-.insight-name {
-  flex: 1;
-  text-align: left;
-  font-weight: 600;
-}
-.insight-score {
-  font-family: Consolas, monospace;
-  font-size: 9.5px;
-  color: var(--accent-cyan);
-}
-.insight-isolated-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 10px;
-  color: var(--text-secondary);
-  border-top: 1px dashed rgba(255,255,255,0.05);
-  padding-top: 6px;
-  margin-top: 4px;
-}
-.isolated-badge {
-  font-family: Consolas, monospace;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.05);
-  color: var(--text-secondary);
-}
-.isolated-badge.has-isolated {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
 }
 </style>

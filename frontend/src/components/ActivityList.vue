@@ -87,13 +87,13 @@ const handleSignUp = (activity: string) => {
 
 <style scoped>
 .result-card { height: 100%; display: flex; flex-direction: column; }
-.result-card h3 { font-size: 13px; margin: 0; color: var(--text-secondary); }
+.result-card h3 { font-size: 13px; margin: 0 0 12px 0; color: var(--text-secondary); }
 .interest-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
 .filter-pill { background-color: rgba(255,255,255,0.02); border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 20px; padding: 6px 12px; font-size: 11px; cursor: pointer; transition: all 0.2s ease; user-select: none; }
 .filter-pill:hover { background-color: rgba(255,255,255,0.06); color: var(--text-primary); }
 .tab-active { background-color: rgba(6,182,212,0.15) !important; border-color: rgba(6,182,212,0.4) !important; color: #cffafe !important; box-shadow: 0 0 10px rgba(6,182,212,0.15); }
 .accordion-container { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-right: 4px; }
-.accordion-item { border: 1px solid var(--border-color); border-radius: 6px; background-color: rgba(255,255,255,0.005); overflow: hidden; transition: all 0.2s ease; }
+.accordion-item { border: 1px solid var(--border-color); border-radius: 6px; background-color: rgba(255,255,255,0.005); overflow: hidden; transition: all 0.2s ease; flex-shrink: 0; }
 .accordion-item:hover { border-color: rgba(6,182,212,0.2); }
 .accordion-header-static { padding: 10px 14px; background-color: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
 .accordion-title { font-size: 12px; font-weight: bold; color: var(--text-primary); }
