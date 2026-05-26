@@ -7,7 +7,7 @@
 
     <!-- Jaccard-ranked buddy list -->
     <ul v-if="recommendations.buddies.length" class="buddy-list">
-      <li v-for="buddy in recommendations.buddies.slice(0, 30)" :key="buddy.name" class="path-item">
+      <li v-for="buddy in recommendations.buddies.slice(0, maxVisibleBuddies)" :key="buddy.name" class="path-item">
         <div class="buddy-row">
           <div class="path-flow">
             <span class="node student">{{ activeStudent }}</span>
@@ -30,10 +30,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { activeStudent, recommendations, getSharedInterest } from '@/composables/useRecommendations'
+import { currentUserRole } from '@/composables/useAuth'
 import PathFinder from '@/components/buddy/PathFinder.vue'
 
 const emit = defineEmits<{ 'open-graph-highlight': [] }>()
+
+const maxVisibleBuddies = computed(() => currentUserRole.value === 'admin' ? 30 : 10)
 </script>
 
 <style scoped>

@@ -22,7 +22,7 @@
                 <span class="checkbox-box"></span>
                 👁️ 隐藏活动
               </label>
-              <label class="neon-checkbox" v-if="activeStudent">
+              <label class="neon-checkbox" v-if="activeStudent && currentUserRole === 'admin'">
                 <input type="checkbox" v-model="showGlobal" />
                 <span class="checkbox-box"></span>
                 🌐 全局骨干网络
@@ -30,7 +30,7 @@
             </div>
             <div class="limit-slider-group">
               <span class="slider-label">👥 推荐搭子限额: {{ buddyLimit }}人</span>
-              <input type="range" min="0" max="40" step="1" v-model.number="buddyLimit" class="neon-slider" />
+              <input type="range" min="0" :max="maxLimit" step="1" v-model.number="buddyLimit" class="neon-slider" />
             </div>
           </div>
           <div class="zoom-controls-modal">
@@ -80,17 +80,27 @@ const visible        = ref(false)
 const svgRef         = ref<SVGSVGElement | null>(null)
 const hideBuddies    = ref(false)
 const hideActivities = ref(false)
-const buddyLimit     = ref(30)
+const maxLimit       = computed(() => currentUserRole.value === 'admin' ? 40 : 10)
+const buddyLimit     = ref(currentUserRole.value === 'admin' ? 30 : 10)
 const showGlobal     = ref(false)
 const hoveredDetail  = ref<HoveredConnectionDetail | null>(null)
 let   graphRenderer: ForceGraphRenderer | null = null
 
-const isGlobalMode = computed(() => showGlobal.value || !activeStudent.value)
+const isGlobalMode = computed(() => {
+  if (currentUserRole.value !== 'admin') return false
+  return showGlobal.value || !activeStudent.value
+})
+
+watch(maxLimit, (newMax) => {
+  if (buddyLimit.value > newMax) {
+    buddyLimit.value = newMax
+  }
+}, { immediate: true })
 
 // ─── Public API ────────────────────────────────────────────────────────────────
 const open = (forceGlobal?: boolean) => {
   visible.value = true
-  if (forceGlobal === true) {
+  if (forceGlobal === true && currentUserRole.value === 'admin') {
     showGlobal.value = true
   }
   setTimeout(drawGraph, 50)
@@ -133,14 +143,14 @@ const drawGraph = () => {
   graphRenderer.draw({
     graph: graph.value,
     activeStudent: activeStudent.value,
-    recommendations,
+    recommendations: recommendations.value,
     hideBuddies: hideBuddies.value,
     hideActivities: hideActivities.value,
     buddyLimit: buddyLimit.value,
     pathResult: pathResult.value,
     currentUser: currentUser.value,
     currentUserRole: currentUserRole.value,
-    showGlobal: showGlobal.value
+    showGlobal: currentUserRole.value === 'admin' ? showGlobal.value : false
   })
 }
 
