@@ -112,8 +112,13 @@
 </template>
 
 <script setup lang="ts">
-import { regForm, previewPersona, previewPersonaClass, toggleInterestTag } from '@/composables/useAuth'
+import { previewPersona, previewPersonaClass, toggleInterestTag } from '@/composables/useAuth'
+import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
 import { AVATAR_OPTIONS, INTEREST_CATEGORIES } from '@/constants/interests'
+
+const authStore = useAuthStore()
+const { regForm } = storeToRefs(authStore)
 
 const emit = defineEmits<{
   // Fired when the user clicks submit; parent plays the loading animation,

@@ -16,7 +16,7 @@
       :class="activeTab === 'student' ? 'glow-orange student-card-width' : 'glow-cyan admin-card-width'"
     >
       <div class="logo">
-        <span class="icon">{{ activeTab === 'student' ? '🧭' : '🛡️' }}</span>
+        <span class="icon">{{ activeTab === 'student' ? '🧭' : '🔐' }}</span>
         <h1>{{ activeTab === 'student' ? 'Campus Buddy 校园社交图谱与活动搭子推荐' : '管理员安全认证' }}</h1>
       </div>
 
@@ -36,7 +36,7 @@
           :class="{ 'tab-active-admin': activeTab === 'admin' }"
           @click="activeTab = 'admin'"
         >
-          🛡️ 管理员控制台
+          🔐 管理员控制台
         </button>
       </div>
 
