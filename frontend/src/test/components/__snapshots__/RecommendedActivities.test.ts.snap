@@ -18,8 +18,8 @@ exports[`RecommendedActivities.vue > renders recommended activities list correct
         </div><!-- Network Flow Path (Visualization) -->
         <div data-v-a54913d8="" class="network-flow-path">
           <div data-v-a54913d8="" class="flow-step"><span data-v-a54913d8="" class="flow-node node-student" title="您">Alice</span><span data-v-a54913d8="" class="flow-arrow">➔</span><span data-v-a54913d8="" class="flow-node node-interest" title="匹配兴趣: 篮球">篮球</span><span data-v-a54913d8="" class="flow-arrow">➔</span><span data-v-a54913d8="" class="flow-node node-activity" title="推荐活动: 校长杯篮球赛">校长杯篮球赛</span></div>
-        </div><!-- Buddy recommendation explanation -->
-        <div data-v-a54913d8="" class="match-reason reason-interest"><span data-v-a54913d8="" class="reason-text text-cyan-light"> 💡 智能理由: 基于图数据 Jaccard 契合度与共同兴趣推荐 </span></div><!-- Footer & Actions -->
+        </div><!-- Buddy match reason (compact) -->
+        <div data-v-a54913d8="" class="match-reason-line"><span data-v-a54913d8="" class="recommend-reason-text"> 💡 基于共同兴趣推荐 </span></div><!-- Footer & Actions -->
         <div data-v-a54913d8="" class="activity-card-footer">
           <div data-v-a54913d8="" class="activity-card-members"><span data-v-a54913d8="" class="members-icon">👥</span><span data-v-a54913d8="" class="members-text">0 人已报名</span></div>
           <div data-v-a54913d8="" class="action-buttons">

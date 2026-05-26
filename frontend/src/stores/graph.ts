@@ -5,6 +5,15 @@ import { countConnectedComponents, nodeKey } from '@/utils/graph-algorithms'
 
 export const useGraphStore = defineStore('graph', () => {
   const graph = ref<Map<string, Set<string>>>(new Map())
+  const privateStudents = ref<Set<string>>(new Set())
+
+  function setStudentPrivacy(student: string, isPrivate: boolean): void {
+    if (isPrivate) {
+      privateStudents.value.add(student)
+    } else {
+      privateStudents.value.delete(student)
+    }
+  }
   const stats = reactive<GraphStats>({
     studentsCount: 0,
     interestsCount: 0,
@@ -49,6 +58,8 @@ export const useGraphStore = defineStore('graph', () => {
       const data = await res.json()
 
       graph.value.clear()
+      privateStudents.value.clear()
+      privateStudents.value.add('张子涵')
 
       // 1. Select 4 random students to make them completely isolated (degree 0)
       const allStudentNames = Array.from(new Set(data.students.map((s: any) => s[0]))) as string[]
@@ -142,6 +153,8 @@ export const useGraphStore = defineStore('graph', () => {
   return {
     graph,
     stats,
+    privateStudents,
+    setStudentPrivacy,
     registerOnStatsUpdate,
     addEdge,
     updateStats,

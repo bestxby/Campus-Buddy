@@ -24,7 +24,7 @@ export const updateStats = (): void => {
 }
 
 export const findPath = (studentA: string, studentB: string): PathResult | null =>
-  pureFindPath(useGraphStore().graph, studentA, studentB)
+  pureFindPath(useGraphStore().graph, studentA, studentB, useGraphStore().privateStudents)
 
 export const loadGraphData = async (): Promise<void> => {
   await useGraphStore().loadGraphData()

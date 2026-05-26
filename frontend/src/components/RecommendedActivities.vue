@@ -49,16 +49,13 @@
             </div>
           </div>
 
-
-
-          <!-- Buddy recommendation explanation -->
-          <div class="match-reason" :class="act.buddiesSigned.length > 0 ? 'reason-buddies' : 'reason-interest'">
-            <span v-if="act.buddiesSigned.length > 0" class="reason-text text-orange-light">
-              👥 <b>{{ act.buddiesSigned.slice(0, 2).join('、') }}</b>
-              <span v-if="act.buddiesSigned.length > 2"> 等 {{ act.buddiesSigned.length }} 位搭子</span>也报名了
+          <!-- Buddy match reason (compact) -->
+          <div class="match-reason-line">
+            <span v-if="act.buddiesSigned.length > 0" class="buddy-signup-text">
+              👥 {{ act.buddiesSigned.slice(0, 2).join('、') }}<span v-if="act.buddiesSigned.length > 2">等{{ act.buddiesSigned.length }}人</span>也报名了
             </span>
-            <span v-else class="reason-text text-cyan-light">
-              💡 智能理由: 基于图数据 Jaccard 契合度与共同兴趣推荐
+            <span v-else class="recommend-reason-text">
+              💡 基于共同兴趣推荐
             </span>
           </div>
 
@@ -204,11 +201,11 @@ const getTagClass = (tag: string) => {
 .activity-card-item {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%) !important;
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  padding: 14px 16px !important;
-  border-radius: 10px;
+  padding: 10px 14px !important;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
 }
@@ -258,21 +255,38 @@ const getTagClass = (tag: string) => {
 
 /* Network Flow Path Visualization */
 .network-flow-path {
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 8px;
-  padding: 10px 12px;
-  margin: 4px 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 2px 0 4px 0;
   display: flex;
   align-items: center;
-  overflow-x: auto;
+  overflow: hidden;
+  white-space: nowrap;
 }
-.flow-step { display: inline-flex; align-items: center; gap: 4px; }
-.flow-node { font-size: 10.5px; padding: 3px 8px; border-radius: 6px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
-.node-student { background-color: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.25); color: #c084fc; max-width: 80px; }
-.node-interest { background-color: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); color: #60a5fa; max-width: 100px; }
-.node-activity { background-color: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.25); color: #22d3ee; max-width: none; }
-.flow-arrow { font-size: 11px; color: #ffb74d; font-weight: 900; margin: 0 4px; text-shadow: 0 0 8px rgba(253, 151, 31, 0.4); }
+.flow-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.flow-node {
+  font-size: 9px;
+  padding: 0 !important;
+  font-weight: 500;
+  background: none !important;
+  border: none !important;
+  border-radius: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.node-student { color: #c084fc; flex-shrink: 0; }
+.node-interest { color: #60a5fa; flex-shrink: 0; }
+.node-activity { color: #22d3ee; flex-shrink: 1; min-width: 0; }
+.flow-arrow { font-size: 9px; color: #ffb74d; font-weight: 900; margin: 0 3px; text-shadow: 0 0 4px rgba(253, 151, 31, 0.3); flex-shrink: 0; }
 
 .activity-card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .activity-tag-chip { font-size: 8.5px; padding: 1.5px 5px; border-radius: 4px; font-weight: bold; }
@@ -281,27 +295,28 @@ const getTagClass = (tag: string) => {
 .tag-tech { background: rgba(255, 183, 77, 0.06); border: 1px solid rgba(255, 183, 77, 0.15); color: #ffb74d; }
 .tag-social { background: rgba(52, 211, 153, 0.06); border: 1px solid rgba(52, 211, 153, 0.15); color: #34d399; }
 
-.match-reason {
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-left: 3px solid rgba(6, 182, 212, 0.4);
-  border-radius: 6px;
-  padding: 8px 12px;
-  margin: 2px 0;
+.match-reason-line {
+  font-size: 9px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.45);
 }
-.reason-buddies {
-  border-left-color: #ffb74d;
-  background: rgba(253, 151, 31, 0.02);
-  border-color: rgba(253, 151, 31, 0.08);
+.buddy-signup-text {
+  color: #ffb74d;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  font-weight: 600;
 }
-.reason-interest {
-  border-left-color: #22d3ee;
-  background: rgba(6, 182, 212, 0.02);
-  border-color: rgba(6, 182, 212, 0.08);
+.recommend-reason-text {
+  color: rgba(6, 182, 212, 0.75);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
 }
-.reason-text { font-size: 9.5px; display: inline-block; font-weight: 500; }
-.text-orange-light { color: #ffb74d; }
-.text-cyan-light { color: rgba(34,211,238,0.75); }
 
 .activity-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.03); padding-top: 6px; margin-top: 2px; }
 .activity-card-members { display: flex; align-items: center; gap: 4px; }

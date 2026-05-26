@@ -14,6 +14,7 @@ export interface ForceGraphConfig {
   currentUser: string | null
   currentUserRole: string
   showGlobal?: boolean
+  privateStudents?: Set<string>
 }
 
 export interface GraphDataResult {
@@ -34,7 +35,10 @@ export class ForceGraphDataBuilder {
       currentUser,
       currentUserRole,
       showGlobal,
+      privateStudents,
     } = config
+
+    const privateStudentsSet = privateStudents ?? new Set<string>()
 
     let nodesToDraw: any[] = []
     let linksToDraw: any[] = []
@@ -70,6 +74,7 @@ export class ForceGraphDataBuilder {
         studentDegrees.sort((a, b) => b.deg - a.deg)
         const topStudents = studentDegrees.slice(0, 80)
         for (const s of topStudents) {
+          if (privateStudentsSet.has(s.name) && s.name !== currentUser && currentUserRole !== 'admin') continue
           addedNodes.add(s.node)
           nodesToDraw.push({ id: s.node, type: 'student', name: s.name })
         }
@@ -131,6 +136,7 @@ export class ForceGraphDataBuilder {
             const isBuddy = sub.startsWith('student:') && !hideBuddies && allowedBuddies.has(subName)
             const isActivity = sub.startsWith('activity:') && !hideActivities && recommendations.activities.includes(subName)
             if (isBuddy || isActivity) {
+              if (isBuddy && privateStudentsSet.has(subName) && subName !== currentUser && currentUserRole !== 'admin') continue
               if (!addedNodes.has(sub)) {
                 addedNodes.add(sub)
                 nodesToDraw.push({ id: sub, type: sub.startsWith('student:') ? 'student' : 'activity', name: subName })

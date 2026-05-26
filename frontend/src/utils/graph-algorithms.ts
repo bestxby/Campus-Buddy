@@ -28,7 +28,8 @@ export function countConnectedComponents(graph: Map<string, Set<string>>): numbe
 export function findPath(
   graph: Map<string, Set<string>>,
   studentA: string,
-  studentB: string
+  studentB: string,
+  privateStudents: Set<string> = new Set()
 ): PathResult | null {
   const start = nodeKey('student', studentA)
   const end = nodeKey('student', studentB)
@@ -43,6 +44,10 @@ export function findPath(
   while (queue.length > 0) {
     const current = queue.shift()!
     for (const neighbor of graph.get(current) ?? []) {
+      if (neighbor.startsWith('student:')) {
+        const name = neighbor.slice('student:'.length)
+        if (privateStudents.has(name) && neighbor !== start && neighbor !== end) continue
+      }
       if (parent.has(neighbor)) continue
       parent.set(neighbor, current)
       if (neighbor === end) {
@@ -65,7 +70,8 @@ export function findPath(
 export function calculateJaccardSimilarity(
   graph: Map<string, Set<string>>,
   student: string,
-  promotedActivities: Set<string>
+  promotedActivities: Set<string>,
+  privateStudents: Set<string> = new Set()
 ): { activities: string[]; buddies: BuddyResult[] } {
   const start = nodeKey('student', student)
   if (!graph.has(start)) {
@@ -85,6 +91,7 @@ export function calculateJaccardSimilarity(
         matchedActivities.add(neighbor.replace('activity:', ''))
       } else if (neighbor.startsWith('student:') && neighbor !== start) {
         const buddyName = neighbor.replace('student:', '')
+        if (privateStudents.has(buddyName)) continue
         if (seenBuddies.has(buddyName)) continue
         seenBuddies.add(buddyName)
 

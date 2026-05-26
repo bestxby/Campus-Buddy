@@ -18,7 +18,8 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     const { activities, buddies } = calculateJaccardSimilarity(
       graphStore.graph,
       student,
-      promotedActivities.value
+      promotedActivities.value,
+      graphStore.privateStudents
     )
     recommendations.activities = activities
     recommendations.buddies = buddies
@@ -59,7 +60,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
 
   function calculatePath(studentA: string, studentB: string): void {
     const graphStore = useGraphStore()
-    pathResult.value = findPath(graphStore.graph, studentA, studentB)
+    pathResult.value = findPath(graphStore.graph, studentA, studentB, graphStore.privateStudents)
   }
 
   function clearRecommendations(): void {

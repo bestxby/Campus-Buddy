@@ -10,6 +10,16 @@ export const useAuthStore = defineStore('auth', () => {
   const currentUserAvatar = ref<string>(AVATAR_OPTIONS[0])
   const userPersona = ref<string>('未知')
   const signedUpActivities = ref<string[]>([])
+  const isPrivateMode = ref<boolean>(false)
+
+  function togglePrivacyMode(): void {
+    isPrivateMode.value = !isPrivateMode.value
+    localStorage.setItem('campus_buddy_private_mode', isPrivateMode.value ? 'true' : 'false')
+    const graphStore = useGraphStore()
+    if (currentUser.value) {
+      graphStore.setStudentPrivacy(currentUser.value, isPrivateMode.value)
+    }
+  }
 
   const regForm = reactive<RegForm>({
     name: '',
@@ -82,12 +92,14 @@ export const useAuthStore = defineStore('auth', () => {
     currentUserRole.value = 'student'
     currentUserAvatar.value = regForm.avatar
     userPersona.value = computePersona(regForm.selectedInterests)
+    isPrivateMode.value = false
 
     localStorage.setItem('campus_buddy_user',      name)
     localStorage.setItem('campus_buddy_role',      'student')
     localStorage.setItem('campus_buddy_avatar',    regForm.avatar)
     localStorage.setItem('campus_buddy_persona',   userPersona.value)
     localStorage.setItem('campus_buddy_interests', JSON.stringify(regForm.selectedInterests))
+    localStorage.setItem('campus_buddy_private_mode', 'false')
 
     const graphStore = useGraphStore()
     const sNode = `student:${name}`
@@ -147,6 +159,11 @@ export const useAuthStore = defineStore('auth', () => {
     for (const act of savedSignups) {
       graphStore.addEdge(sNode, `activity:${act}`)
     }
+
+    isPrivateMode.value = localStorage.getItem('campus_buddy_private_mode') === 'true'
+    if (isPrivateMode.value) {
+      graphStore.setStudentPrivacy(savedUser, true)
+    }
   }
 
   async function logout(): Promise<void> {
@@ -156,6 +173,7 @@ export const useAuthStore = defineStore('auth', () => {
     currentUserAvatar.value = AVATAR_OPTIONS[0]
     userPersona.value = '未知'
     signedUpActivities.value = []
+    isPrivateMode.value = false
     regForm.selectedInterests = []
     regForm.name = ''
     regForm.avatar = AVATAR_OPTIONS[0]
@@ -221,5 +239,7 @@ export const useAuthStore = defineStore('auth', () => {
     signUpForActivity,
     cancelSignUpForActivity,
     isSignedUp,
+    isPrivateMode,
+    togglePrivacyMode,
   }
 })

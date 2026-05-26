@@ -72,6 +72,7 @@ import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
 import { graph } from '@/composables/useGraph'
 import { activeStudent, recommendations, selectStudent, pathResult } from '@/composables/useRecommendations'
 import { currentUser, currentUserRole, signedUpActivities } from '@/composables/useAuth'
+import { useGraphStore } from '@/stores/graph'
 import type { HoveredConnectionDetail } from '@/types'
 import { ForceGraphRenderer } from '@/services/ForceGraphRenderer'
 
@@ -150,7 +151,8 @@ const drawGraph = () => {
     pathResult: pathResult.value,
     currentUser: currentUser.value,
     currentUserRole: currentUserRole.value,
-    showGlobal: currentUserRole.value === 'admin' ? showGlobal.value : false
+    showGlobal: currentUserRole.value === 'admin' ? showGlobal.value : false,
+    privateStudents: useGraphStore().privateStudents,
   })
 }
 

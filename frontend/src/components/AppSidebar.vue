@@ -27,8 +27,12 @@
       @create-activity="emit('create-activity')"
     />
 
-    <!-- Signed-up Activities Timeline Component (compact) - Student Only -->
-    <SidebarTimeline v-if="currentUserRole !== 'admin'" />
+    <!-- Student Only Panels -->
+    <template v-if="currentUserRole !== 'admin'">
+      <SidebarInterests />
+      <SidebarIcebreaker />
+      <SidebarTimeline />
+    </template>
 
     <!-- Footer: Author info -->
     <a href="https://github.com/bestxby" target="_blank" rel="noopener" class="sidebar-footer" title="访问作者 GitHub 主页">
@@ -53,6 +57,8 @@ import SidebarProfile from '@/components/sidebar/SidebarProfile.vue'
 import SidebarAdminControl from '@/components/sidebar/SidebarAdminControl.vue'
 import SidebarStats from '@/components/sidebar/SidebarStats.vue'
 import SidebarTimeline from '@/components/sidebar/SidebarTimeline.vue'
+import SidebarInterests from '@/components/sidebar/SidebarInterests.vue'
+import SidebarIcebreaker from '@/components/sidebar/SidebarIcebreaker.vue'
 
 const props = defineProps<{ width: number }>()
 const emit  = defineEmits<{ 
@@ -133,7 +139,7 @@ const emit  = defineEmits<{
 
 /* ─── Footer ──────────────────────────────────────────────── */
 .sidebar-footer {
-  margin: auto 10px 10px 10px;
+  margin: 10px;
   flex-shrink: 0;
   padding: 12px 10px;
   border: 1px solid rgba(255,255,255,0.04);

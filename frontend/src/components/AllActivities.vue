@@ -184,25 +184,24 @@ const getTagClass = (tag: string) => {
   gap: 12px;
 }
 .activity-card-item {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  padding: 14px 16px !important;
-  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.005) 0%, rgba(255, 255, 255, 0.015) 100%) !important;
+  border: 1px solid var(--border-color) !important;
+  padding: 12px 14px !important;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s ease;
   text-align: left;
 }
 .activity-card-item:hover {
-  border-color: rgba(6, 182, 212, 0.45) !important;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.04) 0%, rgba(30, 41, 59, 0.55) 100%) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 15px rgba(6, 182, 212, 0.12);
-  transform: translateY(-2px);
+  border-color: rgba(6, 182, 212, 0.25) !important;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.02) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 .activity-card-item.card-signed {
   border-color: rgba(74, 222, 128, 0.2) !important;
-  background: linear-gradient(135deg, rgba(74, 222, 128, 0.015) 0%, rgba(15, 23, 42, 0.6) 100%) !important;
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.015) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
 }
 .activity-card-header-row {
   display: flex;
@@ -229,12 +228,13 @@ const getTagClass = (tag: string) => {
   font-size: 14px;
 }
 .activity-card-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   margin: 0;
   color: var(--text-primary);
-  white-space: normal;
-  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   flex: 1;
 }
 .activity-card-tags {

@@ -47,3 +47,8 @@ export const cancelSignUpForActivity = (activity: string): void => {
 
 export const isSignedUp = (activity: string): boolean =>
   useAuthStore().isSignedUp(activity)
+
+export const isPrivateMode = computed(() => useAuthStore().isPrivateMode)
+export const togglePrivacyMode = (): void => {
+  useAuthStore().togglePrivacyMode()
+}
