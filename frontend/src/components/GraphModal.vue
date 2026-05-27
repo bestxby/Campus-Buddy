@@ -10,17 +10,15 @@
           </span>
         </div>
         <div class="modal-controls-row">
-          <!-- View Mode Tabs (Admin Only) -->
-          <div class="view-mode-tabs" v-if="currentUserRole === 'admin' && activeStudent">
-            <button 
-              :class="['tab-btn', viewMode === 'network' ? 'active' : '']" 
-              @click="viewMode = 'network'"
-            >🌌 关系网络</button>
-            <button 
-              :class="['tab-btn', viewMode === 'matrix' ? 'active' : '']" 
-              @click="viewMode = 'matrix'"
-            >🧮 邻接矩阵</button>
-          </div>
+          <!-- Return to Matrix Button (Admin Only, when activeStudent is selected and in network view mode) -->
+          <button
+            v-if="currentUserRole === 'admin' && activeStudent && viewMode === 'network'"
+            class="return-matrix-btn-neon"
+            @click="viewMode = 'matrix'"
+            title="返回全校人脉邻接关联矩阵"
+          >
+            🧮 返回人脉矩阵
+          </button>
 
           <!-- Matrix Mode Select -->
           <div class="matrix-mode-select-wrap" v-if="viewMode === 'matrix'">
@@ -50,11 +48,6 @@
                 <input type="checkbox" v-model="hideActivities" />
                 <span class="checkbox-box"></span>
                 👁️ 隐藏活动
-              </label>
-              <label class="neon-checkbox" v-if="activeStudent && currentUserRole === 'admin'">
-                <input type="checkbox" v-model="showGlobal" />
-                <span class="checkbox-box"></span>
-                🌐 全局骨干网络
               </label>
             </div>
             <div class="limit-slider-group" v-if="!isGlobalMode">
