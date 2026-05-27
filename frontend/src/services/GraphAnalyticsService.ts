@@ -13,11 +13,10 @@ export interface InterestStat {
   count: number
 }
 
-export interface IcebreakingStat {
+export interface PopularActivityStat {
   name: string
   interest: string
-  score: number
-  unregisteredCount: number
+  count: number
 }
 
 export class GraphAnalyticsService {
@@ -27,7 +26,7 @@ export class GraphAnalyticsService {
   public readonly bridgeStudents = ref<CentralityResult[]>([])
   public readonly isolatedCount = ref(0)
   public readonly popularInterests = ref<InterestStat[]>([])
-  public readonly icebreakingActivities = ref<IcebreakingStat[]>([])
+  public readonly popularActivities = ref<PopularActivityStat[]>([])
 
   public readonly connectivityRate = ref(0)
   public readonly averagePathLength = ref(0)
@@ -156,8 +155,8 @@ export class GraphAnalyticsService {
     return count
   }
 
-  private calculateIcebreakingPotential(): IcebreakingStat[] {
-    const list: IcebreakingStat[] = []
+  private calculatePopularActivities(): PopularActivityStat[] {
+    const list: PopularActivityStat[] = []
     const graph = useGraphStore().graph
 
     for (const [node, neighbors] of graph.entries()) {
@@ -171,48 +170,19 @@ export class GraphAnalyticsService {
       if (!interestNode) continue
       const interestName = interestNode.slice('interest:'.length)
 
-      const interestNeighbors = graph.get(interestNode) ?? new Set<string>()
-      const interestStudents: string[] = []
-      for (const n of interestNeighbors) {
-        if (n.startsWith('student:')) interestStudents.push(n)
+      let studentCount = 0
+      for (const n of neighbors) {
+        if (n.startsWith('student:')) studentCount++
       }
 
-      const unregistered = interestStudents.filter(s => {
-        const sNeighbors = graph.get(s) ?? new Set<string>()
-        return !sNeighbors.has(node)
-      })
-
-      if (unregistered.length < 2) {
-        list.push({ name: actName, interest: interestName, score: 0, unregisteredCount: unregistered.length })
-        continue
-      }
-
-      let unconnectedPairs = 0
-      const neighborSets = unregistered.map(s => graph.get(s) ?? new Set<string>())
-
-      for (let i = 0; i < unregistered.length; i++) {
-        const setI = neighborSets[i]
-        for (let j = i + 1; j < unregistered.length; j++) {
-          const setJ = neighborSets[j]
-          const [smaller, larger] = setI.size <= setJ.size ? [setI, setJ] : [setJ, setI]
-          let sharesNeighbor = false
-          for (const n of smaller) {
-            if (larger.has(n)) { sharesNeighbor = true; break }
-          }
-          if (!sharesNeighbor) unconnectedPairs++
-        }
-      }
-
-      const score = Math.min(100, Math.round(unconnectedPairs * 15))
       list.push({
         name: actName,
         interest: interestName,
-        score,
-        unregisteredCount: unregistered.length
+        count: studentCount
       })
     }
 
-    return list.sort((a, b) => b.score - a.score || b.unregisteredCount - a.unregisteredCount).slice(0, 5)
+    return list.sort((a, b) => b.count - a.count).slice(0, 5)
   }
 
   private calculateConnectivityRate(): number {
@@ -370,7 +340,7 @@ export class GraphAnalyticsService {
         }
       }
       this.popularInterests.value = list.sort((a, b) => b.count - a.count)
-      this.icebreakingActivities.value = this.calculateIcebreakingPotential()
+      this.popularActivities.value = this.calculatePopularActivities()
       this.debounceTimer = null
     }, 150)
   }

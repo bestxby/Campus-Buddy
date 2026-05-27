@@ -11,8 +11,8 @@
       <!-- Grid Card 4: Isolation Diagnostics & Auto-Bridge (Spans 2 rows) -->
       <IsolationCard class="span-2-rows" />
 
-      <!-- Grid Card 7: Icebreaking Potential Ranking -->
-      <IcebreakingPotentialCard />
+      <!-- Grid Card 7: Popular Activities Ranking -->
+      <PopularActivitiesCard />
 
       <!-- Grid Card 5: System Logs -->
       <SystemLogsCard />
@@ -49,7 +49,7 @@ import DegreeCentralityCard from '@/components/admin/DegreeCentralityCard.vue'
 import PopularInterestsCard from '@/components/admin/PopularInterestsCard.vue'
 import SystemLogsCard from '@/components/admin/SystemLogsCard.vue'
 import BetweennessCentralityCard from '@/components/admin/BetweennessCentralityCard.vue'
-import IcebreakingPotentialCard from '@/components/admin/IcebreakingPotentialCard.vue'
+import PopularActivitiesCard from '@/components/admin/PopularActivitiesCard.vue'
 import MatrixDiagnosticsCard from '@/components/admin/MatrixDiagnosticsCard.vue'
 import NetworkMetricsCard from '@/components/admin/NetworkMetricsCard.vue'
 

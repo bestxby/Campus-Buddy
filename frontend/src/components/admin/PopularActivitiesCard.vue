@@ -2,35 +2,35 @@
   <div class="dashboard-grid-card card">
     <div class="col-header">
       <div class="title-with-info">
-        <h3>🎯 校园活动“破冰探索”排行</h3>
+        <h3>🔥 热门校园活动排行</h3>
         <div class="info-tooltip-wrapper">
           <span class="info-icon">ℹ️</span>
           <div class="tooltip-content">
-            <h4>活动社交破冰说明</h4>
-            <p>评估活动连接不同圈子、打破社交隔阂的潜在作用。有些活动可能报名总数不多，但能吸引来自不同兴趣背景的同学参与，非常利于“破冰”与新朋友结识。置顶推荐此类活动，能有效促进全校不同群体同学间的交流沟通。</p>
+            <h4>热门活动排行说明</h4>
+            <p>展示全校学生参与度最高、最受欢迎的校园社交活动。您可以一键“置顶推荐”这些活动，使其在学生端推荐列表中优先置顶展示，以吸引更多同学报名参与。</p>
           </div>
         </div>
       </div>
     </div>
     
     <div class="card-scroll-body">
-      <div class="icebreaking-list">
-        <div v-for="(item, idx) in icebreakingActivities" :key="item.name" class="icebreaking-item">
-          <div class="icebreaking-item-header">
-            <span class="ice-rank">#{{ idx + 1 }}</span>
-            <span class="ice-name" :title="item.name">{{ item.name }}</span>
-            <span class="ice-interest">{{ item.interest }}</span>
+      <div class="popularity-list">
+        <div v-for="(item, idx) in popularActivities" :key="item.name" class="popularity-item">
+          <div class="popularity-item-header">
+            <span class="pop-rank">#{{ idx + 1 }}</span>
+            <span class="pop-name" :title="item.name">{{ item.name }}</span>
+            <span class="pop-interest">{{ item.interest }}</span>
           </div>
           
-          <div class="icebreaking-item-body">
+          <div class="popularity-item-body">
             <div class="progress-bar-container">
               <div class="progress-bar-track">
                 <div 
                   class="progress-bar-fill" 
-                  :style="{ width: item.score + '%' }"
+                  :style="{ width: (maxCount > 0 ? (item.count / maxCount * 100) : 0) + '%' }"
                 ></div>
               </div>
-              <span class="progress-value">{{ item.score }}% 社交破冰潜力</span>
+              <span class="progress-value">{{ item.count }} 人报名 / 参与</span>
             </div>
             
             <button 
@@ -48,9 +48,14 @@
 </template>
 
 <script setup lang="ts">
-import { icebreakingActivities } from '@/composables/useGraphInsights'
+import { computed } from 'vue'
+import { popularActivities } from '@/composables/useGraphInsights'
 import { promotedActivities, activeStudent, runRecommendations } from '@/composables/useRecommendations'
 import { addLog } from '@/composables/useLogs'
+
+const maxCount = computed(() => {
+  return popularActivities.value.length ? Math.max(...popularActivities.value.map(a => a.count)) : 1
+})
 
 const isPromoted = (name: string): boolean => {
   return promotedActivities.value.has(name)
@@ -59,18 +64,15 @@ const isPromoted = (name: string): boolean => {
 const togglePromotion = (name: string) => {
   if (promotedActivities.value.has(name)) {
     promotedActivities.value.delete(name)
-    // Force reactive trigger
     promotedActivities.value = new Set(promotedActivities.value)
-    addLog('action', `【推广置顶取消】已取消活动【${name}】的优先推荐状态`)
+    addLog('action', `【推广置顶取消】已取消热门活动【${name}】的优先推荐状态`)
   } else {
     promotedActivities.value.add(name)
-    // Force reactive trigger
     promotedActivities.value = new Set(promotedActivities.value)
-    addLog('action', `【活动推荐置顶】成功将破冰潜力活动【${name}】设为置顶推荐，引导更多同学跨圈交流`)
+    addLog('action', `【活动推荐置顶】成功将热门活动【${name}】设为置顶推荐，吸引更多同学报名参与`)
     addLog('info', `推荐引擎优化：正在为相关兴趣群体的同学们调整活动展示顺序，方便其查看该活动`)
   }
   
-  // Re-run recommendations for current student to apply sorting change immediately
   if (activeStudent.value) {
     runRecommendations(activeStudent.value)
   }
@@ -112,13 +114,13 @@ const togglePromotion = (name: string) => {
   overflow-y: auto;
   padding-right: 4px;
 }
-.icebreaking-list {
+.popularity-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 2px;
 }
-.icebreaking-item {
+.popularity-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -127,18 +129,18 @@ const togglePromotion = (name: string) => {
   border-radius: 6px;
   padding: 8px 10px;
 }
-.icebreaking-item-header {
+.popularity-item-header {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 11px;
 }
-.ice-rank {
+.pop-rank {
   font-weight: 800;
   color: var(--text-secondary);
   font-family: monospace;
 }
-.ice-name {
+.pop-name {
   flex: 1;
   text-align: left;
   font-weight: 700;
@@ -147,7 +149,7 @@ const togglePromotion = (name: string) => {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.ice-interest {
+.pop-interest {
   background-color: rgba(6, 182, 212, 0.06);
   border: 1px solid rgba(6, 182, 212, 0.15);
   color: #22d3ee;
@@ -156,7 +158,7 @@ const togglePromotion = (name: string) => {
   font-size: 9px;
   flex-shrink: 0;
 }
-.icebreaking-item-body {
+.popularity-item-body {
   display: flex;
   align-items: center;
   justify-content: space-between;
