@@ -339,3 +339,56 @@
 .view-network-btn-neon:active {
   transform: translateY(0);
 }
+
+@media (max-width: 768px) {
+  .fullscreen-graph-overlay {
+    padding: 0;
+  }
+  .fullscreen-modal-card {
+    width: 100vw;
+    height: 100vh;
+    border: none !important;
+    border-radius: 0;
+    padding: 12px !important;
+  }
+  .fullscreen-modal-header {
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+  .modal-controls-row {
+    gap: 8px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .canvas-toggles {
+    padding: 4px 8px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .toggle-group {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .limit-slider-group {
+    border-left: none;
+    padding-left: 0;
+  }
+  .view-network-btn-neon {
+    margin-left: 0;
+    margin-top: 4px;
+    width: 100%;
+    justify-content: center;
+  }
+  .matrix-mode-select-wrap {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .matrix-select-neon {
+    width: 100%;
+  }
+  .zoom-controls-modal {
+    width: auto;
+  }
+}

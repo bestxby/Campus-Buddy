@@ -6,14 +6,28 @@
   <div v-else class="dashboard">
     <AppSidebar 
       :width="sidebarWidth" 
+      :class="{ 'sidebar-open': sidebarOpen }"
       @logout="onLogout" 
       @open-graph="openGraph" 
       @create-activity="showCreateActivity = true"
       @create-interest="showCreateInterest = true"
     />
+    <div v-if="sidebarOpen" class="sidebar-backdrop" @click="sidebarOpen = false" />
     <div class="layout-splitter vertical-splitter" role="separator" @mousedown="startSidebarResize" />
 
     <main class="main-content">
+      <!-- Mobile Top Bar (Visible only on mobile) -->
+      <div class="mobile-top-bar" v-if="currentUser">
+        <button 
+          class="hamburger-btn" 
+          @click="sidebarOpen = !sidebarOpen" 
+          aria-label="打开菜单"
+        >
+          ☰
+        </button>
+        <span class="mobile-title">Campus Buddy</span>
+        <div class="mobile-avatar">{{ currentUserRole === 'admin' ? '🤖' : '👤' }}</div>
+      </div>
 
 
 
@@ -111,6 +125,7 @@ import { graphAnalyticsService } from '@/services/GraphAnalyticsService'
 
 const showCreateActivity = ref(false)
 const showCreateInterest = ref(false)
+const sidebarOpen = ref(false)
 
 // ─── Graph Modal ───────────────────────────────────────────────────────────────
 const graphModalRef = ref<InstanceType<typeof GraphModal> | null>(null)
@@ -146,6 +161,7 @@ watch([currentUser, currentUserRole], ([user, role]) => {
 }, { immediate: true })
 
 watch(activeStudent, (newStudent) => {
+  sidebarOpen.value = false
   if (currentUserRole.value === 'student' && newStudent !== currentUser.value) {
     if (currentUser.value) {
       selectStudent(currentUser.value)
@@ -334,5 +350,93 @@ onMounted(async () => {
   gap: 14px;
 }
 
-
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .layout-splitter {
+    display: none !important;
+  }
+  .main-content {
+    padding: 0 12px 12px 12px;
+    margin-top: 55px; /* Leave space for top bar */
+    overflow: visible;
+  }
+  .content-grid {
+    padding: 0;
+    overflow: visible;
+  }
+  .mobile-top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: rgba(14, 20, 34, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 300;
+  }
+  .hamburger-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .mobile-title {
+    font-size: 16px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #ff007f 0%, #00f0ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .mobile-avatar {
+    font-size: 18px;
+  }
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 12, 21, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 450;
+  }
+  
+  /* Recommendations stacking for mobile */
+  .recommendations-row {
+    flex-direction: column;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    gap: 16px;
+  }
+  .rec-split-col {
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    flex: none;
+  }
+  .recommendations {
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  
+  .student-graph-btn-card {
+    margin: 0;
+  }
+}
 </style>

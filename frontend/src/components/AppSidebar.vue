@@ -323,4 +323,22 @@ const emit  = defineEmits<{
 .sidebar-footer:hover .author-sub {
   color: rgba(255,255,255,0.7);
 }
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 500;
+    width: 280px !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-right: 1px solid rgba(253, 151, 31, 0.25);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(253, 151, 31, 0.05);
+  }
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+}
 </style>

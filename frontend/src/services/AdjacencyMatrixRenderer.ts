@@ -24,6 +24,11 @@ export class AdjacencyMatrixRenderer {
   // Fixed layout metrics (CSS pixels)
   private scrollbarWidth: number = 14
 
+  // Touch state
+  private touchStartClientY: number = 0
+  private touchStartScrollTop: number = 0
+  private isTouching: boolean = false
+
   // Event handlers references for unbinding
   private handleWheelFn: any = null
   private handleMouseMoveFn: any = null
@@ -31,6 +36,9 @@ export class AdjacencyMatrixRenderer {
   private handleMouseUpFn: any = null
   private handleMouseOutFn: any = null
   private handleClickFn: any = null
+  private handleTouchStartFn: any = null
+  private handleTouchMoveFn: any = null
+  private handleTouchEndFn: any = null
 
   constructor(canvasElement: HTMLCanvasElement, callbacks: MatrixCallbacks = {}) {
     this.canvasElement = canvasElement
@@ -152,12 +160,41 @@ export class AdjacencyMatrixRenderer {
       }
     }
 
+    this.handleTouchStartFn = (e: TouchEvent) => {
+      if (!this.currentConfig || e.touches.length !== 1) return
+      this.isTouching = true
+      this.touchStartClientY = e.touches[0].clientY
+      this.touchStartScrollTop = this.scrollTop
+    }
+
+    this.handleTouchMoveFn = (e: TouchEvent) => {
+      if (!this.isTouching || !this.currentConfig || e.touches.length !== 1 || this.maxScrollTop <= 0) return
+      const rect = canvas.getBoundingClientRect()
+      const mx = e.touches[0].clientX - rect.left
+      const my = e.touches[0].clientY - rect.top
+      const { gridY, gridH, gridX, gridW } = this.getLayoutSpecs()
+
+      if (mx >= gridX && mx < gridX + gridW && my >= gridY && my < gridY + gridH) {
+        e.preventDefault()
+        const dy = e.touches[0].clientY - this.touchStartClientY
+        this.scrollTop = Math.max(0, Math.min(this.maxScrollTop, this.touchStartScrollTop - dy))
+        this.redraw()
+      }
+    }
+
+    this.handleTouchEndFn = () => {
+      this.isTouching = false
+    }
+
     canvas.addEventListener('wheel', this.handleWheelFn, { passive: false })
     canvas.addEventListener('mousemove', this.handleMouseMoveFn)
     canvas.addEventListener('mousedown', this.handleMouseDownFn)
     window.addEventListener('mouseup', this.handleMouseUpFn)
     canvas.addEventListener('mouseout', this.handleMouseOutFn)
     canvas.addEventListener('click', this.handleClickFn)
+    canvas.addEventListener('touchstart', this.handleTouchStartFn, { passive: true })
+    canvas.addEventListener('touchmove', this.handleTouchMoveFn, { passive: false })
+    canvas.addEventListener('touchend', this.handleTouchEndFn, { passive: true })
   }
 
   private unbindEvents() {
@@ -168,6 +205,9 @@ export class AdjacencyMatrixRenderer {
     window.removeEventListener('mouseup', this.handleMouseUpFn)
     if (this.handleMouseOutFn) canvas.removeEventListener('mouseout', this.handleMouseOutFn)
     if (this.handleClickFn) canvas.removeEventListener('click', this.handleClickFn)
+    if (this.handleTouchStartFn) canvas.removeEventListener('touchstart', this.handleTouchStartFn)
+    if (this.handleTouchMoveFn) canvas.removeEventListener('touchmove', this.handleTouchMoveFn)
+    if (this.handleTouchEndFn) canvas.removeEventListener('touchend', this.handleTouchEndFn)
   }
 
   public draw(config: any) {

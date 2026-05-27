@@ -138,4 +138,29 @@ watch(() => graph.value.size, (newSize, oldSize) => {
   flex: 1;
   min-height: 0;
 }
+
+@media (max-width: 1024px) {
+  .admin-dashboard {
+    overflow: visible;
+    height: auto;
+  }
+  .dashboard-grid-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    overflow: visible;
+  }
+  .span-2-rows {
+    grid-row: span 1;
+  }
+  .col-3-layout {
+    grid-column: 1;
+    grid-row: auto;
+    height: auto;
+    overflow: visible;
+  }
+  .col-3-layout > :nth-child(2),
+  .col-3-layout > :nth-child(3) {
+    height: auto !important;
+  }
+}
 </style>
