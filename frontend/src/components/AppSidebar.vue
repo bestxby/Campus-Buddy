@@ -1,17 +1,21 @@
 <template>
   <aside class="sidebar" :style="{ width: props.width + 'px' }">
-    <!-- Logo Banner (Centered Layout) -->
+    <!-- Logo Banner (Horizontal Layout) -->
     <a href="https://github.com/bestxby/Campus-Buddy" target="_blank" rel="noopener" class="sidebar-logo-banner" title="访问 GitHub 项目仓库">
-      <div class="sidebar-logo-icon">🧭</div>
-      <div class="sidebar-logo-title">Campus Buddy</div>
-      <div class="sidebar-logo-sub">校园社交智能推荐系统</div>
+      <div class="logo-main-group">
+        <div class="sidebar-logo-icon">🧭</div>
+        <div class="sidebar-logo-text-wrap">
+          <div class="sidebar-logo-title">Campus Buddy</div>
+          <div class="sidebar-logo-sub">校园社交智能推荐系统</div>
+        </div>
+      </div>
       <div v-if="currentUserRole === 'admin'" class="admin-dashboard-title-badge">
         <span class="pulse-dot">📡</span>
-        <span>系统大数据中心化管理看板</span>
+        <span>管理端</span>
       </div>
       <div v-else class="student-dashboard-title-badge">
         <span class="pulse-dot">📊</span>
-        <span>个人社交推荐看板</span>
+        <span>推荐端</span>
       </div>
     </a>
 
@@ -82,125 +86,131 @@ const emit  = defineEmits<{
 
 /* ─── Logo Banner ─────────────────────────────────────────── */
 .sidebar-logo-banner {
-  margin: 12px 10px 0;
+  margin: 10px 10px 0;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 5px;
-  padding: 18px 14px 15px;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
   background: linear-gradient(145deg, #09090e 0%, #110e20 50%, #030712 100%) !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 240, 255, 0.25) !important;
-  border-radius: 12px;
+  border: 1px solid rgba(0, 240, 255, 0.2) !important;
+  border-radius: 10px;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 4px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 240, 255, 0.05), inset 0 0 30px rgba(255,0,127,0.02);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6), inset 0 0 10px rgba(0, 240, 255, 0.05);
 }
 .sidebar-logo-banner:hover {
-  border-color: rgba(255, 0, 127, 0.6) !important;
+  border-color: rgba(255, 0, 127, 0.5) !important;
   background: linear-gradient(145deg, #110e20 0%, #09090e 50%, #1a0b2e 100%) !important;
-  box-shadow: 0 8px 30px rgba(255, 0, 127, 0.18), inset 0 0 15px rgba(0, 240, 255, 0.08) !important;
+  box-shadow: 0 6px 20px rgba(255, 0, 127, 0.15), inset 0 0 10px rgba(0, 240, 255, 0.08) !important;
   transform: translateY(-1px);
 }
 .sidebar-logo-banner::before {
-  content: ''; position: absolute; top: -30px; right: -20px;
-  width: 80px; height: 80px;
-  background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%);
+  content: ''; position: absolute; top: -20px; right: -15px;
+  width: 60px; height: 60px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.12) 0%, transparent 70%);
   pointer-events: none;
 }
+.logo-main-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.sidebar-logo-text-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 .sidebar-logo-icon {
-  font-size: 36px;
-  filter: drop-shadow(0 0 12px #00f0ff) drop-shadow(0 0 25px rgba(255,0,127,0.4));
+  font-size: 22px;
+  filter: drop-shadow(0 0 8px #00f0ff) drop-shadow(0 0 15px rgba(255,0,127,0.3));
   animation: floatIcon 3s ease-in-out infinite, spinCompass 16s linear infinite;
-  margin-bottom: 3px;
   user-select: none;
+  flex-shrink: 0;
 }
 @keyframes floatIcon {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-3px); }
 }
 @keyframes spinCompass {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 .sidebar-logo-title {
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 950;
   letter-spacing: -0.2px;
   background: linear-gradient(90deg, #ff007f 0%, #ff7f00 45%, #00f0ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 0 8px rgba(0,240,255,0.4);
+  text-shadow: 0 0 6px rgba(0,240,255,0.3);
+  line-height: 1.2;
 }
 .sidebar-logo-sub {
-  font-size: 11px;
+  font-size: 9px;
   color: #93c5fd;
   margin-top: 1px;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.3px;
   font-weight: 600;
-  text-shadow: 0 0 5px rgba(147,197,253,0.3);
+  text-shadow: 0 0 4px rgba(147,197,253,0.25);
+  line-height: 1.1;
 }
-.admin-dashboard-title-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  padding: 4px 14px;
-  background: rgba(255, 0, 127, 0.05) !important;
-  border: 1px solid #ff007f !important;
-  border-radius: 20px;
-  color: #ff007f;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  box-shadow: 0 0 8px rgba(255, 0, 127, 0.35);
-  animation: neonMagentaGlow 2.5s infinite ease-in-out;
-}
+.admin-dashboard-title-badge,
 .student-dashboard-title-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  padding: 4px 14px;
-  background: rgba(0, 240, 255, 0.05) !important;
-  border: 1px solid #00f0ff !important;
-  border-radius: 20px;
-  color: #00f0ff;
-  font-size: 9.5px;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 8.5px;
   font-weight: 700;
   letter-spacing: 0.2px;
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.35);
+  flex-shrink: 0;
+}
+.admin-dashboard-title-badge {
+  background: rgba(255, 0, 127, 0.05) !important;
+  border: 1px solid #ff007f !important;
+  color: #ff007f;
+  box-shadow: 0 0 6px rgba(255, 0, 127, 0.25);
+  animation: neonMagentaGlow 2.5s infinite ease-in-out;
+}
+.student-dashboard-title-badge {
+  background: rgba(0, 240, 255, 0.05) !important;
+  border: 1px solid #00f0ff !important;
+  color: #00f0ff;
+  box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
   animation: neonCyanGlow 2.5s infinite ease-in-out;
 }
 @keyframes neonCyanGlow {
   0%, 100% {
-    border-color: rgba(0, 240, 255, 0.4);
-    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+    border-color: rgba(0, 240, 255, 0.3);
+    box-shadow: 0 0 4px rgba(0, 240, 255, 0.2);
   }
   50% {
-    border-color: rgba(0, 240, 255, 0.95);
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+    border-color: rgba(0, 240, 255, 0.85);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.45);
   }
 }
 @keyframes neonMagentaGlow {
   0%, 100% {
-    border-color: rgba(255, 0, 127, 0.4);
-    box-shadow: 0 0 6px rgba(255, 0, 127, 0.25);
+    border-color: rgba(255, 0, 127, 0.3);
+    box-shadow: 0 0 4px rgba(255, 0, 127, 0.2);
   }
   50% {
-    border-color: rgba(255, 0, 127, 0.95);
-    box-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
+    border-color: rgba(255, 0, 127, 0.85);
+    box-shadow: 0 0 10px rgba(255, 0, 127, 0.45);
   }
 }
 .pulse-dot {
-  font-size: 10px;
+  font-size: 9px;
   display: inline-block;
   animation: pulseScale 2s infinite ease-in-out;
 }
