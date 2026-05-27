@@ -81,31 +81,36 @@ import { themeCommunities } from '@/composables/useGraphInsights'
 .theme-communities-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 2px 0;
+  justify-content: space-around;
+  height: 100%;
+  padding: 4px 0;
+  box-sizing: border-box;
 }
 .theme-community-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.02);
-  border-radius: 6px;
-  padding: 4px 8px;
+  border-radius: 8px;
+  padding: 8px 12px;
 }
 .theme-community-left {
   display: flex;
   align-items: center;
-  gap: 4px;
-  width: 55px; /* Fixed width to align progress bars */
+  gap: 6px;
+  width: 65px; /* Fixed width to align progress bars */
   flex-shrink: 0;
 }
 .theme-icon {
-  font-size: 11px;
+  font-size: 14px;
+  width: 16px; /* Fixed width for emoji icon to guarantee label alignment */
+  display: inline-block;
+  text-align: center;
 }
 .theme-label {
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 700;
   text-align: left;
 }
@@ -113,38 +118,38 @@ import { themeCommunities } from '@/composables/useGraphInsights'
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 .progress-bar-track {
   flex: 1;
-  height: 4px;
+  height: 6px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border-color);
-  border-radius: 2px;
+  border-radius: 3px;
   overflow: hidden;
 }
 .progress-bar-fill {
   height: 100%;
-  border-radius: 2px;
+  border-radius: 3px;
   transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 .progress-value {
-  font-size: 8px;
+  font-size: 9.5px;
   color: var(--text-secondary);
   font-weight: 600;
-  min-width: 24px;
+  min-width: 28px;
   text-align: right;
 }
 .theme-metrics {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   flex-shrink: 0;
 }
 .metric-badge {
-  font-size: 8px;
-  padding: 1px 3px;
-  border-radius: 3px;
+  font-size: 9.5px;
+  padding: 2px 5px;
+  border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.02);
   color: var(--text-secondary);
