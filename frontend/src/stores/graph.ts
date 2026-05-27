@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, triggerRef } from 'vue'
 import type { GraphStats } from '@/types'
 import { GraphAlgorithms, nodeKey } from '@/utils/graph-algorithms'
 import { ADMIN_NAME, addInterestTagToTaxonomy } from '@/constants/interests'
@@ -15,6 +15,7 @@ export const useGraphStore = defineStore('graph', () => {
     } else {
       privateStudents.value.delete(student)
     }
+    triggerRef(privateStudents)
   }
 
   function setStudentSocial(student: string, isSocial: boolean): void {
@@ -23,6 +24,7 @@ export const useGraphStore = defineStore('graph', () => {
     } else {
       socialStudents.value.delete(student)
     }
+    triggerRef(socialStudents)
   }
 
   const studentsList = computed<string[]>(() => {
@@ -85,6 +87,9 @@ export const useGraphStore = defineStore('graph', () => {
     stats.studentsCount   = s
     stats.interestsCount  = i
     stats.activitiesCount = a
+
+    // Immediately trigger reactive dependencies on the graph Map
+    triggerRef(graph)
 
     // Immediately notify subscribers for basic stats/filters
     statsUpdateSubscribers.forEach(cb => cb())

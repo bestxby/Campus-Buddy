@@ -141,12 +141,14 @@ interface FlattenedActivity {
 const flattenedRecommendedActivities = computed((): FlattenedActivity[] => {
   const result: FlattenedActivity[] = []
   const groups = filteredActivitiesGrouped.value
+  const seen = new Set<string>()
   
   for (const interest in groups) {
     const acts = groups[interest]
     for (const act of acts) {
       // Avoid duplicate activity entries in matching result
-      if (result.some(r => r.name === act)) continue
+      if (seen.has(act)) continue
+      seen.add(act)
       
       const info = activityInfoMap.value.get(act) ?? { interests: [], studentCount: 0 }
       const buddiesSigned = getBuddiesForActivity(activeStudent.value ?? '', act)

@@ -15,6 +15,9 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     pool: 'threads',
+    threads: {
+      singleThread: true,
+    },
   },
   build: {
     // ✅ OPTIMIZED: Split d3 (~500KB) into its own vendor chunk.

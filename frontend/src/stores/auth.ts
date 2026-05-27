@@ -90,9 +90,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   const personaBadgeClass = computed((): string => {
     const p = userPersona.value
-    if (p.includes('Tech'))     return 'badge-orange'
-    if (p.includes('Sports'))   return 'badge-cyan'
-    if (p.includes('Creative')) return 'badge-pink'
+    if (p.includes('科技'))     return 'badge-orange'
+    if (p.includes('运动'))     return 'badge-cyan'
+    if (p.includes('文艺'))     return 'badge-pink'
     return 'badge-green'
   })
 
@@ -102,9 +102,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   const previewPersonaClass = computed((): string => {
     const p = previewPersona.value
-    if (p.includes('Tech'))     return 'text-orange'
-    if (p.includes('Sports'))   return 'text-cyan'
-    if (p.includes('Creative')) return 'text-pink'
+    if (p.includes('科技'))     return 'text-orange'
+    if (p.includes('运动'))     return 'text-cyan'
+    if (p.includes('文艺'))     return 'text-pink'
     return 'text-green'
   })
 

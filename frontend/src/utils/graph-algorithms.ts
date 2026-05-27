@@ -1,5 +1,8 @@
 import type { PathResult, BuddyResult, NodeKind } from '@/types'
 
+const SOCIAL_BOOST_FACTOR = 1.3
+const BOOST_LIMIT = 1.0
+
 export function nodeKey(kind: NodeKind, name: string): string {
   return `${kind}:${name}`
 }
@@ -114,21 +117,28 @@ export class GraphAlgorithms {
           seenBuddies.add(buddyName)
 
           const bNode = nodeKey('student', buddyName)
-          const bInterests = new Set(
-            Array.from(graph.get(bNode) ?? []).filter(n => n.startsWith('interest:'))
-          )
-          const intersectCount = sInterests.filter(i => bInterests.has(i)).length
-          const unionCount = new Set([...sInterestSet, ...bInterests]).size
+          const bInterests = new Set<string>()
+          for (const n of graph.get(bNode) ?? []) {
+            if (n.startsWith('interest:')) {
+              bInterests.add(n)
+            }
+          }
+
+          let intersectCount = 0
+          const sharedInterests: string[] = []
+          for (const i of sInterests) {
+            if (bInterests.has(i)) {
+              intersectCount++
+              sharedInterests.push(i.replace('interest:', ''))
+            }
+          }
+          const unionCount = sInterestSet.size + bInterests.size - intersectCount
           let jaccard = unionCount > 0 ? intersectCount / unionCount : 0
 
           // Boost Jaccard similarity score for social/talent mode students, capping at 1.0
           if (socialStudents.has(buddyName)) {
-            jaccard = Math.min(1.0, jaccard * 1.3)
+            jaccard = Math.min(BOOST_LIMIT, jaccard * SOCIAL_BOOST_FACTOR)
           }
-
-          const sharedInterests = sInterests
-            .filter(i => bInterests.has(i))
-            .map(i => i.replace('interest:', ''))
 
           rankedBuddies.push({ name: buddyName, jaccard, sharedCount: intersectCount, sharedInterests })
         }

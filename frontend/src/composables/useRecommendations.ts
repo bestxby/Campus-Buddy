@@ -3,7 +3,11 @@ import { computed, watch, customRef, ref } from 'vue'
 import type { MatchedFriend, PathResult } from '@/types'
 import { useGraphStore } from '@/stores/graph'
 import { nodeKey } from '@/composables/useGraph'
-import { useAuthStore } from '@/stores/auth'
+
+// Named Constants
+const DEBOUNCE_SEARCH_MS = 250
+const DEBOUNCE_RECALC_MS = 300
+const FRIEND_MATCH_LIMIT = 30
 
 // Domain state delegates to Pinia store with writable computed for pathResult
 export const pathResult = computed<PathResult | null>({
@@ -18,20 +22,20 @@ export const recommendations = computed(() => useRecommendationStore().recommend
 
 // UI State delegates dynamically to Pinia recommendation store using customRef (no global caching)
 export const activeStudent = customRef<string | null>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().activeStudent } catch { return null } },
-  set: (val) => { try { useRecommendationStore().activeStudent = val; trigger() } catch {} }
+  get: () => { track(); try { return useRecommendationStore().activeStudent } catch (err) { console.error('[useRecommendations] Error getting activeStudent:', err); return null } },
+  set: (val) => { try { useRecommendationStore().activeStudent = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting activeStudent:', err) } }
 }))
 export const searchQuery = customRef<string>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().searchQuery } catch { return '' } },
-  set: (val) => { try { useRecommendationStore().searchQuery = val; trigger() } catch {} }
+  get: () => { track(); try { return useRecommendationStore().searchQuery } catch (err) { console.error('[useRecommendations] Error getting searchQuery:', err); return '' } },
+  set: (val) => { try { useRecommendationStore().searchQuery = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting searchQuery:', err) } }
 }))
 export const suggestions = customRef<string[]>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().suggestions } catch { return [] } },
-  set: (val) => { try { useRecommendationStore().suggestions = val; trigger() } catch {} }
+  get: () => { track(); try { return useRecommendationStore().suggestions } catch (err) { console.error('[useRecommendations] Error getting suggestions:', err); return [] } },
+  set: (val) => { try { useRecommendationStore().suggestions = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting suggestions:', err) } }
 }))
 export const searchFriendQuery = customRef<string>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().searchFriendQuery } catch { return '' } },
-  set: (val) => { try { useRecommendationStore().searchFriendQuery = val; trigger() } catch {} }
+  get: () => { track(); try { return useRecommendationStore().searchFriendQuery } catch (err) { console.error('[useRecommendations] Error getting searchFriendQuery:', err); return '' } },
+  set: (val) => { try { useRecommendationStore().searchFriendQuery = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting searchFriendQuery:', err) } }
 }))
 export const debouncedSearchFriendQuery = ref('')
 let _searchFriendDebounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -42,17 +46,17 @@ watch(
     if (_searchFriendDebounceTimer) clearTimeout(_searchFriendDebounceTimer)
     _searchFriendDebounceTimer = setTimeout(() => {
       debouncedSearchFriendQuery.value = newVal
-    }, 250)
+    }, DEBOUNCE_SEARCH_MS)
   },
   { immediate: true }
 )
 export const activeFilter = customRef<string>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().activeFilter } catch { return '全部' } },
-  set: (val) => { try { useRecommendationStore().activeFilter = val; trigger() } catch {} }
+  get: () => { track(); try { return useRecommendationStore().activeFilter } catch (err) { console.error('[useRecommendations] Error getting activeFilter:', err); return '全部' } },
+  set: (val) => { try { useRecommendationStore().activeFilter = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting activeFilter:', err) } }
 }))
 export const expandedGroups = customRef<Record<string, boolean>>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().expandedGroups } catch { return {} } },
-  set: (val) => { try { useRecommendationStore().expandedGroups = val; trigger() } catch {} }
+  get: () => { track(); try { return useRecommendationStore().expandedGroups } catch (err) { console.error('[useRecommendations] Error getting expandedGroups:', err); return {} } },
+  set: (val) => { try { useRecommendationStore().expandedGroups = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting expandedGroups:', err) } }
 }))
 
 // Helper functions/actions
@@ -175,21 +179,24 @@ export const matchedFriends = computed((): MatchedFriend[] => {
   results.sort((a, b) =>
     b.sharedCount !== a.sharedCount ? b.sharedCount - a.sharedCount : a.name.localeCompare(b.name)
   )
-  return results.slice(0, 30)
+  return results.slice(0, FRIEND_MATCH_LIMIT)
 })
 
-// ✅ PERFORMANCE: Debounce Jaccard recommendation recalculation triggered by sign-up/cancel events.
-// Without debounce, each click synchronously runs O(N²) similarity calculations, freezing the UI.
+// ✅ PERFORMANCE: Debounce Jaccard recommendation recalculation triggered by graph or user changes.
 let _recalcDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
 watch(
-  () => {
-    try {
-      return useAuthStore().signedUpActivities
-    } catch {
-      return []
-    }
-  },
+  [
+    () => {
+      try {
+        const store = useGraphStore()
+        return [store.graph, store.privateStudents, store.socialStudents]
+      } catch {
+        return null
+      }
+    },
+    () => activeStudent.value
+  ],
   () => {
     if (_recalcDebounceTimer) clearTimeout(_recalcDebounceTimer)
     _recalcDebounceTimer = setTimeout(() => {
@@ -197,7 +204,7 @@ watch(
         runRecommendations(activeStudent.value)
       }
       _recalcDebounceTimer = null
-    }, 300)
+    }, DEBOUNCE_RECALC_MS)
   },
   { deep: true }
 )
