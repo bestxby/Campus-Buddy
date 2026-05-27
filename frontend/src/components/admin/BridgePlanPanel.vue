@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { graph, addEdge, updateStats, nodeKey } from '@/composables/useGraph'
+import { graph } from '@/composables/useGraph'
 import { topSocialStudents, popularInterests } from '@/composables/useGraphInsights'
 import { addLog } from '@/composables/useLogs'
 
@@ -72,7 +72,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: []
-  applied: []
+  applied: [studentName: string]
 }>()
 
 const bridgeOptionSelected = ref<'interest' | 'student' | 'activity'>('interest')
@@ -102,33 +102,24 @@ const mostPopularActivity = computed(() => {
 
 const applyBridgePlan = () => {
   const studentName = props.studentName
-  const studentNode = nodeKey('student', studentName)
-  let targetNode = ''
   let targetName = ''
   let bridgeType = ''
 
   if (bridgeOptionSelected.value === 'interest') {
     targetName = mostPopularInterest.value.name
-    targetNode = nodeKey('interest', targetName)
     bridgeType = '兴趣圈'
   } else if (bridgeOptionSelected.value === 'student') {
     targetName = topHubStudent.value.name
-    targetNode = nodeKey('student', targetName)
     bridgeType = '社交枢纽同学'
   } else {
     targetName = mostPopularActivity.value.name
-    targetNode = nodeKey('activity', targetName)
     bridgeType = '热门校园活动'
   }
 
-  // Add the edge to bridge them
-  addEdge(studentNode, targetNode)
-  updateStats()
+  addLog('action', `【人脉桥接建议】已成功向孤立同学【${studentName}】推送${bridgeType}【${targetName}】的帮扶建议`)
+  addLog('info', `系统状态：已向用户端下发建议通知，等待该生确认加入以融入校园网。`)
 
-  addLog('action', `【人脉桥接推送】成功向孤立同学【${studentName}】推送${bridgeType}【${targetName}】的社交桥接建议`)
-  addLog('info', `系统诊断：已向用户端下发帮扶建议。若其接受并完成关联，社交度数将增至 1，正式连通校园网。`)
-
-  emit('applied')
+  emit('applied', studentName)
 }
 </script>
 

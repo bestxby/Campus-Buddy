@@ -7,37 +7,40 @@
           <span class="info-icon">ℹ️</span>
           <div class="tooltip-content left-align">
             <h4>主题社群分析说明</h4>
-            <p>基于运动、艺术、科技、社交四大领域类别，实时分析对应圈子的学生覆盖比例（即参与了该类兴趣的学生占比）以及在该圈子中活跃学生的平均社交度数（连接活跃度）。有助于管理员动态发现冷门社群并针对性发布活动进行调控。</p>
+            <p>基于运动、艺术、科技、社交四大领域类别，实时 analysis 对应圈子的学生覆盖比例（即参与了该类兴趣的学生占比）以及在该圈子中活跃学生的平均社交度数（连接活跃度）。有助于管理员动态发现冷门社群并针对性发布活动进行调控。</p>
           </div>
         </div>
       </div>
     </div>
     
     <div class="card-scroll-body">
-      <div class="theme-communities-list">
+      <div class="theme-communities-grid">
         <div 
           v-for="item in themeCommunities" 
           :key="item.domain" 
-          class="theme-community-item"
+          class="theme-community-card-cell"
+          :style="{ borderColor: 'rgba(' + hexToRgb(item.color) + ', 0.15)' }"
         >
-          <div class="theme-community-left">
-            <span class="theme-icon" :style="{ color: item.color }">{{ item.icon }}</span>
-            <span class="theme-label" :style="{ color: item.color }">{{ item.label }}</span>
+          <div class="cell-header">
+            <span class="cell-icon-label">
+              <span class="cell-icon">{{ item.icon }}</span>
+              <span class="cell-label" :style="{ color: item.color }">{{ item.label }}社群</span>
+            </span>
+            <span class="cell-percentage" :style="{ color: item.color }">{{ item.percentage }}%</span>
           </div>
           
-          <div class="progress-bar-container">
+          <div class="cell-progress">
             <div class="progress-bar-track">
               <div 
                 class="progress-bar-fill" 
-                :style="{ width: item.percentage + '%', background: item.color, boxShadow: '0 0 4px ' + item.color }"
+                :style="{ width: item.percentage + '%', background: item.color, boxShadow: '0 0 6px ' + item.color }"
               ></div>
             </div>
-            <span class="progress-value">{{ item.percentage }}%</span>
           </div>
           
-          <div class="theme-metrics">
-            <span class="metric-badge">👥 {{ item.size }}</span>
-            <span class="metric-badge metric-deg" :style="{ borderColor: item.color, color: item.color }">⚡ {{ item.avgDegree }}</span>
+          <div class="cell-metrics">
+            <span class="metric-badge">👥 {{ item.size }}人</span>
+            <span class="metric-badge metric-deg" :style="{ color: item.color, borderColor: 'rgba(' + hexToRgb(item.color) + ', 0.3)' }">⚡ {{ item.avgDegree }}</span>
           </div>
         </div>
       </div>
@@ -47,6 +50,13 @@
 
 <script setup lang="ts">
 import { themeCommunities } from '@/composables/useGraphInsights'
+
+const hexToRgb = (hex: string) => {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `${r}, ${g}, ${b}`
+}
 </script>
 
 <style scoped>
@@ -76,85 +86,90 @@ import { themeCommunities } from '@/composables/useGraphInsights'
 }
 .card-scroll-body {
   flex: 1;
-  overflow-y: hidden; /* Prevent scrollbar since we have exactly 4 static domains */
-}
-.theme-communities-list {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
+  overflow-y: hidden;
   height: 100%;
-  padding: 4px 0;
+}
+.theme-communities-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+  height: 100%;
+  padding: 2px 0;
   box-sizing: border-box;
 }
-.theme-community-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  background: rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.02);
+.theme-community-card-cell {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
 }
-.theme-community-left {
+.theme-community-card-cell:hover {
+  background: rgba(30, 41, 59, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.cell-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10.5px;
+}
+.cell-icon-label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  width: 65px; /* Fixed width to align progress bars */
-  flex-shrink: 0;
+  gap: 4px;
 }
-.theme-icon {
-  font-size: 14px;
-  width: 16px; /* Fixed width for emoji icon to guarantee label alignment */
-  display: inline-block;
-  text-align: center;
+.cell-icon {
+  font-size: 12px;
 }
-.theme-label {
-  font-size: 11.5px;
+.cell-label {
   font-weight: 700;
-  text-align: left;
 }
-.progress-bar-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.cell-percentage {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 10.5px;
+}
+.cell-progress {
+  width: 100%;
+  margin: 4px 0;
 }
 .progress-bar-track {
-  flex: 1;
-  height: 6px;
+  height: 4px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border-color);
-  border-radius: 3px;
+  border-radius: 2px;
   overflow: hidden;
 }
 .progress-bar-fill {
   height: 100%;
-  border-radius: 3px;
+  border-radius: 2px;
   transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-.progress-value {
-  font-size: 9.5px;
-  color: var(--text-secondary);
-  font-weight: 600;
-  min-width: 28px;
-  text-align: right;
-}
-.theme-metrics {
+.cell-metrics {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 5px;
-  flex-shrink: 0;
+  gap: 4px;
 }
 .metric-badge {
-  font-size: 9.5px;
-  padding: 2px 5px;
+  font-size: 8.5px;
+  padding: 1.5px 4px;
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.02);
   color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
 }
 .metric-deg {
   font-family: monospace;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 </style>

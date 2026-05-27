@@ -41,8 +41,14 @@
                 <span class="student-avatar-icon">👤</span>
                 <span class="student-name-text">{{ student }}</span>
                 <span class="student-deg-badge">度数: 0</span>
+                <span v-if="sentSuggestions.has(student)" class="suggestion-sent-badge">已建议</span>
               </div>
-              <button class="btn btn-xs btn-secondary select-bridge-btn">⚡ 桥接</button>
+              <button 
+                class="btn btn-xs select-bridge-btn"
+                :class="sentSuggestions.has(student) ? 'suggested-btn' : 'btn-secondary'"
+              >
+                {{ sentSuggestions.has(student) ? '✓ 已建议' : '⚡ 桥接' }}
+              </button>
             </div>
           </div>
         </div>
@@ -52,7 +58,7 @@
           v-if="selectedIsolatedStudent"
           :student-name="selectedIsolatedStudent"
           @close="selectedIsolatedStudent = null"
-          @applied="selectedIsolatedStudent = null"
+          @applied="handleApplied"
           class="bridge-panel-sidebar"
         />
       </div>
@@ -67,6 +73,7 @@ import { ADMIN_NAME } from '@/constants/interests'
 import BridgePlanPanel from './BridgePlanPanel.vue'
 
 const selectedIsolatedStudent = ref<string | null>(null)
+const sentSuggestions = ref(new Set<string>())
 
 const isolatedStudents = computed(() => {
   const list: string[] = []
@@ -80,6 +87,12 @@ const isolatedStudents = computed(() => {
 
 const selectIsolatedStudent = (name: string) => {
   selectedIsolatedStudent.value = name
+}
+
+const handleApplied = (studentName: string) => {
+  sentSuggestions.value.add(studentName)
+  sentSuggestions.value = new Set(sentSuggestions.value) // Trigger reactivity
+  selectedIsolatedStudent.value = null
 }
 </script>
 
@@ -219,6 +232,21 @@ const selectIsolatedStudent = (name: string) => {
 .select-bridge-btn {
   font-size: 8px;
   padding: 2px 5px;
+}
+.select-bridge-btn.suggested-btn {
+  background-color: rgba(253, 151, 31, 0.12) !important;
+  border-color: rgba(253, 151, 31, 0.4) !important;
+  color: #ffb74d !important;
+  box-shadow: 0 0 6px rgba(253, 151, 31, 0.2);
+}
+.suggestion-sent-badge {
+  font-size: 7.5px;
+  color: #ffb74d;
+  background: rgba(253, 151, 31, 0.08);
+  border: 1px solid rgba(253, 151, 31, 0.2);
+  padding: 0px 3px;
+  border-radius: 3px;
+  margin-left: 2px;
 }
 .bridge-panel-sidebar {
   flex: 1;
