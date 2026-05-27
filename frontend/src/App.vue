@@ -350,6 +350,10 @@ onMounted(async () => {
   gap: 14px;
 }
 
+.mobile-top-bar {
+  display: none;
+}
+
 /* Mobile Styles */
 @media (max-width: 768px) {
   .dashboard {

@@ -115,7 +115,7 @@ import {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 6px;
+  gap: 8px;
   min-height: 0;
 }
 
@@ -126,7 +126,7 @@ import {
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.02);
   border-radius: 6px;
-  padding: 5px 8px;
+  padding: 6px 10px;
   box-sizing: border-box;
   text-align: left;
   transition: all 0.3s ease;
@@ -140,12 +140,12 @@ import {
 .metric-meta {
   display: flex;
   align-items: center;
-  gap: 3px;
-  margin-bottom: 1px;
+  gap: 4px;
+  margin-bottom: 2px;
 }
 
 .metric-label {
-  font-size: 9.5px;
+  font-size: 10.5px;
   color: var(--text-secondary);
   white-space: nowrap;
 }
@@ -172,16 +172,16 @@ import {
 
 .metric-value {
   font-family: Consolas, monospace;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 .metric-desc {
-  font-size: 8px;
+  font-size: 9px;
   color: rgba(255, 255, 255, 0.35);
-  line-height: 1.0;
-  margin-top: 1px;
+  line-height: 1.1;
+  margin-top: 2px;
 }
 
 /* Colors with soft glow shadows */
