@@ -142,12 +142,12 @@ const handleStudentSubmit = () => {
 .section-title { font-size: 12px; color: var(--accent-orange); margin: 8px 0 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 .form-split-row { display: flex; gap: 20px; margin-bottom: 8px; }
 .form-left-col, .form-right-col { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-.form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
-.label-bold { font-size: 12.5px; font-weight: bold; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.label-bold { font-size: 12.5px; font-weight: bold; line-height: 18px; display: block; }
 .form-group input {
   background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color);
-  color: var(--text-primary); border-radius: 6px; padding: 8px 12px; font-size: 13px;
-  width: 100%;
+  color: var(--text-primary); border-radius: 6px; padding: 0 12px; font-size: 13px;
+  width: 100%; height: 36px;
   box-sizing: border-box;
 }
 .form-group input:focus,
@@ -155,10 +155,10 @@ const handleStudentSubmit = () => {
   outline: none !important;
   border-color: rgba(255, 255, 255, 0.25) !important;
 }
-.avatar-picker-grid { display: flex; gap: 6px; flex-wrap: nowrap; justify-content: space-between; padding: 4px 0; }
+.avatar-picker-grid { display: flex; gap: 6px; flex-wrap: nowrap; justify-content: space-between; padding: 0; align-items: center; height: 36px; }
 .avatar-picker-btn {
-  width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.3);
-  border: 1px solid var(--border-color); font-size: 15px; display: flex;
+  width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border-color); font-size: 16px; display: flex;
   align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;
 }
 .avatar-picker-btn:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 2px; }
