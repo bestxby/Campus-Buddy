@@ -226,16 +226,42 @@ onMounted(async () => {
   padding: 14px 20px !important;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  background: linear-gradient(135deg, rgba(18, 24, 38, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%) !important;
-  border: 1px solid rgba(253, 151, 31, 0.2) !important;
+  background: linear-gradient(135deg, rgba(18, 24, 38, 0.98) 0%, rgba(30, 41, 59, 0.92) 100%) !important;
+  border: none !important;
   border-radius: 8px;
   flex-shrink: 0;
   user-select: none;
+  position: relative;
+  z-index: 0;
+}
+.student-graph-btn-card::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  z-index: -1;
+  border-radius: 9px;
+  background: conic-gradient(
+    from 0deg,
+    #fd971f,
+    #ec4899,
+    #8b5cf6,
+    #06b6d4,
+    #34d399,
+    #fd971f
+  );
+  animation: borderSpin 4s linear infinite;
+  transition: inset 0.3s ease;
 }
 .student-graph-btn-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(253, 151, 31, 0.5) !important;
-  background: linear-gradient(135deg, rgba(253, 151, 31, 0.04) 0%, rgba(18, 24, 38, 0.98) 100%) !important;
+}
+.student-graph-btn-card:hover::before {
+  inset: -2.5px;
+  border-radius: 10px;
+}
+@keyframes borderSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 .student-card-content {
   display: flex;
