@@ -5,18 +5,35 @@
       <div class="stats-grid-title">🌐 全局网络与数据控制</div>
       
       <div class="control-cards-grid">
-        <!-- 打开全局拓扑卡片 (可点击) -->
+
+        <!-- 发布新活动卡片 (可点击) -->
         <div 
-          @click="triggerOpenGlobalGraph" 
+          @click="triggerCreateActivity" 
+          class="control-card action-card" 
+          style="--control-color: #34d399"
+        >
+          <div class="control-card-content">
+            <div class="control-card-header">
+              <span class="control-icon">➕</span>
+              <span class="control-label">发布校园新活动</span>
+            </div>
+            <span class="action-hint">创建新活动并设置相关兴趣圈标签</span>
+          </div>
+          <span class="action-arrow">➔</span>
+        </div>
+
+        <!-- 发布新兴趣标签卡片 (可点击) -->
+        <div 
+          @click="triggerCreateInterest" 
           class="control-card action-card" 
           style="--control-color: #06b6d4"
         >
           <div class="control-card-content">
             <div class="control-card-header">
-              <span class="control-icon">🌌</span>
-              <span class="control-label">打开全局拓扑图谱</span>
+              <span class="control-icon">🏷️</span>
+              <span class="control-label">发布新兴趣标签</span>
             </div>
-            <span class="action-hint">查看/缩放全校所有人脉关系网络</span>
+            <span class="action-hint">创建新兴趣并设置相关归属领域类别</span>
           </div>
           <span class="action-arrow">➔</span>
         </div>
@@ -33,22 +50,6 @@
               <span class="control-label">重置系统数据</span>
             </div>
             <span class="action-hint">重置为系统默认网络关系</span>
-          </div>
-          <span class="action-arrow">➔</span>
-        </div>
-
-        <!-- 发布新活动卡片 (可点击) -->
-        <div 
-          @click="triggerCreateActivity" 
-          class="control-card action-card" 
-          style="--control-color: #34d399"
-        >
-          <div class="control-card-content">
-            <div class="control-card-header">
-              <span class="control-icon">➕</span>
-              <span class="control-label">发布校园新活动</span>
-            </div>
-            <span class="action-hint">创建新活动并设置相关兴趣圈标签</span>
           </div>
           <span class="action-arrow">➔</span>
         </div>
@@ -121,12 +122,10 @@ const closeSuggestions = () => {
 const emit = defineEmits<{
   logout: [],
   'open-graph': [forceGlobal?: boolean],
-  'create-activity': []
+  'create-activity': [],
+  'create-interest': []
 }>()
 
-const triggerOpenGlobalGraph = () => {
-  emit('open-graph', true)
-}
 
 const triggerOpenIndividualGraph = () => {
   emit('open-graph', false)
@@ -134,6 +133,10 @@ const triggerOpenIndividualGraph = () => {
 
 const triggerCreateActivity = () => {
   emit('create-activity')
+}
+
+const triggerCreateInterest = () => {
+  emit('create-interest')
 }
 
 const triggerResetGraph = async () => {

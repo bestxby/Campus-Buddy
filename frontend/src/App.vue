@@ -9,8 +9,9 @@
       @logout="onLogout" 
       @open-graph="openGraph" 
       @create-activity="showCreateActivity = true"
+      @create-interest="showCreateInterest = true"
     />
-    <div class="layout-splitter vertical-splitter" @mousedown="startSidebarResize" />
+    <div class="layout-splitter vertical-splitter" role="separator" @mousedown="startSidebarResize" />
 
     <main class="main-content">
 
@@ -19,7 +20,11 @@
       <div class="content-grid">
         <!-- Welcome screen / Admin Dashboard (no student selected) -->
         <template v-if="!activeStudent">
-          <AdminDashboard v-if="currentUserRole === 'admin'" @create-activity="showCreateActivity = true" />
+          <AdminDashboard 
+            v-if="currentUserRole === 'admin'" 
+            @create-activity="showCreateActivity = true" 
+            @open-graph="openGraph"
+          />
           <div v-else class="card welcome-card fade-in">
             <h2>👋 欢迎，{{ currentUser }}！</h2>
             <p>
@@ -43,7 +48,10 @@
           <div
             v-if="currentUserRole === 'student'"
             class="student-graph-btn-card card"
+            role="button"
+            tabindex="0"
             @click="openGraph"
+            @keydown.enter="openGraph"
           >
             <div class="student-card-content">
               <span class="btn-icon">🌌</span>
@@ -59,7 +67,7 @@
             <div class="rec-split-col">
               <AllActivities />
             </div>
-            <div class="rec-split-col">
+            <div class="rec-split-col buddy-col">
               <BuddyList @open-graph-highlight="openGraph" />
             </div>
           </div>
@@ -76,6 +84,11 @@
       @close="showCreateActivity = false"
       @created="onActivityCreated"
     />
+    <CreateInterestModal 
+      :visible="showCreateInterest" 
+      @close="showCreateInterest = false"
+      @created="onActivityCreated"
+    />
   </div>
 </template>
 
@@ -89,6 +102,7 @@ import BuddyList     from '@/components/BuddyList.vue'
 import GraphModal    from '@/components/GraphModal.vue'
 import AdminDashboard from '@/components/AdminDashboard.vue'
 import CreateActivityModal from '@/components/admin/CreateActivityModal.vue'
+import CreateInterestModal from '@/components/admin/CreateInterestModal.vue'
 
 import { loadGraphData, updateStats } from '@/composables/useGraph'
 import { currentUser, restoreSession, currentUserRole } from '@/composables/useAuth'
@@ -96,12 +110,13 @@ import { activeStudent, selectStudent, clearSearch } from '@/composables/useReco
 import { graphAnalyticsService } from '@/services/GraphAnalyticsService'
 
 const showCreateActivity = ref(false)
+const showCreateInterest = ref(false)
 
 // ─── Graph Modal ───────────────────────────────────────────────────────────────
 const graphModalRef = ref<InstanceType<typeof GraphModal> | null>(null)
-const openGraph     = (forceGlobal?: any) => {
+const openGraph     = (forceGlobal?: any, viewMode?: any, matrixMode?: any) => {
   const isGlobal = typeof forceGlobal === 'boolean' ? forceGlobal : undefined
-  graphModalRef.value?.open(isGlobal)
+  graphModalRef.value?.open(isGlobal, viewMode, matrixMode)
 }
 
 // ─── Event handlers ────────────────────────────────────────────────────────────
@@ -217,6 +232,9 @@ onMounted(async () => {
   padding: 10px 10px 0;
   margin: -10px -10px 0;
 }
+.rec-split-col.buddy-col {
+  flex: 1.35;
+}
 
 /* Student Entry Card */
 .student-graph-btn-card {
@@ -224,6 +242,7 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding: 14px 20px !important;
+  margin: 0 3px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   background: linear-gradient(135deg, rgba(18, 24, 38, 0.98) 0%, rgba(30, 41, 59, 0.92) 100%) !important;

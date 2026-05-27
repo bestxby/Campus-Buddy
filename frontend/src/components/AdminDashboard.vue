@@ -8,20 +8,29 @@
       <!-- Grid Card 2: Activity Saturation Diagnostics & Precision Promo -->
       <ActivitySaturationCard @create-activity="emit('create-activity')" />
 
-      <!-- Grid Card 3: Centrality Insights - Degree Centrality -->
-      <DegreeCentralityCard />
-
       <!-- Grid Card 4: Isolation Diagnostics & Auto-Bridge (Spans 2 rows) -->
       <IsolationCard class="span-2-rows" />
 
       <!-- Grid Card 5: System Logs -->
       <SystemLogsCard />
 
-      <!-- Grid Card 6: Betweenness Centrality (Spans 2 rows) -->
-      <BetweennessCentralityCard class="span-2-rows" />
-
       <!-- Grid Card 7: Icebreaking Potential Ranking -->
       <IcebreakingPotentialCard />
+
+      <!-- Column 3 Layout (Spans all 3 rows) -->
+      <div class="col-3-layout">
+        <!-- Matrix Diagnostics Card (Height auto-contracts) -->
+        <MatrixDiagnosticsCard @open-graph="(forceGlobal, viewMode, matrixMode) => emit('open-graph', forceGlobal, viewMode, matrixMode)" />
+
+        <!-- Betweenness Centrality (Flex grow) -->
+        <BetweennessCentralityCard />
+
+        <!-- Degree Centrality (Flex grow) -->
+        <DegreeCentralityCard />
+
+        <!-- Network Metrics Card (Height auto-contracts) -->
+        <NetworkMetricsCard />
+      </div>
     </div>
   </div>
 </template>
@@ -41,9 +50,12 @@ import PopularInterestsCard from '@/components/admin/PopularInterestsCard.vue'
 import SystemLogsCard from '@/components/admin/SystemLogsCard.vue'
 import BetweennessCentralityCard from '@/components/admin/BetweennessCentralityCard.vue'
 import IcebreakingPotentialCard from '@/components/admin/IcebreakingPotentialCard.vue'
+import MatrixDiagnosticsCard from '@/components/admin/MatrixDiagnosticsCard.vue'
+import NetworkMetricsCard from '@/components/admin/NetworkMetricsCard.vue'
 
 const emit = defineEmits<{
-  'create-activity': []
+  'create-activity': [],
+  'open-graph': [forceGlobal: boolean, viewMode: 'network' | 'matrix', matrixMode: 'student-interest' | 'student-activity' | 'interest-cooccurrence']
 }>()
 
 // Seed initial logs
@@ -98,5 +110,32 @@ watch(() => graph.value.size, (newSize, oldSize) => {
 
 .span-2-rows {
   grid-row: span 2;
+}
+
+.col-3-layout {
+  grid-column: 3;
+  grid-row: 1 / span 3;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Diagnostics card height fits its 3 buttons */
+.col-3-layout > :nth-child(1) {
+  height: auto !important;
+}
+
+/* Centrality cards have a compact height to fit exactly 5 items */
+.col-3-layout > :nth-child(2),
+.col-3-layout > :nth-child(3) {
+  height: 185px !important;
+}
+
+/* Global Network Metrics Card stretches to fill the remaining vertical height */
+.col-3-layout > :nth-child(4) {
+  flex: 1;
+  min-height: 0;
 }
 </style>

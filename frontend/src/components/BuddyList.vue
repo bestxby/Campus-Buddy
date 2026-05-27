@@ -10,14 +10,14 @@
       <li v-for="buddy in recommendations.buddies.slice(0, maxVisibleBuddies)" :key="buddy.name" class="path-item" :class="{ 'social-buddy-item': isSocialBuddy(buddy.name) }">
         <div class="buddy-row">
           <div class="path-flow">
-            <span class="node student" :class="{ 'social-buddy-node': isSocialBuddy(activeStudent!) }">
+            <span class="node student" :class="{ 'social-buddy-node': isSocialBuddy(activeStudent!) }" :title="activeStudent || ''">
               {{ activeStudent }}
               <span v-if="isSocialBuddy(activeStudent!)" class="social-star" title="社交达人">🌟</span>
             </span>
             <span class="arrow">➔</span>
-            <span class="node interest">{{ getSharedInterest(activeStudent!, buddy.name, 'student') }}</span>
+            <span class="node interest" :title="getSharedInterest(activeStudent!, buddy.name, 'student')">{{ getSharedInterest(activeStudent!, buddy.name, 'student') }}</span>
             <span class="arrow">➔</span>
-            <span class="node student" :class="{ 'social-buddy-node': isSocialBuddy(buddy.name) }">
+            <span class="node student" :class="{ 'social-buddy-node': isSocialBuddy(buddy.name) }" :title="buddy.name">
               {{ buddy.name }}
               <span v-if="isSocialBuddy(buddy.name)" class="social-star" title="社交达人">🌟</span>
             </span>
@@ -64,12 +64,12 @@ const maxVisibleBuddies = computed(() => currentUserRole.value === 'admin' ? 30 
   flex: 1;
 }
 .path-item { background-color: rgba(255,255,255,0.01); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 12px; }
-.buddy-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-.path-flow { display: flex; align-items: center; gap: 8px; font-size: 10px; }
-.node { padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+.buddy-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: nowrap; min-width: 0; }
+.path-flow { display: flex; align-items: center; gap: 6px; font-size: 10px; flex: 1; min-width: 0; }
+.node { padding: 4px 8px; border-radius: 4px; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 95px; }
 .node.student { background-color: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.2); color: #a5f3fc; }
 .node.interest { background-color: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #93c5fd; }
-.arrow { color: var(--text-secondary); font-weight: bold; }
+.arrow { color: var(--text-secondary); font-weight: bold; flex-shrink: 0; }
 .jaccard-badge { display: flex; align-items: center; gap: 4px; background: rgba(253,151,31,0.08); border: 1px solid rgba(253,151,31,0.2); border-radius: 20px; padding: 3px 8px; flex-shrink: 0; }
 .jaccard-icon { font-size: 10px; }
 .jaccard-count { font-size: 9px; color: rgba(255,255,255,0.5); }

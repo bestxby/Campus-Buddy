@@ -21,10 +21,12 @@
       </div>
 
       <!-- Role Tab Toggles -->
-      <div class="login-tabs">
+      <div class="login-tabs" role="tablist">
         <button
           type="button"
           class="login-tab-btn"
+          role="tab"
+          :aria-selected="activeTab === 'student'"
           :class="{ 'tab-active': activeTab === 'student' }"
           @click="activeTab = 'student'"
         >
@@ -33,6 +35,8 @@
         <button
           type="button"
           class="login-tab-btn"
+          role="tab"
+          :aria-selected="activeTab === 'admin'"
           :class="{ 'tab-active-admin': activeTab === 'admin' }"
           @click="activeTab = 'admin'"
         >

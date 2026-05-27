@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '../stores/auth'
 // @ts-ignore
@@ -12,6 +12,14 @@ describe('Auth Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     localStorage.clear()
+
+    // Mock global fetch to prevent relative URL fetch warnings during logout/loadGraphData
+    globalThis.fetch = vi.fn().mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ students: [], activities: [], registrations: [] })
+      } as Response)
+    )
   })
 
   it('should initialize with default states', () => {
@@ -64,5 +72,33 @@ describe('Auth Store', () => {
     expect(store.currentUser).toBe('Bob')
     expect(store.currentUserRole).toBe('student')
     expect(store.signedUpActivities).toContain('活动A')
+  })
+
+  it('should logout and clear states', async () => {
+    const store = useAuthStore()
+    store.regForm.name = 'Alice'
+    store.regForm.selectedInterests = ['Python']
+    store.submitRegistration()
+    
+    await store.logout()
+    expect(store.currentUser).toBeNull()
+    expect(store.currentUserRole).toBeNull()
+    expect(store.signedUpActivities.length).toBe(0)
+    expect(localStorage.getItem('campus_buddy_user')).toBeNull()
+  })
+
+  it('should handle signing up for and cancelling activities', () => {
+    const store = useAuthStore()
+    store.regForm.name = 'Alice'
+    store.regForm.selectedInterests = ['Python']
+    store.submitRegistration()
+
+    store.signUpForActivity('周三篮球赛')
+    expect(store.isSignedUp('周三篮球赛')).toBe(true)
+    expect(store.signedUpActivities).toContain('周三篮球赛')
+
+    store.cancelSignUpForActivity('周三篮球赛')
+    expect(store.isSignedUp('周三篮球赛')).toBe(false)
+    expect(store.signedUpActivities).not.toContain('周三篮球赛')
   })
 })

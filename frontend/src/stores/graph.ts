@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, reactive, computed } from 'vue'
 import type { GraphStats } from '@/types'
 import { GraphAlgorithms, nodeKey } from '@/utils/graph-algorithms'
-import { ADMIN_NAME } from '@/constants/interests'
+import { ADMIN_NAME, addInterestTagToTaxonomy } from '@/constants/interests'
 
 export const useGraphStore = defineStore('graph', () => {
   const graph = ref<Map<string, Set<string>>>(new Map())
@@ -217,6 +217,15 @@ export const useGraphStore = defineStore('graph', () => {
     updateStats()
   }
 
+  function addInterestNode(name: string, domain: 'sports' | 'arts' | 'tech' | 'social'): void {
+    const interestNode = `interest:${name}`
+    if (!graph.value.has(interestNode)) {
+      graph.value.set(interestNode, new Set())
+    }
+    addInterestTagToTaxonomy(name, domain)
+    updateStats()
+  }
+
   return {
     graph,
     stats,
@@ -230,6 +239,7 @@ export const useGraphStore = defineStore('graph', () => {
     loadGraphData,
     addActivity,
     deleteActivity,
+    addInterestNode,
     studentsList,
     allActivitiesList,
   }

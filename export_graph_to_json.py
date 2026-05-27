@@ -11,13 +11,13 @@ def export_data():
         print("Error: Mock CSV data not found. Please run 'python generate_mock_data.py' first.")
         return
 
-    students = []
+    student_interests = []
     with open(student_csv, mode="r", encoding="utf-8") as f:
         reader = csv.reader(f)
         next(reader, None)  # skip header
         for row in reader:
             if row and len(row) >= 2:
-                students.append([row[0].strip(), row[1].strip()])
+                student_interests.append([row[0].strip(), row[1].strip()])
 
     activities = []
     with open(activity_csv, mode="r", encoding="utf-8") as f:
@@ -37,7 +37,7 @@ def export_data():
                     registrations.append([row[0].strip(), row[1].strip()])
 
     data = {
-        "students": students,
+        "students": student_interests,
         "activities": activities,
         "registrations": registrations
     }
@@ -49,7 +49,7 @@ def export_data():
     with open(output_file, mode="w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    print(f"Exported {len(students)} student-interests, {len(activities)} activity-interests, and {len(registrations)} registrations to '{output_file}'.")
+    print(f"Exported {len(student_interests)} student-interests, {len(activities)} activity-interests, and {len(registrations)} registrations to '{output_file}'.")
 
 if __name__ == "__main__":
     export_data()

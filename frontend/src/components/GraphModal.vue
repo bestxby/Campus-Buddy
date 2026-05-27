@@ -4,13 +4,42 @@
       <!-- Header -->
       <div class="fullscreen-modal-header">
         <div class="vis-title-group">
-          <h3>🌐 {{ isGlobalMode ? '校园全局人脉拓扑网络' : '局域关联拓扑网络' }}</h3>
+          <h3>🌐 {{ viewMode === 'matrix' ? '校园人脉邻接关联矩阵' : (isGlobalMode ? '校园全局人脉拓扑网络' : '局域关联拓扑网络') }}</h3>
           <span class="vis-subtitle">
-            {{ isGlobalMode ? '全校兴趣社群与活动分布骨干网络图谱' : (currentUserRole === 'admin' ? `${activeStudent} 的双跳聚焦关系网络` : '您的双跳聚焦关系网络') }}
+            {{ viewMode === 'matrix' ? '通过二维网格交叉诊断兴趣重合与活动参与' : (isGlobalMode ? '全校兴趣社群与活动分布骨干网络图谱' : (currentUserRole === 'admin' ? `${activeStudent} 的双跳聚焦关系网络` : '您的双跳聚焦关系网络')) }}
           </span>
         </div>
         <div class="modal-controls-row">
-          <div class="canvas-toggles">
+          <!-- View Mode Tabs (Admin Only) -->
+          <div class="view-mode-tabs" v-if="currentUserRole === 'admin' && activeStudent">
+            <button 
+              :class="['tab-btn', viewMode === 'network' ? 'active' : '']" 
+              @click="viewMode = 'network'"
+            >🌌 关系网络</button>
+            <button 
+              :class="['tab-btn', viewMode === 'matrix' ? 'active' : '']" 
+              @click="viewMode = 'matrix'"
+            >🧮 邻接矩阵</button>
+          </div>
+
+          <!-- Matrix Mode Select -->
+          <div class="matrix-mode-select-wrap" v-if="viewMode === 'matrix'">
+            <select v-model="matrixMode" class="matrix-select-neon">
+              <option value="student-interest">👤 学生个人兴趣倾向</option>
+              <option value="interest-cooccurrence">🎯 兴趣社群交叉共现</option>
+              <option value="student-activity">🎉 校园活动参与分布</option>
+            </select>
+            <button
+              v-if="activeStudent"
+              class="view-network-btn-neon"
+              @click="viewMode = 'network'"
+              title="切换至该学生的双跳拓扑关系网络"
+            >
+              🌌 查看 {{ activeStudent }} 的聚焦关系网络
+            </button>
+          </div>
+
+          <div class="canvas-toggles" v-if="viewMode === 'network'">
             <div class="toggle-group">
               <label class="neon-checkbox">
                 <input type="checkbox" v-model="hideBuddies" />
@@ -28,23 +57,23 @@
                 🌐 全局骨干网络
               </label>
             </div>
-            <div class="limit-slider-group">
+            <div class="limit-slider-group" v-if="!isGlobalMode">
               <span class="slider-label">👥 推荐搭子限额: {{ buddyLimit }}人</span>
               <input type="range" min="0" :max="maxLimit" step="1" v-model.number="buddyLimit" class="neon-slider" />
             </div>
           </div>
-          <div class="zoom-controls-modal">
-            <button @click="zoomIn" class="zoom-btn" title="放大">➕</button>
-            <button @click="zoomOut" class="zoom-btn" title="缩小">➖</button>
-            <button @click="resetZoom" class="zoom-btn" title="重置">🔄</button>
+          <div class="zoom-controls-modal" v-if="viewMode === 'network'">
+            <button @click="zoomIn" class="zoom-btn" title="放大" aria-label="放大">➕</button>
+            <button @click="zoomOut" class="zoom-btn" title="缩小" aria-label="缩小">➖</button>
+            <button @click="resetZoom" class="zoom-btn" title="重置" aria-label="重置">🔄</button>
           </div>
-          <button @click="close" class="close-modal-btn" title="关闭拓扑图">❌</button>
+          <button @click="close" class="close-modal-btn" title="关闭拓扑图" aria-label="关闭">❌</button>
         </div>
       </div>
 
       <!-- Canvas -->
       <div class="fullscreen-canvas-container">
-        <svg ref="svgRef" width="100%" height="100%"></svg>
+        <canvas ref="canvasRef" style="width: 100%; height: 100%; display: block;"></canvas>
         
         <!-- Hover tooltip -->
         <div v-if="hoveredDetail" class="vis-tooltip fade-in">
@@ -59,9 +88,7 @@
           </div>
         </div>
         
-        <div class="canvas-hint">
-          💡 支持滚动鼠标缩放，拖拽/悬停节点<span v-if="currentUserRole === 'admin'">，点击同学可切换视图</span>
-        </div>
+
       </div>
     </div>
   </div>
@@ -75,17 +102,21 @@ import { currentUser, currentUserRole, signedUpActivities } from '@/composables/
 import { useGraphStore } from '@/stores/graph'
 import type { HoveredConnectionDetail } from '@/types'
 import { ForceGraphRenderer } from '@/services/ForceGraphRenderer'
+import { AdjacencyMatrixRenderer } from '@/services/AdjacencyMatrixRenderer'
 
 // ─── Local State ───────────────────────────────────────────────────────────────
 const visible        = ref(false)
-const svgRef         = ref<SVGSVGElement | null>(null)
+const canvasRef      = ref<HTMLCanvasElement | null>(null)
 const hideBuddies    = ref(false)
 const hideActivities = ref(false)
 const maxLimit       = computed(() => currentUserRole.value === 'admin' ? 40 : 10)
 const buddyLimit     = ref(currentUserRole.value === 'admin' ? 30 : 10)
 const showGlobal     = ref(false)
 const hoveredDetail  = ref<HoveredConnectionDetail | null>(null)
+const viewMode       = ref<'network' | 'matrix'>('network')
+const matrixMode     = ref<'student-interest' | 'student-activity' | 'interest-cooccurrence'>('student-interest')
 let   graphRenderer: ForceGraphRenderer | null = null
+let   matrixRenderer: AdjacencyMatrixRenderer | null = null
 
 const isGlobalMode = computed(() => {
   if (currentUserRole.value !== 'admin') return false
@@ -99,10 +130,24 @@ watch(maxLimit, (newMax) => {
 }, { immediate: true })
 
 // ─── Public API ────────────────────────────────────────────────────────────────
-const open = (forceGlobal?: boolean) => {
+const open = (
+  forceGlobal?: boolean,
+  initialViewMode?: 'network' | 'matrix',
+  initialMatrixMode?: 'student-interest' | 'student-activity' | 'interest-cooccurrence'
+) => {
   visible.value = true
   if (forceGlobal === true && currentUserRole.value === 'admin') {
     showGlobal.value = true
+  }
+  if (initialViewMode) {
+    viewMode.value = initialViewMode
+  } else if (showGlobal.value || !activeStudent.value) {
+    viewMode.value = 'matrix'
+  } else {
+    viewMode.value = 'network'
+  }
+  if (initialMatrixMode) {
+    matrixMode.value = initialMatrixMode
   }
   setTimeout(drawGraph, 50)
 }
@@ -116,74 +161,110 @@ defineExpose({ open, close, redraw })
 
 // ─── Zoom Actions ──────────────────────────────────────────────────────────────
 const zoomIn = () => {
-  graphRenderer?.zoomIn()
+  if (viewMode.value === 'network') graphRenderer?.zoomIn()
 }
 const zoomOut = () => {
-  graphRenderer?.zoomOut()
+  if (viewMode.value === 'network') graphRenderer?.zoomOut()
 }
 const resetZoom = () => {
-  graphRenderer?.resetZoom()
+  if (viewMode.value === 'network') graphRenderer?.resetZoom()
 }
 
 // ─── D3 Force-directed Graph Renderer Delegation ──────────────────────────────
 let drawScheduled = false
 const drawGraph = () => {
-  if (!svgRef.value) return
+  if (!canvasRef.value) return
   if (drawScheduled) return
   drawScheduled = true
 
   nextTick(() => {
     drawScheduled = false
-    if (!svgRef.value) return
-    if (!graphRenderer) {
-      graphRenderer = new ForceGraphRenderer(svgRef.value, {
-        onNodeClick: (node: any) => {
-          if (node.type === 'student' && currentUserRole.value === 'admin') {
-            selectStudent(node.name)
+    if (!canvasRef.value) return
+
+    if (viewMode.value === 'network') {
+      if (matrixRenderer) {
+        matrixRenderer.destroy()
+        matrixRenderer = null
+      }
+
+      if (!graphRenderer) {
+        graphRenderer = new ForceGraphRenderer(canvasRef.value, {
+          onNodeClick: (node: any) => {
+            if (node.type === 'student' && currentUserRole.value === 'admin') {
+              selectStudent(node.name)
+            }
+          },
+          onHover: (detail) => {
+            hoveredDetail.value = detail
           }
-        },
-        onHover: (detail) => {
-          hoveredDetail.value = detail
-        }
+        })
+      }
+
+      graphRenderer.draw({
+        graph: graph.value,
+        activeStudent: activeStudent.value,
+        recommendations: recommendations.value,
+        hideBuddies: hideBuddies.value,
+        hideActivities: hideActivities.value,
+        buddyLimit: buddyLimit.value,
+        pathResult: pathResult.value,
+        currentUser: currentUser.value,
+        currentUserRole: currentUserRole.value,
+        showGlobal: currentUserRole.value === 'admin' ? showGlobal.value : false,
+        privateStudents: useGraphStore().privateStudents,
+      })
+    } else {
+      if (graphRenderer) {
+        graphRenderer.destroy()
+        graphRenderer = null
+      }
+
+      if (!matrixRenderer) {
+        matrixRenderer = new AdjacencyMatrixRenderer(canvasRef.value, {
+          onNodeClick: (node: any) => {
+            if (node.type === 'student' && currentUserRole.value === 'admin') {
+              selectStudent(node.name)
+            }
+          },
+          onHover: (detail) => {
+            hoveredDetail.value = detail
+          }
+        })
+      }
+
+      matrixRenderer.draw({
+        graph: graph.value,
+        activeStudent: activeStudent.value,
+        matrixMode: matrixMode.value,
       })
     }
-
-    graphRenderer.draw({
-      graph: graph.value,
-      activeStudent: activeStudent.value,
-      recommendations: recommendations.value,
-      hideBuddies: hideBuddies.value,
-      hideActivities: hideActivities.value,
-      buddyLimit: buddyLimit.value,
-      pathResult: pathResult.value,
-      currentUser: currentUser.value,
-      currentUserRole: currentUserRole.value,
-      showGlobal: currentUserRole.value === 'admin' ? showGlobal.value : false,
-      privateStudents: useGraphStore().privateStudents,
-    })
   })
 }
 
-// Redraw when filter controls change
-watch([hideBuddies, hideActivities, buddyLimit, showGlobal], () => {
-  if (visible.value) drawGraph()
-})
-
-// Auto redraw if visible and activeStudent changes
-watch(activeStudent, () => {
-  showGlobal.value = false
-  if (visible.value) drawGraph()
-})
-
-// Auto redraw on activity signup changes to keep graph fresh
-watch(signedUpActivities, () => {
-  if (visible.value) drawGraph()
-}, { deep: true })
-
-// Auto redraw on pathResult changes to draw/clear highlighted shortest paths
-watch(pathResult, () => {
-  if (visible.value) drawGraph()
-})
+// Unified watcher for all reactive state changes that trigger redraw
+watch(
+  [
+    hideBuddies,
+    hideActivities,
+    buddyLimit,
+    showGlobal,
+    viewMode,
+    matrixMode,
+    activeStudent,
+    pathResult,
+    () => signedUpActivities.value
+  ],
+  ([_hb, _ha, _bl, _sg, _vm, _mm, newStudent], [_ohb, _oha, _obl, _osg, _ovm, _omm, oldStudent]) => {
+    if (newStudent !== oldStudent) {
+      showGlobal.value = false
+      if (!newStudent) {
+        viewMode.value = 'matrix'
+      }
+    }
+    if (visible.value) drawGraph()
+  },
+  { deep: true }
+)
 
 // ─── Lifecycle ─────────────────────────────────────────────────────────────────
 onMounted(() => {
@@ -195,6 +276,10 @@ onUnmounted(() => {
   if (graphRenderer) {
     graphRenderer.destroy()
     graphRenderer = null
+  }
+  if (matrixRenderer) {
+    matrixRenderer.destroy()
+    matrixRenderer = null
   }
 })
 </script>

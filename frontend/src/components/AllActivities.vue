@@ -99,7 +99,10 @@ const handleCancelSignUp = (activity: string) => {
   emit('cancelled', activity)
 }
 
-const allActivities = computed(() => useGraphStore().allActivitiesList)
+const allActivities = computed(() => {
+  // 按照活动名称拼音/字母排序，防止报名人数变化时卡片顺序动态改变发生乱跳
+  return [...useGraphStore().allActivitiesList].sort((a, b) => a.name.localeCompare(b.name))
+})
 
 const filteredAllActivities = computed(() => {
   const q = allActivitiesSearchQuery.value.trim().toLowerCase()

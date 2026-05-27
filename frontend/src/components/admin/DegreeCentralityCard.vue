@@ -14,7 +14,7 @@
     </div>
     <div class="card-scroll-body">
       <div class="centrality-list">
-        <div v-for="(item, idx) in topSocialStudents" :key="item.name" class="centrality-item">
+        <div v-for="(item, idx) in topSocialStudents.slice(0, 5)" :key="item.name" class="centrality-item">
           <span class="centrality-rank">#{{ idx + 1 }}</span>
           <span class="centrality-name">👤 {{ item.name }}</span>
           <span class="centrality-score">{{ item.score }} 个连结</span>
@@ -60,8 +60,7 @@ import { topSocialStudents } from '@/composables/useGraphInsights'
 }
 .card-scroll-body {
   flex: 1;
-  overflow-y: auto;
-  padding-right: 4px;
+  overflow-y: hidden;
 }
 .centrality-list {
   display: flex;

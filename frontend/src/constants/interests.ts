@@ -8,21 +8,29 @@
 /** Available avatar emoji options for the registration form */
 export const AVATAR_OPTIONS = ['🚀', '💻', '🎨', '🎮', '🧭', '🎧', '🧠'] as const
 
+import { reactive, computed } from 'vue'
+
 /**
  * Interest categories — 30 tags across 4 domains.
  * Mirrors the taxonomy used in generate_mock_data.py.
  */
-export const INTEREST_CATEGORIES = {
+export const INTEREST_CATEGORIES = reactive({
   sports: ['篮球', '足球', '羽毛球', '网球', '游泳', '乒乓球', '排球'],
   arts:   ['摄影', '读书', '电影', '音乐', '绘画', '棋类', '桌游', '书法'],
   tech:   ['Python', 'Web开发', '机器学习', '算法竞赛', '网络安全', 'Linux', '硬件DIY', '物联网'],
   social: ['志愿服务', '英语角', '户外探索', '辩论社', '公益支教', '求职沙龙', '旅行搭子'],
-} as const
+})
 
-export type InterestDomain = keyof typeof INTEREST_CATEGORIES
+export type InterestDomain = 'sports' | 'arts' | 'tech' | 'social'
+
+export function addInterestTagToTaxonomy(name: string, domain: InterestDomain) {
+  if (INTEREST_CATEGORIES[domain] && !INTEREST_CATEGORIES[domain].includes(name)) {
+    INTEREST_CATEGORIES[domain].push(name)
+  }
+}
 
 /** All interest tags flattened into a single array */
-export const ALL_INTERESTS: string[] = Object.values(INTEREST_CATEGORIES).flat()
+export const ALL_INTERESTS = computed(() => Object.values(INTEREST_CATEGORIES).flat())
 
 /** Domain metadata for the sidebar profile bar chart */
 export const DOMAIN_META = [

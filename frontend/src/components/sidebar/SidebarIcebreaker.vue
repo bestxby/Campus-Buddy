@@ -43,16 +43,12 @@ const tipData = computed(() => {
 <style scoped>
 .sidebar-icebreaker-panel {
   margin: 10px 10px 0;
-  background: linear-gradient(135deg, rgba(253, 151, 31, 0.03) 0%, rgba(255, 255, 255, 0.015) 100%);
-  border: 1px solid rgba(253, 151, 31, 0.15);
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   padding: 12px;
   flex-shrink: 0;
-  animation: subtleGlow 4s infinite ease-in-out;
-}
-@keyframes subtleGlow {
-  0%, 100% { border-color: rgba(253, 151, 31, 0.15); }
-  50% { border-color: rgba(253, 151, 31, 0.3); }
+  box-sizing: border-box;
 }
 .panel-title {
   font-size: 11.5px;

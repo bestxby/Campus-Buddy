@@ -27,6 +27,7 @@
       @logout="emit('logout')"
       @open-graph="(forceGlobal) => emit('open-graph', forceGlobal)"
       @create-activity="emit('create-activity')"
+      @create-interest="emit('create-interest')"
     />
 
     <!-- Student Only Panels -->
@@ -66,7 +67,8 @@ const props = defineProps<{ width: number }>()
 const emit  = defineEmits<{ 
   logout: [],
   'open-graph': [forceGlobal?: boolean],
-  'create-activity': []
+  'create-activity': [],
+  'create-interest': []
 }>()
 </script>
 
@@ -75,7 +77,9 @@ const emit  = defineEmits<{
   background: linear-gradient(180deg, #0e1422 0%, #0b0f19 100%);
   border-right: 1px solid rgba(255,255,255,0.06);
   display: flex; flex-direction: column;
-  box-sizing: border-box; overflow-y: auto;
+  box-sizing: border-box; 
+  overflow-y: auto;
+  overflow-x: hidden;
   flex-shrink: 0;
   height: 100%;
 }
@@ -214,6 +218,7 @@ const emit  = defineEmits<{
 /* ─── Footer ──────────────────────────────────────────────── */
 .sidebar-footer {
   margin: 10px;
+  margin-top: auto;
   flex-shrink: 0;
   padding: 12px 10px;
   border: 1px solid rgba(255,255,255,0.04);

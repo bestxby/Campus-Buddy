@@ -80,7 +80,7 @@ import { INTEREST_CATEGORIES, DOMAIN_META } from '@/constants/interests'
 import { useGraphStore } from '@/stores/graph'
 import { addLog } from '@/composables/useLogs'
 
-const props = defineProps<{
+defineProps<{
   visible: boolean
 }>()
 
