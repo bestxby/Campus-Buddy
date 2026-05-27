@@ -200,13 +200,12 @@ export class GraphAnalyticsService {
   private calculateThemeCommunities(): ThemeCommunityStat[] {
     const list: ThemeCommunityStat[] = []
     const graph = useGraphStore().graph
-    const totalStudents = useGraphStore().stats.studentsCount || 1
 
-    for (const meta of DOMAIN_META) {
+    // First, pass over domains to compute sizes and average degrees
+    const domainStats = DOMAIN_META.map(meta => {
       const tags = INTEREST_CATEGORIES[meta.key] || []
       const tagsSet = new Set(tags.map(t => `interest:${t}`))
 
-      // Find all students who have at least one interest in this domain
       const domainStudents = new Set<string>()
       let totalDegree = 0
 
@@ -228,18 +227,52 @@ export class GraphAnalyticsService {
       }
 
       const size = domainStudents.size
-      const percentage = Math.round((size / totalStudents) * 100)
       const avgDegree = size > 0 ? Math.round((totalDegree / size) * 10) / 10 : 0
 
-      list.push({
-        domain: meta.key,
-        label: meta.label,
-        icon: meta.icon,
-        color: meta.color,
+      return {
+        meta,
         size,
-        percentage,
         avgDegree,
         tagsCount: tags.length
+      }
+    })
+
+    const totalSize = domainStats.reduce((sum, item) => sum + item.size, 0)
+    let sumPercentages = 0
+
+    const listWithRawPercents = domainStats.map(stat => {
+      const rawPercent = totalSize > 0 ? (stat.size / totalSize) * 100 : 0
+      const percentage = Math.round(rawPercent)
+      sumPercentages += percentage
+      return {
+        stat,
+        percentage,
+        error: rawPercent - percentage
+      }
+    })
+
+    // Adjust to exactly 100 if sumPercentages is not 100 and totalSize > 0
+    if (totalSize > 0 && sumPercentages !== 100) {
+      const diff = 100 - sumPercentages
+      if (diff > 0) {
+        const sorted = [...listWithRawPercents].sort((a, b) => b.error - a.error)
+        sorted[0].percentage += diff
+      } else {
+        const sorted = [...listWithRawPercents].sort((a, b) => a.error - b.error)
+        sorted[0].percentage += diff
+      }
+    }
+
+    for (const item of listWithRawPercents) {
+      list.push({
+        domain: item.stat.meta.key,
+        label: item.stat.meta.label,
+        icon: item.stat.meta.icon,
+        color: item.stat.meta.color,
+        size: item.stat.size,
+        percentage: item.percentage,
+        avgDegree: item.stat.avgDegree,
+        tagsCount: item.stat.tagsCount
       })
     }
 

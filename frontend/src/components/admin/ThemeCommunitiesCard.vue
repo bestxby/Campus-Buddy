@@ -7,40 +7,75 @@
           <span class="info-icon">ℹ️</span>
           <div class="tooltip-content left-align">
             <h4>主题社群分析说明</h4>
-            <p>基于运动、艺术、科技、社交四大领域类别，实时 analysis 对应圈子的学生覆盖比例（即参与了该类兴趣的学生占比）以及在该圈子中活跃学生的平均社交度数（连接活跃度）。有助于管理员动态发现冷门社群并针对性发布活动进行调控。</p>
+            <p>基于运动、艺术、科技、社交四大领域类别，划分兴趣关联关系。环状图展示了各大兴趣领域学生参与人次的分布比重，指点悬停至不同区块可实时获取各社群的具体覆盖率与社交活跃度数。</p>
           </div>
         </div>
       </div>
     </div>
     
     <div class="card-scroll-body">
-      <div class="theme-communities-grid">
-        <div 
-          v-for="item in themeCommunities" 
-          :key="item.domain" 
-          class="theme-community-card-cell"
-          :style="{ borderColor: 'rgba(' + hexToRgb(item.color) + ', 0.15)' }"
-        >
-          <div class="cell-header">
-            <span class="cell-icon-label">
-              <span class="cell-icon">{{ item.icon }}</span>
-              <span class="cell-label" :style="{ color: item.color }">{{ item.label }}社群</span>
-            </span>
-            <span class="cell-percentage" :style="{ color: item.color }">{{ item.percentage }}%</span>
-          </div>
-          
-          <div class="cell-progress">
-            <div class="progress-bar-track">
-              <div 
-                class="progress-bar-fill" 
-                :style="{ width: item.percentage + '%', background: item.color, boxShadow: '0 0 6px ' + item.color }"
-              ></div>
+      <div class="theme-communities-donut-layout">
+        <!-- Left: Donut Chart -->
+        <div class="donut-chart-container">
+          <svg class="donut-svg" viewBox="0 0 100 100">
+            <!-- Background circle track -->
+            <circle 
+              cx="50" 
+              cy="50" 
+              r="40" 
+              fill="none" 
+              stroke="rgba(255,255,255,0.03)" 
+              stroke-width="9" 
+            />
+            <!-- Donut segments -->
+            <circle
+              v-for="slice in slices"
+              :key="slice.domain"
+              class="donut-segment"
+              cx="50"
+              cy="50"
+              r="40"
+              fill="none"
+              stroke-width="9"
+              :stroke="slice.color"
+              :stroke-dasharray="slice.strokeDasharray"
+              :stroke-dashoffset="slice.strokeDashoffset"
+              transform="rotate(-90 50 50)"
+              @mouseenter="hoveredSlice = slice"
+              @mouseleave="hoveredSlice = null"
+              :style="{ '--hover-color': slice.color }"
+              :class="{ 'segment-highlighted': hoveredSlice?.domain === slice.domain }"
+            />
+            
+            <!-- Center Text Group -->
+            <g class="donut-center-text">
+              <text x="50" y="42" class="center-title">{{ hoveredSlice ? hoveredSlice.label + '社群' : '主题社群' }}</text>
+              <text x="50" y="55" class="center-value">{{ hoveredSlice ? `👥 ${hoveredSlice.size}人` : `共 ${totalSize}人次` }}</text>
+              <text x="50" y="66" class="center-sub">{{ hoveredSlice ? `⚡ 均度: ${hoveredSlice.avgDegree}` : '悬停诊断' }}</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Right: Legend list -->
+        <div class="donut-legend-list">
+          <div 
+            v-for="slice in slices" 
+            :key="slice.domain" 
+            class="legend-item"
+            :class="{ 'legend-item-active': hoveredSlice?.domain === slice.domain }"
+            @mouseenter="hoveredSlice = slice"
+            @mouseleave="hoveredSlice = null"
+            :style="{ '--theme-color': slice.color }"
+          >
+            <div class="legend-header">
+              <span class="legend-dot" :style="{ backgroundColor: slice.color }"></span>
+              <span class="legend-label">{{ slice.label }}社群</span>
+              <span class="legend-percentage">{{ slice.percentage }}%</span>
             </div>
-          </div>
-          
-          <div class="cell-metrics">
-            <span class="metric-badge">👥 {{ item.size }}人</span>
-            <span class="metric-badge metric-deg" :style="{ color: item.color, borderColor: 'rgba(' + hexToRgb(item.color) + ', 0.3)' }">⚡ {{ item.avgDegree }}</span>
+            <div class="legend-details">
+              <span>👥 {{ slice.size }}人</span>
+              <span class="legend-deg">⚡ 均度: {{ slice.avgDegree }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -49,14 +84,35 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import { themeCommunities } from '@/composables/useGraphInsights'
 
-const hexToRgb = (hex: string) => {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
-  return `${r}, ${g}, ${b}`
-}
+const hoveredSlice = ref<any | null>(null)
+
+const totalSize = computed(() => {
+  return themeCommunities.value.reduce((acc, item) => acc + item.size, 0)
+})
+
+const slices = computed(() => {
+  const C = 2 * Math.PI * 40 // Circumference: ~251.327
+  let accumulatedPercent = 0
+  
+  return themeCommunities.value.map(item => {
+    const share = totalSize.value > 0 ? (item.size / totalSize.value) : 0
+    const sliceLength = C * share
+    const strokeDasharray = `${sliceLength} ${C}`
+    const strokeDashoffset = -C * accumulatedPercent
+    
+    accumulatedPercent += share
+    
+    return {
+      ...item,
+      share,
+      strokeDasharray,
+      strokeDashoffset,
+    }
+  })
+})
 </script>
 
 <style scoped>
@@ -89,87 +145,110 @@ const hexToRgb = (hex: string) => {
   overflow-y: hidden;
   height: 100%;
 }
-.theme-communities-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 8px;
+.theme-communities-donut-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   height: 100%;
-  padding: 2px 0;
+  width: 100%;
   box-sizing: border-box;
 }
-.theme-community-card-cell {
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 8px;
+.donut-chart-container {
+  flex: 0 0 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.donut-svg {
+  width: 100%;
+  height: auto;
+  max-width: 130px;
+}
+.donut-segment {
+  cursor: pointer;
+  transition: stroke-width 0.25s ease, filter 0.25s ease;
+}
+.donut-segment:hover,
+.donut-segment.segment-highlighted {
+  stroke-width: 12px;
+  filter: drop-shadow(0 0 6px var(--hover-color));
+}
+.donut-center-text {
+  pointer-events: none;
+}
+.donut-center-text text {
+  text-anchor: middle;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.center-title {
+  font-size: 8px;
+  font-weight: 700;
+  fill: var(--text-primary);
+}
+.center-value {
+  font-size: 9px;
+  font-weight: bold;
+  fill: #ffb74d;
+}
+.center-sub {
+  font-size: 5.5px;
+  fill: var(--text-secondary);
+}
+.donut-legend-list {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  box-sizing: border-box;
-  transition: all 0.3s ease;
-}
-.theme-community-card-cell:hover {
-  background: rgba(30, 41, 59, 0.6);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-.cell-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 10.5px;
-}
-.cell-icon-label {
-  display: flex;
-  align-items: center;
   gap: 4px;
+  justify-content: center;
 }
-.cell-icon {
-  font-size: 12px;
+.legend-item {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  padding: 5px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
 }
-.cell-label {
+.legend-item:hover,
+.legend-item-active {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: var(--theme-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.legend-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+}
+.legend-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend-label {
   font-weight: 700;
+  color: var(--text-primary);
 }
-.cell-percentage {
+.legend-percentage {
+  margin-left: auto;
   font-family: monospace;
   font-weight: 700;
-  font-size: 10.5px;
 }
-.cell-progress {
-  width: 100%;
-  margin: 4px 0;
-}
-.progress-bar-track {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-color);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.progress-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-.cell-metrics {
+.legend-details {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 4px;
-}
-.metric-badge {
-  font-size: 8.5px;
-  padding: 1.5px 4px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.02);
+  gap: 8px;
+  font-size: 8px;
   color: var(--text-secondary);
-  display: inline-flex;
-  align-items: center;
+  padding-left: 12px;
 }
-.metric-deg {
+.legend-deg {
   font-family: monospace;
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 </style>
