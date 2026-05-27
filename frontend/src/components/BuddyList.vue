@@ -53,7 +53,16 @@ const maxVisibleBuddies = computed(() => currentUserRole.value === 'admin' ? 30 
 <style scoped>
 .result-card { height: 100%; display: flex; flex-direction: column; }
 .result-card h3 { font-size: 13px; margin: 0 0 16px 0; color: var(--text-secondary); }
-.buddy-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; }
+.buddy-list {
+  list-style: none;
+  padding: 8px 8px 8px 6px;
+  margin: -8px -8px -8px -6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
 .path-item { background-color: rgba(255,255,255,0.01); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 12px; }
 .buddy-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 .path-flow { display: flex; align-items: center; gap: 8px; font-size: 10px; }

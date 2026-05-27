@@ -32,7 +32,8 @@
 .activities-scroll-area {
   flex: 1;
   overflow-y: auto;
-  padding-right: 4px;
+  padding: 8px 8px 8px 6px;
+  margin: -8px -8px -8px -6px;
 }
 .activities-grid {
   display: flex;

@@ -189,9 +189,34 @@ onMounted(async () => {
 .tip-box p { margin: 0; }
 
 /* Recommendations */
-.recommendations { width: 100%; display: flex; flex-direction: column; gap: 14px; overflow: hidden; height: 100%; }
-.recommendations-row { display: flex; gap: 16px; flex: 1; overflow: hidden; min-height: 0; }
-.rec-split-col { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.recommendations {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+  height: 100%;
+  padding: 10px 10px 0;
+  margin: -10px -10px 0;
+}
+.recommendations-row {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  padding: 10px 10px 0;
+  margin: -10px -10px 0;
+}
+.rec-split-col {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 10px 10px 0;
+  margin: -10px -10px 0;
+}
 
 /* Student Entry Card */
 .student-graph-btn-card {
@@ -201,27 +226,35 @@ onMounted(async () => {
   padding: 14px 20px !important;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  background: linear-gradient(135deg, rgba(18,24,38,0.9) 0%, rgba(30,41,59,0.8) 100%) !important;
-  border: 1px solid rgba(253,151,31,0.2) !important;
+  background: linear-gradient(135deg, rgba(18,24,38,0.95) 0%, rgba(30,41,59,0.85) 100%) !important;
+  border: 1px solid rgba(253,151,31,0.25) !important;
   flex-shrink: 0;
   user-select: none;
-  animation: breathGlow 3s ease-in-out infinite;
+  animation: breathGlow 2.5s ease-in-out infinite;
 }
 .student-graph-btn-card:hover {
-  animation: none;
-  border-color: rgba(253,151,31,0.5) !important;
-  background: linear-gradient(135deg, rgba(253,151,31,0.06) 0%, rgba(18,24,38,0.95) 100%) !important;
-  box-shadow: 0 0 20px rgba(253,151,31,0.25), inset 0 0 15px rgba(253,151,31,0.08) !important;
-  transform: translateY(-1px);
+  transform: translateY(-2.5px);
+  background: linear-gradient(135deg, rgba(253,151,31,0.08) 0%, rgba(18,24,38,0.98) 100%) !important;
+  animation: breathGlowHover 1.5s ease-in-out infinite;
 }
 @keyframes breathGlow {
   0%, 100% {
-    box-shadow: 0 0 8px rgba(253, 151, 31, 0.12), inset 0 0 4px rgba(253, 151, 31, 0.02);
-    border-color: rgba(253, 151, 31, 0.2) !important;
+    box-shadow: 0 0 10px rgba(253, 151, 31, 0.15), inset 0 0 6px rgba(253, 151, 31, 0.04);
+    border-color: rgba(253, 151, 31, 0.25) !important;
   }
   50% {
-    box-shadow: 0 0 20px rgba(253, 151, 31, 0.32), inset 0 0 10px rgba(253, 151, 31, 0.06);
-    border-color: rgba(253, 151, 31, 0.55) !important;
+    box-shadow: 0 0 22px rgba(253, 151, 31, 0.45), inset 0 0 12px rgba(253, 151, 31, 0.08);
+    border-color: rgba(253, 151, 31, 0.65) !important;
+  }
+}
+@keyframes breathGlowHover {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(253, 151, 31, 0.35), inset 0 0 10px rgba(253, 151, 31, 0.08);
+    border-color: rgba(253, 151, 31, 0.5) !important;
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(253, 151, 31, 0.7), inset 0 0 18px rgba(253, 151, 31, 0.15);
+    border-color: rgba(253, 151, 31, 0.95) !important;
   }
 }
 .student-card-content {
