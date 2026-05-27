@@ -21,8 +21,10 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'd3-vendor': ['d3'],
+        manualChunks(id) {
+          if (id.includes('node_modules/d3')) {
+            return 'd3-vendor';
+          }
         },
       },
     },
