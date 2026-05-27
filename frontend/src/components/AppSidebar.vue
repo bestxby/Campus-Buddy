@@ -1,15 +1,17 @@
 <template>
   <aside class="sidebar" :style="{ width: props.width + 'px' }">
-    <!-- Logo Banner -->
+    <!-- Logo Banner (Centered Layout) -->
     <a href="https://github.com/bestxby/Campus-Buddy" target="_blank" rel="noopener" class="sidebar-logo-banner" title="访问 GitHub 项目仓库">
       <div class="sidebar-logo-icon">🧭</div>
-      <div class="sidebar-logo-text">
-        <div class="sidebar-logo-title">Campus Buddy</div>
-        <div class="sidebar-logo-sub">校园社交智能推荐系统</div>
-        <div v-if="currentUserRole === 'admin'" class="admin-dashboard-title-badge">
-          <span class="pulse-dot">📡</span>
-          <span>系统大数据中心化管理看板</span>
-        </div>
+      <div class="sidebar-logo-title">Campus Buddy</div>
+      <div class="sidebar-logo-sub">校园社交智能推荐系统</div>
+      <div v-if="currentUserRole === 'admin'" class="admin-dashboard-title-badge">
+        <span class="pulse-dot">📡</span>
+        <span>系统大数据中心化管理看板</span>
+      </div>
+      <div v-else class="student-dashboard-title-badge">
+        <span class="pulse-dot">📊</span>
+        <span>个人社交推荐看板</span>
       </div>
     </a>
 
@@ -80,57 +82,127 @@ const emit  = defineEmits<{
 
 /* ─── Logo Banner ─────────────────────────────────────────── */
 .sidebar-logo-banner {
-  display: flex; align-items: center; gap: 12px;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, rgba(253,151,31,0.12) 0%, rgba(6,182,212,0.06) 100%);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  position: relative; overflow: hidden; flex-shrink: 0;
+  margin: 12px 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 5px;
+  padding: 18px 14px 15px;
+  background: linear-gradient(145deg, #09090e 0%, #110e20 50%, #030712 100%) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.25) !important;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
   text-decoration: none;
-  transition: background 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 240, 255, 0.05), inset 0 0 30px rgba(255,0,127,0.02);
 }
 .sidebar-logo-banner:hover {
-  background: linear-gradient(135deg, rgba(253,151,31,0.18) 0%, rgba(6,182,212,0.1) 100%);
+  border-color: rgba(255, 0, 127, 0.6) !important;
+  background: linear-gradient(145deg, #110e20 0%, #09090e 50%, #1a0b2e 100%) !important;
+  box-shadow: 0 8px 30px rgba(255, 0, 127, 0.18), inset 0 0 15px rgba(0, 240, 255, 0.08) !important;
+  transform: translateY(-1px);
 }
 .sidebar-logo-banner::before {
   content: ''; position: absolute; top: -30px; right: -20px;
   width: 80px; height: 80px;
-  background: radial-gradient(circle, rgba(253,151,31,0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%);
   pointer-events: none;
 }
-.sidebar-logo-icon { font-size: 28px; filter: drop-shadow(0 0 10px rgba(253,151,31,0.5)); animation: floatIcon 3s ease-in-out infinite; }
-@keyframes floatIcon { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
-.sidebar-logo-title { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; background: linear-gradient(90deg, #ffb74d, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.sidebar-logo-sub { font-size: 9px; color: rgba(255,255,255,0.35); margin-top: 2px; letter-spacing: 0.3px; }
+.sidebar-logo-icon {
+  font-size: 36px;
+  filter: drop-shadow(0 0 12px #00f0ff) drop-shadow(0 0 25px rgba(255,0,127,0.4));
+  animation: floatIcon 3s ease-in-out infinite, spinCompass 16s linear infinite;
+  margin-bottom: 3px;
+  user-select: none;
+}
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes spinCompass {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.sidebar-logo-title {
+  font-size: 20px;
+  font-weight: 950;
+  letter-spacing: -0.2px;
+  background: linear-gradient(90deg, #ff007f 0%, #ff7f00 45%, #00f0ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 8px rgba(0,240,255,0.4);
+}
+.sidebar-logo-sub {
+  font-size: 11px;
+  color: #93c5fd;
+  margin-top: 1px;
+  letter-spacing: 0.6px;
+  font-weight: 600;
+  text-shadow: 0 0 5px rgba(147,197,253,0.3);
+}
 .admin-dashboard-title-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  margin-top: 6px;
-  padding: 3px 6px;
-  background: rgba(253, 151, 31, 0.08);
-  border: 1px solid rgba(253, 151, 31, 0.25);
-  border-radius: 4px;
-  color: #ffb74d;
-  font-size: 9px;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 4px 14px;
+  background: rgba(255, 0, 127, 0.05) !important;
+  border: 1px solid #ff007f !important;
+  border-radius: 20px;
+  color: #ff007f;
+  font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 0.2px;
-  animation: borderGlow 3s infinite ease-in-out;
-  text-align: left;
+  box-shadow: 0 0 8px rgba(255, 0, 127, 0.35);
+  animation: neonMagentaGlow 2.5s infinite ease-in-out;
+}
+.student-dashboard-title-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 4px 14px;
+  background: rgba(0, 240, 255, 0.05) !important;
+  border: 1px solid #00f0ff !important;
+  border-radius: 20px;
+  color: #00f0ff;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.35);
+  animation: neonCyanGlow 2.5s infinite ease-in-out;
+}
+@keyframes neonCyanGlow {
+  0%, 100% {
+    border-color: rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+  }
+  50% {
+    border-color: rgba(0, 240, 255, 0.95);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+  }
+}
+@keyframes neonMagentaGlow {
+  0%, 100% {
+    border-color: rgba(255, 0, 127, 0.4);
+    box-shadow: 0 0 6px rgba(255, 0, 127, 0.25);
+  }
+  50% {
+    border-color: rgba(255, 0, 127, 0.95);
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
+  }
 }
 .pulse-dot {
   font-size: 10px;
   display: inline-block;
   animation: pulseScale 2s infinite ease-in-out;
-}
-@keyframes borderGlow {
-  0%, 100% {
-    border-color: rgba(253, 151, 31, 0.2);
-    box-shadow: 0 0 4px rgba(253, 151, 31, 0.05);
-  }
-  50% {
-    border-color: rgba(253, 151, 31, 0.4);
-    box-shadow: 0 0 10px rgba(253, 151, 31, 0.15);
-  }
 }
 @keyframes pulseScale {
   0%, 100% { transform: scale(1); }

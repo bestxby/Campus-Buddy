@@ -11,10 +11,12 @@
         <div v-if="isPrivateMode && currentUserRole !== 'admin'" class="avatar-private-overlay">🔒</div>
       </div>
 
-      <!-- Name + Persona (takes remaining space) -->
+      <!-- Name + Persona (same row) -->
       <div class="profile-identity">
-        <div class="profile-name">{{ currentUser }}</div>
-        <div class="profile-persona-badge" :class="personaBadgeClass">{{ userPersona }}</div>
+        <div class="identity-row">
+          <div class="profile-name">{{ currentUser }}</div>
+          <div class="profile-persona-badge" :class="personaBadgeClass">{{ userPersona }}</div>
+        </div>
       </div>
 
       <!-- Logout button (icon-only, top-right) -->
@@ -26,22 +28,22 @@
     <!-- BOTTOM ROW: Mode toggles (Student only) -->
     <template v-if="currentUserRole !== 'admin'">
       <div class="mode-toggle-row">
-        <!-- Privacy mode -->
+        <!-- Privacy mode: turning on disables social -->
         <button
           class="mode-btn"
           :class="isPrivateMode ? 'mode-btn-active-private' : 'mode-btn-inactive'"
-          @click="togglePrivacyMode"
+          @click="togglePrivate"
           :title="isPrivateMode ? '隐身保护中，点击关闭' : '开启隐身模式（不被推荐给他人）'"
         >
           <span class="mode-icon">{{ isPrivateMode ? '🔒' : '🔓' }}</span>
           <span class="mode-label">{{ isPrivateMode ? '隐身中' : '隐身模式' }}</span>
         </button>
 
-        <!-- Social active mode -->
+        <!-- Social active mode: turning on disables privacy -->
         <button
           class="mode-btn"
           :class="isSocialMode ? 'mode-btn-active-social' : 'mode-btn-inactive'"
-          @click="isSocialMode = !isSocialMode"
+          @click="toggleSocial"
           :title="isSocialMode ? '达人模式开启中，点击关闭' : '开启达人模式（优先被推荐给有共同活动的同学）'"
         >
           <span class="mode-icon">{{ isSocialMode ? '🌟' : '🌑' }}</span>
@@ -63,19 +65,32 @@
       <span class="privacy-status-dot"></span>
       <span>隐身保护中 · 您的社交关系已对他人隐藏</span>
     </div>
+
+    <!-- Social status hint -->
+    <div v-if="isSocialMode && currentUserRole !== 'admin'" class="social-status-bar">
+      <span class="social-status-dot"></span>
+      <span>社交达人中 · 您将被优先推荐给有共同兴趣的同学</span>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { currentUser, currentUserAvatar, userPersona, personaBadgeClass,
-         logout, currentUserRole, isPrivateMode, togglePrivacyMode } from '@/composables/useAuth'
+         logout, currentUserRole, isPrivateMode, togglePrivacyMode,
+         isSocialMode, toggleSocialMode } from '@/composables/useAuth'
 
 const emit = defineEmits<{
   logout: []
 }>()
 
-const isSocialMode = ref(false)
+// Mutually exclusive behavior handled globally in store/composable
+const togglePrivate = () => {
+  togglePrivacyMode()
+}
+
+const toggleSocial = () => {
+  toggleSocialMode()
+}
 
 const handleLogout = async () => {
   await logout()
@@ -147,31 +162,35 @@ const handleLogout = async () => {
 }
 @keyframes spinRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-/* Identity: name + persona */
+/* Identity: name + persona on same row */
 .profile-identity {
   flex: 1;
   min-width: 0;
+}
+.identity-row {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 .profile-name {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 700;
   color: #ffb74d;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 90px;
 }
 .profile-persona-badge {
   display: inline-block;
   font-size: 9px;
   font-weight: 600;
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: 20px;
   letter-spacing: 0.2px;
   white-space: nowrap;
-  align-self: flex-start;
+  flex-shrink: 0;
 }
 
 /* Logout: icon-only pill */
@@ -278,6 +297,34 @@ const handleLogout = async () => {
 @keyframes privDotPulse {
   0%,100% { opacity: 0.6; box-shadow: 0 0 4px rgba(168,85,247,0.5); }
   50% { opacity: 1; box-shadow: 0 0 8px rgba(168,85,247,0.9); }
+}
+
+/* ── SOCIAL STATUS BAR ────────────────────────── */
+.social-status-bar {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(253,151,31,0.06);
+  border: 1px solid rgba(253,151,31,0.18);
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 9px;
+  color: rgba(255,183,77,0.9);
+  letter-spacing: 0.2px;
+}
+.social-status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fd971f;
+  box-shadow: 0 0 5px rgba(253,151,31,0.7);
+  flex-shrink: 0;
+  animation: socialDotPulse 2s ease-in-out infinite;
+}
+@keyframes socialDotPulse {
+  0%,100% { opacity: 0.6; box-shadow: 0 0 4px rgba(253,151,31,0.5); }
+  50% { opacity: 1; box-shadow: 0 0 8px rgba(253,151,31,0.9); }
 }
 
 /* ── ADMIN STYLES ─────────────────────────────── */

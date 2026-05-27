@@ -93,5 +93,49 @@ describe('Graph Algorithms', () => {
       // Activities should be ranked: Act2 (promoted) then Act1
       expect(results.activities).toEqual(['Act2', 'Act1'])
     })
+
+    it('should boost buddy Jaccard score for social mode students and cap at 1.0', () => {
+      const graph = new Map<string, Set<string>>()
+      // student:A has X, Y
+      graph.set('student:A', new Set(['interest:X', 'interest:Y']))
+      graph.set('interest:X', new Set(['student:A', 'student:B', 'student:C']))
+      graph.set('interest:Y', new Set(['student:A', 'student:B', 'student:C']))
+
+      // student:B has X, Y (Jaccard: 2/2 = 1.0)
+      graph.set('student:B', new Set(['interest:X', 'interest:Y']))
+      // student:C has X, Y (Jaccard: 2/2 = 1.0)
+      graph.set('student:C', new Set(['interest:X', 'interest:Y']))
+
+      const promoted = new Set<string>()
+      const privateStudents = new Set<string>()
+      const socialStudents = new Set<string>(['C']) // C has social mode enabled
+
+      // Let's run without social boost first
+      const normalResults = GraphAlgorithms.calculateJaccardSimilarity(graph, 'A', promoted)
+      expect(normalResults.buddies[0].jaccard).toBe(1.0)
+      expect(normalResults.buddies[1].jaccard).toBe(1.0)
+
+      // Run with social boost (C should be boosted but capped at 1.0)
+      const boostedResults = GraphAlgorithms.calculateJaccardSimilarity(graph, 'A', promoted, privateStudents, socialStudents)
+      expect(boostedResults.buddies.find(b => b.name === 'C')?.jaccard).toBe(1.0)
+
+      // Test D who has overlap but lower score (Jaccard: 1/2 = 0.5)
+      graph.set('student:D', new Set(['interest:X']))
+      graph.get('interest:X')?.add('student:D')
+
+      const socialStudents2 = new Set<string>(['D'])
+      const boostedResults2 = GraphAlgorithms.calculateJaccardSimilarity(graph, 'A', promoted, privateStudents, socialStudents2)
+
+      const dBuddy = boostedResults2.buddies.find(b => b.name === 'D')
+      expect(dBuddy?.jaccard).toBeCloseTo(0.5 * 1.3) // 0.65
+
+      const bBuddy = boostedResults2.buddies.find(b => b.name === 'B')
+      expect(bBuddy?.jaccard).toBe(1.0) // B not boosted, stays 1.0
+
+      // B boosted (1.0 * 1.3 = 1.3 -> capped at 1.0)
+      const boostedResults3 = GraphAlgorithms.calculateJaccardSimilarity(graph, 'A', promoted, privateStudents, new Set(['B']))
+      const bBuddyBoosted = boostedResults3.buddies.find(b => b.name === 'B')
+      expect(bBuddyBoosted?.jaccard).toBe(1.0)
+    })
   })
 })

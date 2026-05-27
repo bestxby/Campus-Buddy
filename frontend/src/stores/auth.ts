@@ -11,13 +11,43 @@ export const useAuthStore = defineStore('auth', () => {
   const userPersona = ref<string>('未知')
   const signedUpActivities = ref<string[]>([])
   const isPrivateMode = ref<boolean>(false)
+  const isSocialMode = ref<boolean>(false)
 
   function togglePrivacyMode(): void {
     isPrivateMode.value = !isPrivateMode.value
     localStorage.setItem('campus_buddy_private_mode', isPrivateMode.value ? 'true' : 'false')
+    
+    if (isPrivateMode.value && isSocialMode.value) {
+      isSocialMode.value = false
+      localStorage.setItem('campus_buddy_social_mode', 'false')
+      const graphStore = useGraphStore()
+      if (currentUser.value) {
+        graphStore.setStudentSocial(currentUser.value, false)
+      }
+    }
+
     const graphStore = useGraphStore()
     if (currentUser.value) {
       graphStore.setStudentPrivacy(currentUser.value, isPrivateMode.value)
+    }
+  }
+
+  function toggleSocialMode(): void {
+    isSocialMode.value = !isSocialMode.value
+    localStorage.setItem('campus_buddy_social_mode', isSocialMode.value ? 'true' : 'false')
+
+    if (isSocialMode.value && isPrivateMode.value) {
+      isPrivateMode.value = false
+      localStorage.setItem('campus_buddy_private_mode', 'false')
+      const graphStore = useGraphStore()
+      if (currentUser.value) {
+        graphStore.setStudentPrivacy(currentUser.value, false)
+      }
+    }
+
+    const graphStore = useGraphStore()
+    if (currentUser.value) {
+      graphStore.setStudentSocial(currentUser.value, isSocialMode.value)
     }
   }
 
@@ -93,6 +123,7 @@ export const useAuthStore = defineStore('auth', () => {
     currentUserAvatar.value = regForm.avatar
     userPersona.value = computePersona(regForm.selectedInterests)
     isPrivateMode.value = false
+    isSocialMode.value = false
 
     localStorage.setItem('campus_buddy_user',      name)
     localStorage.setItem('campus_buddy_role',      'student')
@@ -100,6 +131,7 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('campus_buddy_persona',   userPersona.value)
     localStorage.setItem('campus_buddy_interests', JSON.stringify(regForm.selectedInterests))
     localStorage.setItem('campus_buddy_private_mode', 'false')
+    localStorage.setItem('campus_buddy_social_mode', 'false')
 
     const graphStore = useGraphStore()
     const sNode = `student:${name}`
@@ -165,6 +197,11 @@ export const useAuthStore = defineStore('auth', () => {
     if (isPrivateMode.value) {
       graphStore.setStudentPrivacy(savedUser, true)
     }
+
+    isSocialMode.value = localStorage.getItem('campus_buddy_social_mode') === 'true'
+    if (isSocialMode.value) {
+      graphStore.setStudentSocial(savedUser, true)
+    }
   }
 
   async function logout(): Promise<void> {
@@ -179,6 +216,7 @@ export const useAuthStore = defineStore('auth', () => {
     userPersona.value = '未知'
     signedUpActivities.value = []
     isPrivateMode.value = false
+    isSocialMode.value = false
     regForm.selectedInterests = []
     regForm.name = ''
     regForm.avatar = AVATAR_OPTIONS[0]
@@ -246,5 +284,7 @@ export const useAuthStore = defineStore('auth', () => {
     isSignedUp,
     isPrivateMode,
     togglePrivacyMode,
+    isSocialMode,
+    toggleSocialMode,
   }
 })

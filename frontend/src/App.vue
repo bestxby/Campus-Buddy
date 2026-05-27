@@ -14,12 +14,7 @@
 
     <main class="main-content">
 
-      <!-- Read-only Banner (Student Only) -->
-      <header v-if="currentUserRole !== 'admin'" class="card student-header-banner">
-        <div class="student-header-title">
-          <h2>个人社交推荐看板</h2>
-        </div>
-      </header>
+
 
       <div class="content-grid">
         <!-- Welcome screen / Admin Dashboard (no student selected) -->
@@ -210,12 +205,24 @@ onMounted(async () => {
   border: 1px solid rgba(253,151,31,0.2) !important;
   flex-shrink: 0;
   user-select: none;
+  animation: breathGlow 3s ease-in-out infinite;
 }
 .student-graph-btn-card:hover {
+  animation: none;
   border-color: rgba(253,151,31,0.5) !important;
   background: linear-gradient(135deg, rgba(253,151,31,0.06) 0%, rgba(18,24,38,0.95) 100%) !important;
-  box-shadow: 0 0 20px rgba(253,151,31,0.15), inset 0 0 15px rgba(253,151,31,0.05) !important;
+  box-shadow: 0 0 20px rgba(253,151,31,0.25), inset 0 0 15px rgba(253,151,31,0.08) !important;
   transform: translateY(-1px);
+}
+@keyframes breathGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(253, 151, 31, 0.12), inset 0 0 4px rgba(253, 151, 31, 0.02);
+    border-color: rgba(253, 151, 31, 0.2) !important;
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(253, 151, 31, 0.32), inset 0 0 10px rgba(253, 151, 31, 0.06);
+    border-color: rgba(253, 151, 31, 0.55) !important;
+  }
 }
 .student-card-content {
   display: flex;
@@ -262,28 +269,5 @@ onMounted(async () => {
   gap: 14px;
 }
 
-/* Student Header Banner */
-.student-header-banner {
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-.student-header-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.student-header-title h2 {
-  font-size: 14px;
-  margin: 0;
-  color: var(--text-primary);
-  font-weight: 600;
-}
-.header-badge {
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-weight: bold;
-}
+
 </style>

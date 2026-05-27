@@ -26,7 +26,8 @@ export const useRecommendationStore = defineStore('recommendation', () => {
       graphStore.graph,
       student,
       promotedActivities.value,
-      graphStore.privateStudents
+      graphStore.privateStudents,
+      graphStore.socialStudents
     )
     recommendations.activities = activities
     recommendations.buddies = buddies

@@ -78,7 +78,8 @@ export class GraphAlgorithms {
     graph: Map<string, Set<string>>,
     student: string,
     promotedActivities: Set<string>,
-    privateStudents: Set<string> = new Set()
+    privateStudents: Set<string> = new Set(),
+    socialStudents: Set<string> = new Set()
   ): { activities: string[]; buddies: BuddyResult[] } {
     const start = nodeKey('student', student)
     if (!graph.has(start)) {
@@ -118,7 +119,13 @@ export class GraphAlgorithms {
           )
           const intersectCount = sInterests.filter(i => bInterests.has(i)).length
           const unionCount = new Set([...sInterestSet, ...bInterests]).size
-          const jaccard = unionCount > 0 ? intersectCount / unionCount : 0
+          let jaccard = unionCount > 0 ? intersectCount / unionCount : 0
+
+          // Boost Jaccard similarity score for social/talent mode students, capping at 1.0
+          if (socialStudents.has(buddyName)) {
+            jaccard = Math.min(1.0, jaccard * 1.3)
+          }
+
           const sharedInterests = sInterests
             .filter(i => bInterests.has(i))
             .map(i => i.replace('interest:', ''))

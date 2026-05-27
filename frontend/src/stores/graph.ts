@@ -7,12 +7,21 @@ import { ADMIN_NAME } from '@/constants/interests'
 export const useGraphStore = defineStore('graph', () => {
   const graph = ref<Map<string, Set<string>>>(new Map())
   const privateStudents = ref<Set<string>>(new Set())
+  const socialStudents = ref<Set<string>>(new Set())
 
   function setStudentPrivacy(student: string, isPrivate: boolean): void {
     if (isPrivate) {
       privateStudents.value.add(student)
     } else {
       privateStudents.value.delete(student)
+    }
+  }
+
+  function setStudentSocial(student: string, isSocial: boolean): void {
+    if (isSocial) {
+      socialStudents.value.add(student)
+    } else {
+      socialStudents.value.delete(student)
     }
   }
 
@@ -110,8 +119,17 @@ export const useGraphStore = defineStore('graph', () => {
       privateStudents.value.clear()
       privateStudents.value.add('张子涵')
 
-      // 1. Select 4 random students to make them completely isolated (degree 0)
       const allStudentNames = Array.from(new Set(data.students.map((s: any) => s[0]))) as string[]
+
+      socialStudents.value.clear()
+      // Seed default social students dynamically: around 15% of the students
+      for (const student of allStudentNames) {
+        if (student !== '张子涵' && Math.random() < 0.15) {
+          socialStudents.value.add(student)
+        }
+      }
+
+      // 1. Select 4 random students to make them completely isolated (degree 0)
       const isolatedTargets = new Set<string>()
       while (isolatedTargets.size < 4 && allStudentNames.length > 10) {
         const randomName = allStudentNames[Math.floor(Math.random() * allStudentNames.length)]
@@ -204,6 +222,8 @@ export const useGraphStore = defineStore('graph', () => {
     stats,
     privateStudents,
     setStudentPrivacy,
+    socialStudents,
+    setStudentSocial,
     registerOnStatsUpdate,
     addEdge,
     updateStats,

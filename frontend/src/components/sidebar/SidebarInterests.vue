@@ -38,7 +38,7 @@ const getTagClass = (tag: string) => {
   font-size: 11.5px;
   font-weight: 800;
   letter-spacing: 0.8px;
-  color: #ffb74d;
+  color: #22d3ee;
   margin-bottom: 10px;
   text-transform: uppercase;
 }

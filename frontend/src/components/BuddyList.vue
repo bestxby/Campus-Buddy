@@ -7,14 +7,20 @@
 
     <!-- Jaccard-ranked buddy list -->
     <ul v-if="recommendations.buddies.length" class="buddy-list">
-      <li v-for="buddy in recommendations.buddies.slice(0, maxVisibleBuddies)" :key="buddy.name" class="path-item">
+      <li v-for="buddy in recommendations.buddies.slice(0, maxVisibleBuddies)" :key="buddy.name" class="path-item" :class="{ 'social-buddy-item': isSocialBuddy(buddy.name) }">
         <div class="buddy-row">
           <div class="path-flow">
-            <span class="node student">{{ activeStudent }}</span>
+            <span class="node student" :class="{ 'social-buddy-node': isSocialBuddy(activeStudent!) }">
+              {{ activeStudent }}
+              <span v-if="isSocialBuddy(activeStudent!)" class="social-star" title="社交达人">🌟</span>
+            </span>
             <span class="arrow">➔</span>
             <span class="node interest">{{ getSharedInterest(activeStudent!, buddy.name, 'student') }}</span>
             <span class="arrow">➔</span>
-            <span class="node student">{{ buddy.name }}</span>
+            <span class="node student" :class="{ 'social-buddy-node': isSocialBuddy(buddy.name) }">
+              {{ buddy.name }}
+              <span v-if="isSocialBuddy(buddy.name)" class="social-star" title="社交达人">🌟</span>
+            </span>
           </div>
           <!-- Jaccard badge -->
           <div class="jaccard-badge" :title="`Jaccard 相似度: ${(buddy.jaccard * 100).toFixed(0)}%`">
@@ -33,9 +39,13 @@
 import { computed } from 'vue'
 import { activeStudent, recommendations, getSharedInterest } from '@/composables/useRecommendations'
 import { currentUserRole } from '@/composables/useAuth'
+import { useGraphStore } from '@/stores/graph'
 import PathFinder from '@/components/buddy/PathFinder.vue'
 
 const emit = defineEmits<{ 'open-graph-highlight': [] }>()
+
+const graphStore = useGraphStore()
+const isSocialBuddy = (name: string) => graphStore.socialStudents.has(name)
 
 const maxVisibleBuddies = computed(() => currentUserRole.value === 'admin' ? 30 : 10)
 </script>
@@ -48,7 +58,7 @@ const maxVisibleBuddies = computed(() => currentUserRole.value === 'admin' ? 30 
 .buddy-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 .path-flow { display: flex; align-items: center; gap: 8px; font-size: 10px; }
 .node { padding: 4px 8px; border-radius: 4px; font-weight: bold; }
-.node.student { background-color: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2); color: #e9d5ff; }
+.node.student { background-color: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.2); color: #a5f3fc; }
 .node.interest { background-color: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #93c5fd; }
 .arrow { color: var(--text-secondary); font-weight: bold; }
 .jaccard-badge { display: flex; align-items: center; gap: 4px; background: rgba(253,151,31,0.08); border: 1px solid rgba(253,151,31,0.2); border-radius: 20px; padding: 3px 8px; flex-shrink: 0; }
@@ -56,4 +66,21 @@ const maxVisibleBuddies = computed(() => currentUserRole.value === 'admin' ? 30 
 .jaccard-count { font-size: 9px; color: rgba(255,255,255,0.5); }
 .jaccard-score { font-size: 10px; font-weight: 700; color: #ffb74d; font-family: monospace; }
 .empty-msg { font-size: 12px; color: var(--text-secondary); margin: 0; }
+
+.social-buddy-item {
+  background: linear-gradient(135deg, rgba(253,151,31,0.02) 0%, rgba(255,255,255,0.01) 100%) !important;
+  border-color: rgba(253, 151, 31, 0.22) !important;
+  box-shadow: 0 0 6px rgba(253, 151, 31, 0.03);
+}
+.social-buddy-node {
+  background-color: rgba(253, 151, 31, 0.12) !important;
+  border: 1px solid rgba(253, 151, 31, 0.35) !important;
+  color: #ffb74d !important;
+  text-shadow: 0 0 4px rgba(253, 151, 31, 0.25);
+}
+.social-star {
+  font-size: 8px;
+  margin-left: 2px;
+  vertical-align: middle;
+}
 </style>

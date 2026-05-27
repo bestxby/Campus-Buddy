@@ -51,3 +51,8 @@ export const isPrivateMode = computed(() => useAuthStore().isPrivateMode)
 export const togglePrivacyMode = (): void => {
   useAuthStore().togglePrivacyMode()
 }
+
+export const isSocialMode = computed(() => useAuthStore().isSocialMode)
+export const toggleSocialMode = (): void => {
+  useAuthStore().toggleSocialMode()
+}
