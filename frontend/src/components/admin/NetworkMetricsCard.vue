@@ -12,65 +12,73 @@
         </div>
       </div>
     </div>
-    <div class="metrics-grid">
+    <div class="metrics-list">
       <!-- Metric 1: Connectivity -->
-      <div class="metric-item">
-        <div class="metric-meta">
-          <span class="metric-label">🌐 全校人脉连通率</span>
-          <div class="info-tooltip-wrapper sub-tooltip">
-            <span class="info-icon mini-icon">?</span>
-            <div class="tooltip-content right-align">
-              <p>非孤立节点学生占全校学生总数的比例，反映社交融入的整体水平。</p>
+      <div class="metric-row">
+        <div class="metric-info">
+          <div class="metric-meta">
+            <span class="metric-label">🌐 全校人脉连通率</span>
+            <div class="info-tooltip-wrapper sub-tooltip">
+              <span class="info-icon mini-icon">?</span>
+              <div class="tooltip-content right-align">
+                <p>非孤立节点学生占全校学生总数的比例，反映社交融入的整体水平。</p>
+              </div>
             </div>
           </div>
+          <span class="metric-desc">已融入圈子学生占比</span>
         </div>
         <span class="metric-value text-cyan">{{ connectivityRate }}%</span>
-        <span class="metric-desc">已融入圈子学生占比</span>
       </div>
 
       <!-- Metric 2: Average Path Length -->
-      <div class="metric-item">
-        <div class="metric-meta">
-          <span class="metric-label">👥 平均社交距离</span>
-          <div class="info-tooltip-wrapper sub-tooltip">
-            <span class="info-icon mini-icon">?</span>
-            <div class="tooltip-content right-align">
-              <p>任意两位同学在社交网中建立关联所需的平均步数（即通过兴趣/活动的间接关联跳数）。</p>
+      <div class="metric-row">
+        <div class="metric-info">
+          <div class="metric-meta">
+            <span class="metric-label">👥 平均社交距离</span>
+            <div class="info-tooltip-wrapper sub-tooltip">
+              <span class="info-icon mini-icon">?</span>
+              <div class="tooltip-content right-align">
+                <p>任意两位同学在社交网中建立关联所需的平均步数（即通过兴趣/活动的间接关联跳数）。</p>
+              </div>
             </div>
           </div>
+          <span class="metric-desc">全校人脉的社交分隔度</span>
         </div>
         <span class="metric-value text-orange">{{ averagePathLength }} 步</span>
-        <span class="metric-desc">全校人脉的社交分隔度</span>
       </div>
 
       <!-- Metric 3: Clustering Coefficient -->
-      <div class="metric-item">
-        <div class="metric-meta">
-          <span class="metric-label">🔮 圈子聚集系数</span>
-          <div class="info-tooltip-wrapper sub-tooltip">
-            <span class="info-icon mini-icon">?</span>
-            <div class="tooltip-content right-align">
-              <p>代表各个兴趣社群内部的抱团紧密程度，系数越高表明兴趣重叠与好友交集越深。</p>
+      <div class="metric-row">
+        <div class="metric-info">
+          <div class="metric-meta">
+            <span class="metric-label">🔮 圈子聚集系数</span>
+            <div class="info-tooltip-wrapper sub-tooltip">
+              <span class="info-icon mini-icon">?</span>
+              <div class="tooltip-content right-align">
+                <p>代表各个兴趣社群内部的抱团紧密程度，系数越高表明兴趣重叠与好友交集越深。</p>
+              </div>
             </div>
           </div>
+          <span class="metric-desc">社群内部凝聚力指数</span>
         </div>
         <span class="metric-value text-purple">{{ clusteringCoefficient }}</span>
-        <span class="metric-desc">社群内部凝聚力指数</span>
       </div>
 
       <!-- Metric 4: Network Density -->
-      <div class="metric-item">
-        <div class="metric-meta">
-          <span class="metric-label">📈 人脉网络密度</span>
-          <div class="info-tooltip-wrapper sub-tooltip">
-            <span class="info-icon mini-icon">?</span>
-            <div class="tooltip-content right-align">
-              <p>实际连线数量与理论上最大可能连线数量的比值，体现关联的密集程度。</p>
+      <div class="metric-row">
+        <div class="metric-info">
+          <div class="metric-meta">
+            <span class="metric-label">📈 人脉网络密度</span>
+            <div class="info-tooltip-wrapper sub-tooltip">
+              <span class="info-icon mini-icon">?</span>
+              <div class="tooltip-content right-align">
+                <p>实际连线数量与理论上最大可能连线数量的比值，体现关联的密集程度。</p>
+              </div>
             </div>
           </div>
+          <span class="metric-desc">网络关联的紧密比例</span>
         </div>
         <span class="metric-value text-green">{{ networkDensity }}%</span>
-        <span class="metric-desc">网络关联的紧密比例</span>
       </div>
     </div>
   </div>
@@ -110,38 +118,44 @@ import {
   text-align: left;
 }
 
-.metrics-grid {
+.metrics-list {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 8px;
-  min-height: 0;
-}
-
-.metric-item {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 6px;
+  min-height: 0;
+  justify-content: space-between;
+}
+
+.metric-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.02);
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   box-sizing: border-box;
   text-align: left;
   transition: all 0.3s ease;
 }
 
-.metric-item:hover {
+.metric-row:hover {
   background: rgba(255, 255, 255, 0.02);
   border-color: rgba(255, 255, 255, 0.05);
+}
+
+.metric-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .metric-meta {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: 2px;
 }
 
 .metric-label {
@@ -175,6 +189,7 @@ import {
   font-size: 16px;
   font-weight: 800;
   line-height: 1.2;
+  flex-shrink: 0;
 }
 
 .metric-desc {
