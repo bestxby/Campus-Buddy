@@ -13,10 +13,6 @@
         <span class="pulse-dot">📡</span>
         <span>管理端</span>
       </div>
-      <div v-else class="student-dashboard-title-badge">
-        <span class="pulse-dot">📊</span>
-        <span>推荐端</span>
-      </div>
     </a>
 
     <!-- Profile Card Component -->
@@ -131,17 +127,13 @@ const emit  = defineEmits<{
 .sidebar-logo-icon {
   font-size: 22px;
   filter: drop-shadow(0 0 8px #00f0ff) drop-shadow(0 0 15px rgba(255,0,127,0.3));
-  animation: floatIcon 3s ease-in-out infinite, spinCompass 16s linear infinite;
+  animation: floatIcon 3s ease-in-out infinite;
   user-select: none;
   flex-shrink: 0;
 }
 @keyframes floatIcon {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }
-}
-@keyframes spinCompass {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 .sidebar-logo-title {
   font-size: 15px;

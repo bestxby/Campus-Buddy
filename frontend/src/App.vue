@@ -231,13 +231,11 @@ onMounted(async () => {
   border-radius: 8px;
   flex-shrink: 0;
   user-select: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 .student-graph-btn-card:hover {
   transform: translateY(-2px);
   border-color: rgba(253, 151, 31, 0.5) !important;
   background: linear-gradient(135deg, rgba(253, 151, 31, 0.04) 0%, rgba(18, 24, 38, 0.98) 100%) !important;
-  box-shadow: 0 8px 24px rgba(253, 151, 31, 0.15), inset 0 0 10px rgba(253, 151, 31, 0.05) !important;
 }
 .student-card-content {
   display: flex;
