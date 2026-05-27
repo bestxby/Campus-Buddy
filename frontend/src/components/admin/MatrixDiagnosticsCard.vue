@@ -57,12 +57,12 @@ const emit = defineEmits<{
   overflow: visible;
   height: 100%;
   background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
-  padding: 14px 18px !important;
+  padding: 10px 14px !important;
 }
 .col-header {
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 8px;
-  margin-bottom: 8px;
+  padding-bottom: 5px;
+  margin-bottom: 6px;
   flex-shrink: 0;
 }
 .col-header h3 {
@@ -77,13 +77,13 @@ const emit = defineEmits<{
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
 }
 .matrix-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 8px;
   border: none;
   cursor: pointer;

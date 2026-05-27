@@ -91,14 +91,14 @@ import {
   flex-direction: column;
   height: 100%;
   background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
-  padding: 14px 18px !important;
+  padding: 10px 14px !important;
   box-sizing: border-box;
 }
 
 .col-header {
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 6px;
-  margin-bottom: 8px;
+  padding-bottom: 4px;
+  margin-bottom: 6px;
   flex-shrink: 0;
 }
 
@@ -115,7 +115,7 @@ import {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
   min-height: 0;
 }
 
@@ -126,7 +126,7 @@ import {
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.02);
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 5px 8px;
   box-sizing: border-box;
   text-align: left;
   transition: all 0.3s ease;
@@ -140,12 +140,12 @@ import {
 .metric-meta {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 2px;
+  gap: 3px;
+  margin-bottom: 1px;
 }
 
 .metric-label {
-  font-size: 10.5px;
+  font-size: 9.5px;
   color: var(--text-secondary);
   white-space: nowrap;
 }
@@ -172,16 +172,16 @@ import {
 
 .metric-value {
   font-family: Consolas, monospace;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .metric-desc {
-  font-size: 9px;
+  font-size: 8px;
   color: rgba(255, 255, 255, 0.35);
-  line-height: 1.1;
-  margin-top: 2px;
+  line-height: 1.0;
+  margin-top: 1px;
 }
 
 /* Colors with soft glow shadows */

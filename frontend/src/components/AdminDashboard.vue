@@ -11,11 +11,11 @@
       <!-- Grid Card 4: Isolation Diagnostics & Auto-Bridge (Spans 2 rows) -->
       <IsolationCard class="span-2-rows" />
 
-      <!-- Grid Card 5: System Logs -->
-      <SystemLogsCard />
-
       <!-- Grid Card 7: Icebreaking Potential Ranking -->
       <IcebreakingPotentialCard />
+
+      <!-- Grid Card 5: System Logs -->
+      <SystemLogsCard />
 
       <!-- Column 3 Layout (Spans all 3 rows) -->
       <div class="col-3-layout">
@@ -130,7 +130,7 @@ watch(() => graph.value.size, (newSize, oldSize) => {
 /* Centrality cards have a compact height to fit exactly 5 items */
 .col-3-layout > :nth-child(2),
 .col-3-layout > :nth-child(3) {
-  height: 185px !important;
+  height: 160px !important;
 }
 
 /* Global Network Metrics Card stretches to fill the remaining vertical height */
