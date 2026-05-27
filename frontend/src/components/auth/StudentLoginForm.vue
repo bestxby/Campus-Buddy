@@ -150,7 +150,11 @@ const handleStudentSubmit = () => {
   width: 100%;
   box-sizing: border-box;
 }
-.form-group input:focus-visible { outline: 2px solid var(--accent-orange); border-color: transparent; }
+.form-group input:focus,
+.form-group input:focus-visible {
+  outline: none !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
 .avatar-picker-grid { display: flex; gap: 6px; flex-wrap: nowrap; justify-content: space-between; padding: 4px 0; }
 .avatar-picker-btn {
   width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.3);

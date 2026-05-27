@@ -27,7 +27,7 @@ describe('Auth Store', () => {
     expect(success).toBe(true)
     expect(store.currentUser).toBe('系统管理员')
     expect(store.currentUserRole).toBe('admin')
-    expect(store.userPersona).toBe('系统管理员 (System Admin)')
+    expect(store.userPersona).toBe('系统管理员')
     expect(localStorage.getItem('campus_buddy_user')).toBe('系统管理员')
   })
 
@@ -47,7 +47,7 @@ describe('Auth Store', () => {
 
     expect(store.currentUser).toBe('Alice')
     expect(store.currentUserRole).toBe('student')
-    expect(store.userPersona).toContain('Tech Geek') // Or Sports depending on categorization
+    expect(store.userPersona).toContain('科技极客') // Or Sports depending on categorization
     expect(localStorage.getItem('campus_buddy_user')).toBe('Alice')
   })
 

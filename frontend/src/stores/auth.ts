@@ -35,10 +35,10 @@ export const useAuthStore = defineStore('auth', () => {
       social: interests.filter(x => (INTEREST_CATEGORIES.social as readonly string[]).includes(x)).length,
     }
     const max = Math.max(...Object.values(counts))
-    if (max === counts.tech)   return '科技极客 (Tech Geek)'
-    if (max === counts.sports) return '运动健将 (Sports Fan)'
-    if (max === counts.arts)   return '文艺青年 (Creative Artist)'
-    return '社交达人 (Social Hub)'
+    if (max === counts.tech)   return '科技极客'
+    if (max === counts.sports) return '运动健将'
+    if (max === counts.arts)   return '文艺青年'
+    return '社交达人'
   }
 
   const userInterestTags = computed((): string[] => {
@@ -125,7 +125,7 @@ export const useAuthStore = defineStore('auth', () => {
     currentUser.value = ADMIN_NAME
     currentUserRole.value = 'admin'
     currentUserAvatar.value = '🤖'
-    userPersona.value = `${ADMIN_NAME} (System Admin)`
+    userPersona.value = ADMIN_NAME
 
     localStorage.setItem('campus_buddy_user',      ADMIN_NAME)
     localStorage.setItem('campus_buddy_role',      'admin')
