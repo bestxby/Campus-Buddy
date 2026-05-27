@@ -20,13 +20,13 @@
   "devDependencies": {
     "@types/d3": "^7.4.3",
     "@vitejs/plugin-vue": "^5.0.4",
-    "@vitest/coverage-v8": "^4.1.7",
+    "@vitest/coverage-v8": "^2.1.9",
     "@vue/test-utils": "^2.4.10",
     "gh-pages": "^6.3.0",
     "jsdom": "^29.1.1",
     "typescript": "^5.2.2",
     "vite": "^5.1.4",
-    "vitest": "^4.1.7",
+    "vitest": "^2.1.9",
     "vue-tsc": "^3.3.2"
   }
 }
