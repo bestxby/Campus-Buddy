@@ -1,4 +1,6 @@
 import { nodeKey } from '@/composables/useGraph'
+import { ADMIN_NAME } from '@/constants/interests'
+import type { ForceGraphNode, ForceGraphLink, NodeKind } from '@/types'
 
 export interface ForceGraphConfig {
   graph: Map<string, Set<string>>
@@ -18,8 +20,8 @@ export interface ForceGraphConfig {
 }
 
 export interface GraphDataResult {
-  nodes: any[]
-  links: any[]
+  nodes: ForceGraphNode[]
+  links: ForceGraphLink[]
 }
 
 export class ForceGraphDataBuilder {
@@ -40,8 +42,8 @@ export class ForceGraphDataBuilder {
 
     const privateStudentsSet = privateStudents ?? new Set<string>()
 
-    let nodesToDraw: any[] = []
-    let linksToDraw: any[] = []
+    let nodesToDraw: ForceGraphNode[] = []
+    let linksToDraw: ForceGraphLink[] = []
     const addedNodes = new Set<string>()
 
     const isGlobal = showGlobal || !activeStudent
@@ -63,7 +65,7 @@ export class ForceGraphDataBuilder {
       if (!hideBuddies) {
         const studentDegrees: Array<{ node: string; name: string; deg: number }> = []
         for (const [node, neighbors] of graph.entries()) {
-          if (node.startsWith('student:') && node !== 'student:系统管理员') {
+          if (node.startsWith('student:') && node !== `student:${ADMIN_NAME}`) {
             studentDegrees.push({
               node,
               name: node.replace('student:', ''),
@@ -80,6 +82,16 @@ export class ForceGraphDataBuilder {
         }
       }
 
+      // Helper to add links and prevent duplicates in O(1)
+      const existingLinks = new Set<string>()
+      const addLink = (src: string, tgt: string, type = 'default') => {
+        const key = src < tgt ? `${src}->${tgt}` : `${tgt}->${src}`
+        if (!existingLinks.has(key)) {
+          existingLinks.add(key)
+          linksToDraw.push({ source: src, target: tgt, type })
+        }
+      }
+
       // 3. Add edges between the drawn nodes
       for (const nodeA of addedNodes) {
         const neighbors = graph.get(nodeA) ?? []
@@ -92,7 +104,7 @@ export class ForceGraphDataBuilder {
               } else if (neighbor.startsWith('student:') && nodeA.startsWith('activity:')) {
                 type = 'registration'
               }
-              linksToDraw.push({ source: nodeA, target: neighbor, type })
+              addLink(nodeA, neighbor, type)
             }
           }
         }
@@ -113,6 +125,16 @@ export class ForceGraphDataBuilder {
       buddyOverlap.sort((a, b) => b.overlap - a.overlap)
       const allowedBuddies = new Set(buddyOverlap.slice(0, buddyLimit).map(x => x.name))
 
+      // Helper to add links and prevent duplicates in O(1)
+      const existingLinks = new Set<string>()
+      const addLink = (src: string, tgt: string, type = 'default') => {
+        const key = src < tgt ? `${src}->${tgt}` : `${tgt}->${src}`
+        if (!existingLinks.has(key)) {
+          existingLinks.add(key)
+          linksToDraw.push({ source: src, target: tgt, type })
+        }
+      }
+
       const focalNeighbors = graph.get(focalNode) ?? []
       for (const neighbor of focalNeighbors) {
         if (neighbor.startsWith('activity:')) {
@@ -122,7 +144,7 @@ export class ForceGraphDataBuilder {
             addedNodes.add(neighbor)
             nodesToDraw.push({ id: neighbor, type: 'activity', name })
           }
-          linksToDraw.push({ source: focalNode, target: neighbor, type: 'registration-active' })
+          addLink(focalNode, neighbor, 'registration-active')
           continue
         }
         if (neighbor.startsWith('interest:')) {
@@ -130,7 +152,7 @@ export class ForceGraphDataBuilder {
             addedNodes.add(neighbor)
             nodesToDraw.push({ id: neighbor, type: 'interest', name: neighbor.replace('interest:', '') })
           }
-          linksToDraw.push({ source: focalNode, target: neighbor })
+          addLink(focalNode, neighbor)
           for (const sub of graph.get(neighbor) ?? []) {
             const subName = sub.split(':')[1]
             const isBuddy = sub.startsWith('student:') && !hideBuddies && allowedBuddies.has(subName)
@@ -141,7 +163,7 @@ export class ForceGraphDataBuilder {
                 addedNodes.add(sub)
                 nodesToDraw.push({ id: sub, type: sub.startsWith('student:') ? 'student' : 'activity', name: subName })
               }
-              linksToDraw.push({ source: neighbor, target: sub })
+              addLink(neighbor, sub)
             }
           }
         }
@@ -151,10 +173,20 @@ export class ForceGraphDataBuilder {
         if (nodeA.startsWith('student:') && nodeA !== focalNode) {
           for (const reg of graph.get(nodeA) ?? []) {
             if (reg.startsWith('activity:') && addedNodes.has(reg))
-              linksToDraw.push({ source: nodeA, target: reg, type: 'registration' })
+              addLink(nodeA, reg, 'registration')
           }
         }
       }
+    }
+
+    // Helper to add shortest path links and highlight them
+    const existingLinksAll = new Set<string>()
+    // Re-verify existing links in linksToDraw
+    for (const l of linksToDraw) {
+      const src = l.source as string
+      const tgt = l.target as string
+      const key = src < tgt ? `${src}->${tgt}` : `${tgt}->${src}`
+      existingLinksAll.add(key)
     }
 
     // Force include shortest path nodes and links if path search is active
@@ -165,15 +197,24 @@ export class ForceGraphDataBuilder {
         if (!addedNodes.has(nodeId)) {
           addedNodes.add(nodeId)
           const parts = nodeId.split(':')
-          nodesToDraw.push({ id: nodeId, type: parts[0], name: parts.slice(1).join(':') })
+          nodesToDraw.push({ id: nodeId, type: parts[0] as NodeKind, name: parts.slice(1).join(':') })
         }
         if (i < pathNodes.length - 1) {
           const nextNodeId = pathNodes[i + 1]
-          const exists = linksToDraw.some(l =>
-            (l.source === nodeId && l.target === nextNodeId) ||
-            (l.source === nextNodeId && l.target === nodeId)
-          )
-          if (!exists) linksToDraw.push({ source: nodeId, target: nextNodeId, type: 'shortest-path' })
+          const key = nodeId < nextNodeId ? `${nodeId}->${nextNodeId}` : `${nextNodeId}->${nodeId}`
+          if (!existingLinksAll.has(key)) {
+            existingLinksAll.add(key)
+            linksToDraw.push({ source: nodeId, target: nextNodeId, type: 'shortest-path' })
+          } else {
+            // Find existing link and promote its type
+            const existingLink = linksToDraw.find(l =>
+              (l.source === nodeId && l.target === nextNodeId) ||
+              (l.source === nextNodeId && l.target === nodeId)
+            )
+            if (existingLink) {
+              existingLink.type = 'shortest-path'
+            }
+          }
         }
       }
     }

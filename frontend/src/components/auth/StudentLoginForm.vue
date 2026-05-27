@@ -114,11 +114,10 @@
 <script setup lang="ts">
 import { previewPersona, previewPersonaClass, toggleInterestTag } from '@/composables/useAuth'
 import { useAuthStore } from '@/stores/auth'
-import { storeToRefs } from 'pinia'
 import { AVATAR_OPTIONS, INTEREST_CATEGORIES } from '@/constants/interests'
 
 const authStore = useAuthStore()
-const { regForm } = storeToRefs(authStore)
+const regForm = authStore.regForm
 
 const emit = defineEmits<{
   // Fired when the user clicks submit; parent plays the loading animation,
@@ -151,13 +150,14 @@ const handleStudentSubmit = () => {
   width: 100%;
   box-sizing: border-box;
 }
-.form-group input:focus { outline: none; border-color: var(--accent-orange); }
+.form-group input:focus-visible { outline: 2px solid var(--accent-orange); border-color: transparent; }
 .avatar-picker-grid { display: flex; gap: 6px; flex-wrap: nowrap; justify-content: space-between; padding: 4px 0; }
 .avatar-picker-btn {
   width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.3);
   border: 1px solid var(--border-color); font-size: 15px; display: flex;
-  align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; outline: none;
+  align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;
 }
+.avatar-picker-btn:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 2px; }
 .avatar-picker-btn:hover { border-color: var(--accent-orange); background-color: rgba(253,151,31,0.08); transform: translateY(-2px); }
 .avatar-active { border-color: var(--accent-orange) !important; background-color: rgba(253,151,31,0.15) !important; box-shadow: 0 0 10px var(--accent-orange-glow); transform: scale(1.05); }
 .live-identity-card { background-color: rgba(168,85,247,0.03); border: 1px solid rgba(168,85,247,0.15); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }

@@ -1,6 +1,5 @@
 import { useAuthStore } from '@/stores/auth'
 import { computed } from 'vue'
-import type { DomainBar, RegForm } from '@/types'
 
 export const currentUser = computed(() => useAuthStore().currentUser)
 export const currentUserRole = computed(() => useAuthStore().currentUserRole)

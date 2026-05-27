@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
 import type { BuddyResult, PathResult } from '@/types'
 import { useGraphStore } from './graph'
-import { calculateJaccardSimilarity, findPath, nodeKey } from '@/utils/graph-algorithms'
+import { GraphAlgorithms, nodeKey } from '@/utils/graph-algorithms'
 
 export const useRecommendationStore = defineStore('recommendation', () => {
   const pathResult = ref<PathResult | null>(null)
@@ -13,9 +13,16 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     buddies: [] as BuddyResult[],
   })
 
+  const activeStudent = ref<string | null>(null)
+  const searchQuery = ref('')
+  const suggestions = ref<string[]>([])
+  const searchFriendQuery = ref('')
+  const activeFilter = ref('全部')
+  const expandedGroups = ref<Record<string, boolean>>({})
+
   function runRecommendations(student: string): void {
     const graphStore = useGraphStore()
-    const { activities, buddies } = calculateJaccardSimilarity(
+    const { activities, buddies } = GraphAlgorithms.calculateJaccardSimilarity(
       graphStore.graph,
       student,
       promotedActivities.value,
@@ -43,7 +50,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     return match ? match.replace('interest:', '') : ''
   }
 
-  function getBuddiesForActivity(studentName: string, activityName: string): string[] {
+  function getBuddiesForActivity(_studentName: string, activityName: string): string[] {
     const graphStore = useGraphStore()
     const actNode = nodeKey('activity', activityName)
     const actNeighbors = graphStore.graph.get(actNode) ?? new Set<string>()
@@ -60,19 +67,31 @@ export const useRecommendationStore = defineStore('recommendation', () => {
 
   function calculatePath(studentA: string, studentB: string): void {
     const graphStore = useGraphStore()
-    pathResult.value = findPath(graphStore.graph, studentA, studentB, graphStore.privateStudents)
+    pathResult.value = GraphAlgorithms.findPath(graphStore.graph, studentA, studentB, graphStore.privateStudents)
   }
 
   function clearRecommendations(): void {
     recommendations.activities = []
     recommendations.buddies = []
     pathResult.value = null
+    activeStudent.value = null
+    searchQuery.value = ''
+    suggestions.value = []
+    searchFriendQuery.value = ''
+    activeFilter.value = '全部'
+    expandedGroups.value = {}
   }
 
   return {
     pathResult,
     promotedActivities,
     recommendations,
+    activeStudent,
+    searchQuery,
+    suggestions,
+    searchFriendQuery,
+    activeFilter,
+    expandedGroups,
     runRecommendations,
     getSharedInterest,
     getBuddiesForActivity,

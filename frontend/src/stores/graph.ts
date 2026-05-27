@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import type { GraphStats } from '@/types'
-import { countConnectedComponents, nodeKey } from '@/utils/graph-algorithms'
+import { GraphAlgorithms, nodeKey } from '@/utils/graph-algorithms'
+import { ADMIN_NAME } from '@/constants/interests'
 
 export const useGraphStore = defineStore('graph', () => {
   const graph = ref<Map<string, Set<string>>>(new Map())
@@ -14,6 +15,31 @@ export const useGraphStore = defineStore('graph', () => {
       privateStudents.value.delete(student)
     }
   }
+
+  const studentsList = computed<string[]>(() => {
+    return Array.from(graph.value.keys()).filter(n => n.startsWith('student:'))
+  })
+
+  const allActivitiesList = computed(() => {
+    const list: Array<{ name: string; interests: string[]; studentCount: number }> = []
+    for (const [node, neighbors] of graph.value.entries()) {
+      if (node.startsWith('activity:')) {
+        const name = node.slice('activity:'.length)
+        const interests: string[] = []
+        let studentCount = 0
+        for (const neighbor of neighbors) {
+          if (neighbor.startsWith('interest:')) {
+            interests.push(neighbor.slice('interest:'.length))
+          } else if (neighbor.startsWith('student:')) {
+            studentCount++
+          }
+        }
+        list.push({ name, interests, studentCount })
+      }
+    }
+    return list.sort((a, b) => b.studentCount - a.studentCount || a.name.localeCompare(b.name))
+  })
+
   const stats = reactive<GraphStats>({
     studentsCount: 0,
     interestsCount: 0,
@@ -24,8 +50,11 @@ export const useGraphStore = defineStore('graph', () => {
   // Set of subscribers to respond to stats/graph updates
   const statsUpdateSubscribers = new Set<() => void>()
 
-  function registerOnStatsUpdate(callback: () => void): void {
+  function registerOnStatsUpdate(callback: () => void): () => void {
     statsUpdateSubscribers.add(callback)
+    return () => {
+      statsUpdateSubscribers.delete(callback)
+    }
   }
 
   function addEdge(u: string, v: string): void {
@@ -45,17 +74,27 @@ export const useGraphStore = defineStore('graph', () => {
     stats.studentsCount   = s
     stats.interestsCount  = i
     stats.activitiesCount = a
-    stats.componentsCount = countConnectedComponents(graph.value)
+    stats.componentsCount = GraphAlgorithms.countConnectedComponents(graph.value)
 
     // Notify all subscribers
     statsUpdateSubscribers.forEach(cb => cb())
   }
 
+  interface GraphDataSchema {
+    students: Array<[string, string]>
+    activities: Array<[string, string]>
+    registrations?: Array<[string, string]>
+  }
+
   async function loadGraphData(): Promise<void> {
     try {
-      const res = await fetch(`${import.meta.env.BASE_URL}graph_data.json`)
+      const res = await fetch(`${(import.meta as any).env.BASE_URL}graph_data.json`)
       if (!res.ok) throw new Error('graph_data.json not found')
-      const data = await res.json()
+      const data = await res.json() as GraphDataSchema
+
+      if (!data || !Array.isArray(data.students) || !Array.isArray(data.activities)) {
+        throw new Error('Invalid graph data format: students and activities must be arrays')
+      }
 
       graph.value.clear()
       privateStudents.value.clear()
@@ -66,7 +105,7 @@ export const useGraphStore = defineStore('graph', () => {
       const isolatedTargets = new Set<string>()
       while (isolatedTargets.size < 4 && allStudentNames.length > 10) {
         const randomName = allStudentNames[Math.floor(Math.random() * allStudentNames.length)]
-        if (randomName && randomName !== '系统管理员') {
+        if (randomName && randomName !== ADMIN_NAME) {
           isolatedTargets.add(randomName)
         }
       }
@@ -161,6 +200,8 @@ export const useGraphStore = defineStore('graph', () => {
     loadGraphData,
     addActivity,
     deleteActivity,
+    studentsList,
+    allActivitiesList,
   }
 })
 

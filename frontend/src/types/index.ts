@@ -73,3 +73,36 @@ export interface DomainBar {
   color: string
   pct: number
 }
+
+// ─── Logs ──────────────────────────────────────────────────────────────────────
+
+/** A single administration or student action log entry */
+export interface LogEntry {
+  id: string
+  timestamp: string
+  type: 'info' | 'action' | 'warning' | 'query'
+  message: string
+}
+
+// ─── Simulation Node / Link Types ──────────────────────────────────────────────
+
+/** Node structure inside D3 force-directed layout */
+export interface ForceGraphNode {
+  id: string
+  type: NodeKind
+  name: string
+  x?: number
+  y?: number
+  vx?: number
+  vy?: number
+  fx?: number | null
+  fy?: number | null
+}
+
+/** Link/Edge structure inside D3 force-directed layout */
+export interface ForceGraphLink {
+  source: string | ForceGraphNode
+  target: string | ForceGraphNode
+  type?: string
+}
+

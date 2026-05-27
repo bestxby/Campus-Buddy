@@ -68,7 +68,7 @@ def main():
     print("-" * 60)
     buddies = g.recommend_buddies("小明")
     print(f"  Recommended buddies: {buddies}")
-    print("  Expected: ['小刚', '小红', '小王', '小赵']")
+    print("  Expected: ['小刚', '小王', '小红', '小赵']")
 
     # 4. Connected Components
     print("\n" + "-" * 60)

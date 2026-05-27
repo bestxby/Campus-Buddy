@@ -16,7 +16,7 @@
       <div class="log-console-fullscreen">
         <div class="console-body">
           <div v-for="(log, idx) in logs" :key="idx" class="console-line" :class="log.type">
-            <span class="line-time">[{{ log.time }}]</span>
+            <span class="line-time">[{{ log.timestamp }}]</span>
             <span class="line-tag">[{{ log.type.toUpperCase() }}]</span>
             <span class="line-msg">{{ log.message }}</span>
           </div>

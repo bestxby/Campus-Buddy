@@ -1,13 +1,13 @@
 import { useGraphStore } from '@/stores/graph'
 import { computed } from 'vue'
-import type { GraphStats, PathResult } from '@/types'
-import { findPath as pureFindPath, nodeKey as pureNodeKey } from '@/utils/graph-algorithms'
+import type { PathResult, NodeKind } from '@/types'
+import { GraphAlgorithms, nodeKey as pureNodeKey } from '@/utils/graph-algorithms'
 
 export const graph = computed(() => useGraphStore().graph)
 
 export const stats = computed(() => useGraphStore().stats)
 
-export const nodeKey = (kind: string, name: string): string =>
+export const nodeKey = (kind: NodeKind, name: string): string =>
   pureNodeKey(kind, name)
 
 export const getNodeInterests = (nodeId: string): string[] => {
@@ -24,7 +24,7 @@ export const updateStats = (): void => {
 }
 
 export const findPath = (studentA: string, studentB: string): PathResult | null =>
-  pureFindPath(useGraphStore().graph, studentA, studentB, useGraphStore().privateStudents)
+  GraphAlgorithms.findPath(useGraphStore().graph, studentA, studentB, useGraphStore().privateStudents)
 
 export const loadGraphData = async (): Promise<void> => {
   await useGraphStore().loadGraphData()

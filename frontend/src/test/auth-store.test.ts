@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '../stores/auth'
+// @ts-ignore
 import { webcrypto } from 'node:crypto'
 
 if (!globalThis.crypto) {

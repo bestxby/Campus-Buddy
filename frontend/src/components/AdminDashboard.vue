@@ -49,8 +49,8 @@ const emit = defineEmits<{
 // Seed initial logs
 onMounted(() => {
   addLog('info', '系统初始化完成，成功加载校园社交关系网图谱数据')
-  addLog('info', `校园社交网络载入就绪：当前共包含 ${stats.studentsCount} 位同学，${stats.interestsCount} 种不同兴趣圈子，${stats.activitiesCount} 个校园活动`)
-  addLog('info', `社群活跃度分析完成：共识别出 ${stats.componentsCount} 个相对独立的主题社群圈子`)
+  addLog('info', `校园社交网络载入就绪：当前共包含 ${stats.value.studentsCount} 位同学，${stats.value.interestsCount} 种不同兴趣圈子，${stats.value.activitiesCount} 个校园活动`)
+  addLog('info', `社群活跃度分析完成：共识别出 ${stats.value.componentsCount} 个相对独立的主题社群圈子`)
   addLog('info', '跨界中介路径计算完成，已找出能够连接不同圈子的关键人脉纽带')
   addLog('info', `待关怀学生筛查完毕：当前共有 ${isolatedCount.value} 名尚未融入任何圈子的同学`)
   addLog('info', '系统状态：校园人脉推荐引擎已就绪')

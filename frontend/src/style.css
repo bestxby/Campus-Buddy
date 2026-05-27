@@ -20,6 +20,15 @@
 /* ─── Reset ───────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 
+*:focus {
+  outline: none;
+}
+
+input:focus-visible, button:focus-visible, select:focus-visible, textarea:focus-visible, [role="button"]:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 2px;
+}
+
 body {
   margin: 0; padding: 0;
   background-color: var(--bg-color);

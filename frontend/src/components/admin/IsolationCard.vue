@@ -58,6 +58,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { graph } from '@/composables/useGraph'
+import { ADMIN_NAME } from '@/constants/interests'
 import BridgePlanPanel from './BridgePlanPanel.vue'
 
 const selectedIsolatedStudent = ref<string | null>(null)
@@ -65,7 +66,7 @@ const selectedIsolatedStudent = ref<string | null>(null)
 const isolatedStudents = computed(() => {
   const list: string[] = []
   for (const [node, neighbors] of graph.value.entries()) {
-    if (node.startsWith('student:') && node !== 'student:系统管理员' && neighbors.size === 0) {
+    if (node.startsWith('student:') && node !== `student:${ADMIN_NAME}` && neighbors.size === 0) {
       list.push(node.slice('student:'.length))
     }
   }

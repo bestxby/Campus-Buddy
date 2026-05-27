@@ -37,7 +37,7 @@ describe('Graph Store', () => {
         json: () => Promise.resolve(mockData)
       } as Response)
     )
-    global.fetch = mockFetch
+    globalThis.fetch = mockFetch
 
     const store = useGraphStore()
     await store.loadGraphData()

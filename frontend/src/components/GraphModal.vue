@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
+import { ref, watch, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { graph } from '@/composables/useGraph'
 import { activeStudent, recommendations, selectStudent, pathResult } from '@/composables/useRecommendations'
 import { currentUser, currentUserRole, signedUpActivities } from '@/composables/useAuth'
@@ -126,33 +126,41 @@ const resetZoom = () => {
 }
 
 // ─── D3 Force-directed Graph Renderer Delegation ──────────────────────────────
+let drawScheduled = false
 const drawGraph = () => {
   if (!svgRef.value) return
-  if (!graphRenderer) {
-    graphRenderer = new ForceGraphRenderer(svgRef.value, {
-      onNodeClick: (node: any) => {
-        if (node.type === 'student' && currentUserRole.value === 'admin') {
-          selectStudent(node.name)
-        }
-      },
-      onHover: (detail) => {
-        hoveredDetail.value = detail
-      }
-    })
-  }
+  if (drawScheduled) return
+  drawScheduled = true
 
-  graphRenderer.draw({
-    graph: graph.value,
-    activeStudent: activeStudent.value,
-    recommendations: recommendations.value,
-    hideBuddies: hideBuddies.value,
-    hideActivities: hideActivities.value,
-    buddyLimit: buddyLimit.value,
-    pathResult: pathResult.value,
-    currentUser: currentUser.value,
-    currentUserRole: currentUserRole.value,
-    showGlobal: currentUserRole.value === 'admin' ? showGlobal.value : false,
-    privateStudents: useGraphStore().privateStudents,
+  nextTick(() => {
+    drawScheduled = false
+    if (!svgRef.value) return
+    if (!graphRenderer) {
+      graphRenderer = new ForceGraphRenderer(svgRef.value, {
+        onNodeClick: (node: any) => {
+          if (node.type === 'student' && currentUserRole.value === 'admin') {
+            selectStudent(node.name)
+          }
+        },
+        onHover: (detail) => {
+          hoveredDetail.value = detail
+        }
+      })
+    }
+
+    graphRenderer.draw({
+      graph: graph.value,
+      activeStudent: activeStudent.value,
+      recommendations: recommendations.value,
+      hideBuddies: hideBuddies.value,
+      hideActivities: hideActivities.value,
+      buddyLimit: buddyLimit.value,
+      pathResult: pathResult.value,
+      currentUser: currentUser.value,
+      currentUserRole: currentUserRole.value,
+      showGlobal: currentUserRole.value === 'admin' ? showGlobal.value : false,
+      privateStudents: useGraphStore().privateStudents,
+    })
   })
 }
 

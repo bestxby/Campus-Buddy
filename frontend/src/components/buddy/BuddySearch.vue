@@ -7,12 +7,13 @@
         v-model="searchFriendQuery"
         placeholder="查找特定朋友/同学姓名，分析共同兴趣..."
         class="buddy-search-input"
+        aria-label="查找特定同学"
       />
-      <button v-if="searchFriendQuery" @click="searchFriendQuery = ''" class="clear-search-btn">清除</button>
+      <button v-if="searchFriendQuery" @click="searchFriendQuery = ''" class="clear-search-btn" aria-label="清除搜索">清除</button>
     </div>
     <!-- Search results -->
-    <div v-if="matchedFriends.length" class="friend-matches-list">
-      <div v-for="friend in matchedFriends" :key="friend.name" class="friend-match-item">
+    <div v-if="matchedFriends.length" class="friend-matches-list" role="listbox" aria-label="匹配的同学">
+      <div v-for="friend in matchedFriends" :key="friend.name" class="friend-match-item" role="option">
         <div class="friend-match-info">
           <span class="friend-name">👤 {{ friend.name }}</span>
           <span v-if="friend.sharedCount > 0" class="friend-shared-desc text-orange-light">

@@ -6,6 +6,6 @@ export type { LogEntry }
 
 export const logs = computed(() => useLogStore().logs)
 
-export const addLog = (type: 'info' | 'action' | 'warning', message: string): void => {
+export const addLog = (type: 'info' | 'action' | 'warning' | 'query', message: string): void => {
   useLogStore().addLog(type, message)
 }

@@ -1,4 +1,5 @@
 import pytest
+import os
 from campus_buddy import CampusBuddyGraph
 
 @pytest.fixture
@@ -163,9 +164,12 @@ def test_name_collision():
     assert "activity:篮球" in g.graph
     assert "interest:摄影" in g.graph
 
+@pytest.mark.skipif(
+    not os.path.exists("data/student_interests.csv") or not os.path.exists("data/activity_interests.csv"),
+    reason="Performance test CSV files not found. Generate mock data first."
+)
 def test_large_scale_performance():
     import time
-    import os
     
     g = CampusBuddyGraph()
     student_csv = "data/student_interests.csv"
@@ -216,3 +220,55 @@ def test_large_scale_performance():
         elapsed_ms3 = (end_time3 - start_time3) * 1000
         print(f"[Performance] BFS find_path from '{student_a}' to '{student_b}' took {elapsed_ms3:.4f} ms. Path length: {len(path) if path else 'None'}")
         assert elapsed_ms3 < 200.0
+
+def test_no_matching_activities():
+    g = CampusBuddyGraph()
+    g.add_student_interest("学生A", "古董鉴定")
+    g.add_activity_interest("高数沙龙", "高数")
+    assert g.recommend_activities("学生A") == []
+
+def test_no_matching_buddies():
+    g = CampusBuddyGraph()
+    g.add_student_interest("学生A", "古玩")
+    g.add_student_interest("学生B", "高数")
+    assert g.recommend_buddies("学生A") == []
+    assert g.recommend_buddies_ranked("学生A") == []
+
+def test_find_path_nonexistent_student():
+    g = CampusBuddyGraph()
+    g.add_student_interest("学生A", "篮球")
+    assert g.find_path("学生A", "不存在的学生") is None
+    assert g.find_path("不存在的学生", "学生A") is None
+
+def test_csv_parsing(tmp_path):
+    student_file = tmp_path / "students.csv"
+    activity_file = tmp_path / "activities.csv"
+    registration_file = tmp_path / "registrations.csv"
+    
+    student_file.write_text("student,interest\n测试学生,篮球\n", encoding="utf-8")
+    activity_file.write_text("activity,interest\n篮球挑战赛,篮球\n", encoding="utf-8")
+    registration_file.write_text("student,activity\n测试学生,篮球挑战赛\n", encoding="utf-8")
+    
+    g = CampusBuddyGraph()
+    g.load_students_from_csv(str(student_file))
+    g.load_activities_from_csv(str(activity_file))
+    g.load_registrations_from_csv(str(registration_file))
+    
+    assert "student:测试学生" in g.graph
+    assert "interest:篮球" in g.graph
+    assert "activity:篮球挑战赛" in g.graph
+    assert "activity:篮球挑战赛" in g.graph["student:测试学生"]
+
+def test_edge_idempotency():
+    g = CampusBuddyGraph()
+    g.add_student_interest("学生A", "篮球")
+    g.add_student_interest("学生A", "篮球")
+    assert len(g.graph["student:学生A"]) == 1
+    assert len(g.graph["interest:篮球"]) == 1
+
+def test_multiple_connected_components():
+    g = CampusBuddyGraph()
+    g.add_student_interest("学生A", "篮球")
+    g.add_student_interest("学生B", "绘画")
+    components = g.connected_components()
+    assert len(components) == 2

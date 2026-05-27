@@ -42,9 +42,15 @@ class CampusBuddyGraph:
         """
         Recommends activities for a student.
         Should trace: student -> interest -> activity (2 hops).
+        Excludes activities the student has already registered for.
         Returns a sorted list of unique activity names (clean names, e.g. "周三篮球赛").
         """
         start = self.node("student", student)
+        registered = {
+            n.removeprefix("activity:")
+            for n in self.graph[start]
+            if n.startswith("activity:")
+        }
         activities = set()
 
         for interest in self.graph[start]:
@@ -52,8 +58,9 @@ class CampusBuddyGraph:
                 continue
             for neighbor in self.graph[interest]:
                 if neighbor.startswith("activity:"):
-                    # Remove prefix 'activity:' to return clean name
-                    activities.add(neighbor.removeprefix("activity:"))
+                    act_name = neighbor.removeprefix("activity:")
+                    if act_name not in registered:
+                        activities.add(act_name)
 
         return sorted(list(activities))
 
@@ -142,23 +149,32 @@ class CampusBuddyGraph:
         if start == end:
             return [start]
 
-        # BFS with path tracking
-        queue = deque([(start, [start])])
+        # BFS with predecessor tracking for O(V) space complexity
+        queue = deque([start])
         visited = {start}
+        parent = {start: None}
 
         while queue:
-            current, path = queue.popleft()
+            current = queue.popleft()
+            if current == end:
+                break
 
             for neighbor in self.graph[current]:
-                if neighbor in visited:
-                    continue
-                new_path = path + [neighbor]
-                if neighbor == end:
-                    return new_path
-                visited.add(neighbor)
-                queue.append((neighbor, new_path))
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    parent[neighbor] = current
+                    queue.append(neighbor)
 
-        return None  # No path found (disconnected graph)
+        if end not in parent:
+            return None
+
+        path = []
+        curr = end
+        while curr is not None:
+            path.append(curr)
+            curr = parent[curr]
+        path.reverse()
+        return path
 
     def connected_components(self):
         """
@@ -218,3 +234,19 @@ class CampusBuddyGraph:
                 if not row or len(row) < 2:
                     continue
                 self.add_activity_interest(row[0].strip(), row[1].strip())
+
+    def load_registrations_from_csv(self, file_path):
+        """
+        Loads student-activity registrations from a CSV file.
+        CSV format: student,activity
+        """
+        with open(file_path, mode='r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            # Skip header if it exists
+            header = next(reader, None)
+            for row in reader:
+                if not row or len(row) < 2:
+                    continue
+                s = self.node("student", row[0].strip())
+                a = self.node("activity", row[1].strip())
+                self.add_edge(s, a)

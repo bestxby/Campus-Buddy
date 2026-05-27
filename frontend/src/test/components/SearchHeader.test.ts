@@ -12,21 +12,13 @@ describe('SearchHeader.vue', () => {
   })
 
   it('renders correctly matches snapshot', () => {
-    const wrapper = mount(SearchHeader, {
-      global: {
-        plugins: [createPinia()]
-      }
-    })
+    const wrapper = mount(SearchHeader)
     expect(wrapper.html()).toMatchSnapshot()
   })
 
   it('shows autocomplete dropdown when suggestions exist', async () => {
     suggestions.value = ['Alice', 'Bob']
-    const wrapper = mount(SearchHeader, {
-      global: {
-        plugins: [createPinia()]
-      }
-    })
+    const wrapper = mount(SearchHeader)
     expect(wrapper.text()).toContain('Alice')
     expect(wrapper.text()).toContain('Bob')
   })

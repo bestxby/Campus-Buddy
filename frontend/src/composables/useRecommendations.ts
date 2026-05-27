@@ -1,6 +1,6 @@
 import { useRecommendationStore } from '@/stores/recommendation'
-import { ref, computed, watch } from 'vue'
-import type { BuddyResult, MatchedFriend, PathResult } from '@/types'
+import { computed, watch, customRef } from 'vue'
+import type { MatchedFriend, PathResult } from '@/types'
 import { useGraphStore } from '@/stores/graph'
 import { nodeKey } from '@/composables/useGraph'
 import { useAuthStore } from '@/stores/auth'
@@ -10,16 +10,37 @@ export const pathResult = computed<PathResult | null>({
   get: () => useRecommendationStore().pathResult,
   set: (val) => { useRecommendationStore().pathResult = val }
 })
-export const promotedActivities = computed(() => useRecommendationStore().promotedActivities)
+export const promotedActivities = computed<Set<string>>({
+  get: () => useRecommendationStore().promotedActivities,
+  set: (val) => { useRecommendationStore().promotedActivities = val }
+})
 export const recommendations = computed(() => useRecommendationStore().recommendations)
 
-// UI State resides locally in the composable (shared ref instances)
-export const activeStudent = ref<string | null>(null)
-export const searchQuery = ref('')
-export const suggestions = ref<string[]>([])
-export const searchFriendQuery = ref('')
-export const activeFilter = ref('全部')
-export const expandedGroups = ref<Record<string, boolean>>({})
+// UI State delegates dynamically to Pinia recommendation store using customRef (no global caching)
+export const activeStudent = customRef<string | null>((track, trigger) => ({
+  get: () => { track(); try { return useRecommendationStore().activeStudent } catch { return null } },
+  set: (val) => { try { useRecommendationStore().activeStudent = val; trigger() } catch {} }
+}))
+export const searchQuery = customRef<string>((track, trigger) => ({
+  get: () => { track(); try { return useRecommendationStore().searchQuery } catch { return '' } },
+  set: (val) => { try { useRecommendationStore().searchQuery = val; trigger() } catch {} }
+}))
+export const suggestions = customRef<string[]>((track, trigger) => ({
+  get: () => { track(); try { return useRecommendationStore().suggestions } catch { return [] } },
+  set: (val) => { try { useRecommendationStore().suggestions = val; trigger() } catch {} }
+}))
+export const searchFriendQuery = customRef<string>((track, trigger) => ({
+  get: () => { track(); try { return useRecommendationStore().searchFriendQuery } catch { return '' } },
+  set: (val) => { try { useRecommendationStore().searchFriendQuery = val; trigger() } catch {} }
+}))
+export const activeFilter = customRef<string>((track, trigger) => ({
+  get: () => { track(); try { return useRecommendationStore().activeFilter } catch { return '全部' } },
+  set: (val) => { try { useRecommendationStore().activeFilter = val; trigger() } catch {} }
+}))
+export const expandedGroups = customRef<Record<string, boolean>>((track, trigger) => ({
+  get: () => { track(); try { return useRecommendationStore().expandedGroups } catch { return {} } },
+  set: (val) => { try { useRecommendationStore().expandedGroups = val; trigger() } catch {} }
+}))
 
 // Helper functions/actions
 export const runRecommendations = (student: string): void => {
@@ -113,8 +134,7 @@ export const matchedFriends = computed((): MatchedFriend[] => {
       .filter(n => n.startsWith('interest:'))
   )
   const results: MatchedFriend[] = []
-  for (const node of graphStore.graph.keys()) {
-    if (!node.startsWith('student:')) continue
+  for (const node of graphStore.studentsList) {
     const name = node.slice('student:'.length)
     if (name === activeStudent.value) continue
     if (!name.toLowerCase().includes(query)) continue

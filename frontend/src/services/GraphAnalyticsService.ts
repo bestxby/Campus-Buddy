@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { useGraphStore } from '@/stores/graph'
+import { ADMIN_NAME } from '@/constants/interests'
 
 export interface CentralityResult {
   name: string
@@ -27,18 +28,32 @@ export class GraphAnalyticsService {
   public readonly popularInterests = ref<InterestStat[]>([])
   public readonly icebreakingActivities = ref<IcebreakingStat[]>([])
 
-  private constructor() {
-    // Register recalculation callback to break circular dependencies!
-    // Defer registration to next tick to ensure Pinia is initialized and active
-    setTimeout(() => {
-      try {
-        useGraphStore().registerOnStatsUpdate(() => {
-          this.recalculateGraphInsights()
-        })
-      } catch (err) {
-        // Ignore errors in test environments where Pinia is not active or has been torn down
-      }
-    }, 0)
+  private unsubscribe: (() => void) | null = null
+  private debounceTimer: any = null
+
+  private constructor() {}
+
+  public initialize(): void {
+    if (this.unsubscribe) return
+    try {
+      this.unsubscribe = useGraphStore().registerOnStatsUpdate(() => {
+        this.recalculateGraphInsights()
+      })
+      this.recalculateGraphInsights()
+    } catch (err) {
+      // Ignore errors in test environments where Pinia is not active or has been torn down
+    }
+  }
+
+  public destroy(): void {
+    if (this.unsubscribe) {
+      this.unsubscribe()
+      this.unsubscribe = null
+    }
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer)
+      this.debounceTimer = null
+    }
   }
 
   public static getInstance(): GraphAnalyticsService {
@@ -54,7 +69,7 @@ export class GraphAnalyticsService {
     for (const [node, neighbors] of graph.entries()) {
       if (node.startsWith('student:')) {
         const name = node.split(':')[1]
-        if (name === '系统管理员') continue
+        if (name === ADMIN_NAME) continue
         list.push({ name, score: neighbors.size })
       }
     }
@@ -69,17 +84,22 @@ export class GraphAnalyticsService {
     const counts: Record<string, number> = {}
     students.forEach(s => { counts[s] = 0 })
 
-    const sample = students
-      .sort(() => 0.5 - Math.random())
-      .slice(0, Math.min(sampleSize, students.length))
+    // Fisher-Yates Shuffle for unbiased sampling
+    const shuffled = [...students]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    const sample = shuffled.slice(0, Math.min(sampleSize, students.length))
 
     for (const start of sample) {
       const queue: string[] = [start]
+      let head = 0
       const parent: Record<string, string[]> = {}
       const dist: Record<string, number> = { [start]: 0 }
 
-      while (queue.length > 0) {
-        const u = queue.shift()!
+      while (head < queue.length) {
+        const u = queue[head++]
         for (const v of graph.get(u) ?? []) {
           if (!dist.hasOwnProperty(v)) {
             dist[v] = dist[u] + 1
@@ -114,7 +134,7 @@ export class GraphAnalyticsService {
         name: key.split(':')[1],
         score: Math.round(score * 10) / 10
       }))
-      .filter(x => x.name !== '系统管理员')
+      .filter(x => x.name !== ADMIN_NAME)
       .sort((a, b) => b.score - a.score)
       .slice(0, 3)
   }
@@ -123,7 +143,7 @@ export class GraphAnalyticsService {
     let count = 0
     const graph = useGraphStore().graph
     for (const [node, neighbors] of graph.entries()) {
-      if (node.startsWith('student:') && node !== 'student:系统管理员' && neighbors.size === 0) {
+      if (node.startsWith('student:') && node !== `student:${ADMIN_NAME}` && neighbors.size === 0) {
         count++
       }
     }
@@ -190,7 +210,10 @@ export class GraphAnalyticsService {
   }
 
   public recalculateGraphInsights(): void {
-    setTimeout(() => {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer)
+    }
+    this.debounceTimer = setTimeout(() => {
       this.topSocialStudents.value = this.calculateDegreeCentrality()
       this.bridgeStudents.value    = this.calculateBetweennessCentrality()
       this.isolatedCount.value      = this.countIsolatedStudents()
@@ -209,7 +232,8 @@ export class GraphAnalyticsService {
       }
       this.popularInterests.value = list.sort((a, b) => b.count - a.count)
       this.icebreakingActivities.value = this.calculateIcebreakingPotential()
-    }, 0)
+      this.debounceTimer = null
+    }, 150)
   }
 }
 

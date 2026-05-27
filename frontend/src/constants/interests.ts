@@ -31,3 +31,6 @@ export const DOMAIN_META = [
   { key: 'tech'   as InterestDomain, label: '科技', icon: '💻', color: '#ffb74d' },
   { key: 'social' as InterestDomain, label: '社交', icon: '🤝', color: '#34d399' },
 ] as const
+
+/** Hardcoded system administrator name */
+export const ADMIN_NAME = '系统管理员'

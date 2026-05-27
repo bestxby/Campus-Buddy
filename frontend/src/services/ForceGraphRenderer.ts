@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import type { HoveredConnectionDetail } from '@/types'
 import { nodeKey } from '@/composables/useGraph'
-import { ForceGraphDataBuilder, type ForceGraphConfig } from './ForceGraphDataBuilder'
+import { ForceGraphDataBuilder } from './ForceGraphDataBuilder'
 import { ForceGraphTooltipHelper } from './ForceGraphTooltipHelper'
 
 export interface ForceGraphCallbacks {
@@ -23,7 +23,13 @@ export class ForceGraphRenderer {
   public destroy() {
     if (this.simulation) {
       this.simulation.stop()
+      this.simulation = null
     }
+    const svg = d3.select(this.svgElement)
+    svg.selectAll('*').remove()
+    svg.on('.zoom', null)
+    svg.on('click', null)
+    this.zoomBehavior = null
   }
 
   public zoomIn() {
@@ -41,7 +47,7 @@ export class ForceGraphRenderer {
     d3.select(this.svgElement).transition().duration(300).call(this.zoomBehavior.transform, d3.zoomIdentity)
   }
 
-  public draw(config: ForceGraphConfig) {
+  public draw(config: any) {
     if (this.simulation) {
       this.simulation.stop()
     }
@@ -53,8 +59,13 @@ export class ForceGraphRenderer {
       showGlobal,
     } = config
 
+    const currentFocalId = activeStudent ? nodeKey('student', activeStudent) : 'global'
+    const lastFocalId = this.svgElement.getAttribute('data-focal-id')
+    const focalChanged = currentFocalId !== lastFocalId
+    this.svgElement.setAttribute('data-focal-id', currentFocalId)
+
     const svg = d3.select(this.svgElement)
-    svg.selectAll('*').remove()
+    let gContainer = svg.select<SVGGElement>('g.zoom-container')
 
     const width = this.svgElement.clientWidth || 900
     const height = this.svgElement.clientHeight || 600
@@ -72,8 +83,6 @@ export class ForceGraphRenderer {
       return false
     }
 
-    // ✅ OPTIMIZED: Tuned alphaDecay (0.028 > default 0.0228) and velocityDecay (0.45 > default 0.4)
-    // so the simulation cools ~20% faster and nodes settle sooner, reducing total main-thread tick work.
     const simulation = d3.forceSimulation(nodesToDraw)
       .alphaDecay(0.028)
       .velocityDecay(0.45)
@@ -94,13 +103,20 @@ export class ForceGraphRenderer {
       }))
     this.simulation = simulation
 
-    const gContainer = svg.append('g')
-    const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.3, 3])
-      .on('zoom', ev => gContainer.attr('transform', ev.transform))
-    this.zoomBehavior = zoom
-    svg.call(zoom)
-    svg.call(zoom.transform, d3.zoomIdentity)
+    if (gContainer.empty()) {
+      gContainer = svg.append('g').attr('class', 'zoom-container')
+      const zoom = d3.zoom<SVGSVGElement, unknown>()
+        .scaleExtent([0.3, 3])
+        .on('zoom', ev => gContainer.attr('transform', ev.transform))
+      this.zoomBehavior = zoom
+      svg.call(zoom)
+      svg.call(zoom.transform, d3.zoomIdentity)
+    } else {
+      gContainer.selectAll('*').remove()
+      if (focalChanged && this.zoomBehavior) {
+        svg.call(this.zoomBehavior.transform, d3.zoomIdentity)
+      }
+    }
 
     // Links
     const link = gContainer.append('g').attr('class', 'links')

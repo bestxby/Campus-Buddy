@@ -98,6 +98,7 @@ import CreateActivityModal from '@/components/admin/CreateActivityModal.vue'
 import { loadGraphData, updateStats } from '@/composables/useGraph'
 import { currentUser, restoreSession, currentUserRole } from '@/composables/useAuth'
 import { activeStudent, selectStudent, clearSearch } from '@/composables/useRecommendations'
+import { graphAnalyticsService } from '@/services/GraphAnalyticsService'
 
 const showCreateActivity = ref(false)
 
@@ -167,6 +168,7 @@ const startSidebarResize = (e: MouseEvent) => {
 onMounted(async () => {
   await loadGraphData()
   restoreSession()
+  graphAnalyticsService.initialize()
   updateStats()
   if (currentUser.value && currentUserRole.value !== 'admin') {
     selectStudent(currentUser.value)

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, reactive, computed } from 'vue'
 import { useGraphStore } from './graph'
-import { AVATAR_OPTIONS, INTEREST_CATEGORIES, DOMAIN_META } from '@/constants/interests'
+import { AVATAR_OPTIONS, INTEREST_CATEGORIES, DOMAIN_META, ADMIN_NAME } from '@/constants/interests'
 import type { DomainBar, RegForm } from '@/types'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -122,12 +122,12 @@ export const useAuthStore = defineStore('auth', () => {
     const hash = await hashPassword(password.trim())
     if (hash !== '3c6a6ef3ab28ad049ea0e4c091d249d6ffe4f8ef69b645a5e855d243980fa877') return false
 
-    currentUser.value = '系统管理员'
+    currentUser.value = ADMIN_NAME
     currentUserRole.value = 'admin'
     currentUserAvatar.value = '🤖'
-    userPersona.value = '系统管理员 (System Admin)'
+    userPersona.value = `${ADMIN_NAME} (System Admin)`
 
-    localStorage.setItem('campus_buddy_user',      '系统管理员')
+    localStorage.setItem('campus_buddy_user',      ADMIN_NAME)
     localStorage.setItem('campus_buddy_role',      'admin')
     localStorage.setItem('campus_buddy_avatar',    '🤖')
     localStorage.setItem('campus_buddy_persona',   userPersona.value)
@@ -143,7 +143,8 @@ export const useAuthStore = defineStore('auth', () => {
     if (!savedUser) return
 
     currentUser.value = savedUser
-    currentUserRole.value = (localStorage.getItem('campus_buddy_role') as 'student' | 'admin') ?? 'student'
+    const savedRole = localStorage.getItem('campus_buddy_role')
+    currentUserRole.value = (savedRole === 'admin' || savedRole === 'student') ? savedRole : 'student'
     currentUserAvatar.value = localStorage.getItem('campus_buddy_avatar') ?? '🧭'
     userPersona.value = localStorage.getItem('campus_buddy_persona') ?? '普通同学'
 
@@ -167,7 +168,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout(): Promise<void> {
-    localStorage.clear()
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('campus_buddy_')) {
+        localStorage.removeItem(key)
+      }
+    })
     currentUser.value = null
     currentUserRole.value = null
     currentUserAvatar.value = AVATAR_OPTIONS[0]

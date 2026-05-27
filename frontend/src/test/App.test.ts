@@ -4,7 +4,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import App from '../App.vue'
 
 // Mock global fetch for graph loading
-global.fetch = vi.fn().mockImplementation(() =>
+globalThis.fetch = vi.fn().mockImplementation(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({ students: [], activities: [], registrations: [] })

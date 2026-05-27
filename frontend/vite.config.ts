@@ -5,7 +5,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [vue()],
-  base: './', // Ensures assets load correctly on GitHub Pages
+  base: '/Campus-Buddy/', // Ensures assets load correctly on GitHub Pages
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),

@@ -1,16 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import {
-  countConnectedComponents,
-  findPath,
-  calculateJaccardSimilarity,
-  nodeKey
-} from '../utils/graph-algorithms'
+import { GraphAlgorithms } from '../utils/graph-algorithms'
 
 describe('Graph Algorithms', () => {
   describe('Connected Components', () => {
     it('should return 0 for an empty graph', () => {
       const graph = new Map<string, Set<string>>()
-      expect(countConnectedComponents(graph)).toBe(0)
+      expect(GraphAlgorithms.countConnectedComponents(graph)).toBe(0)
     })
 
     it('should correctly count connected components', () => {
@@ -30,7 +25,7 @@ describe('Graph Algorithms', () => {
       // Isolated Student F (Component 3)
       graph.set('student:F', new Set())
 
-      expect(countConnectedComponents(graph)).toBe(3)
+      expect(GraphAlgorithms.countConnectedComponents(graph)).toBe(3)
     })
   })
 
@@ -43,7 +38,7 @@ describe('Graph Algorithms', () => {
       graph.set('interest:Y', new Set(['student:B', 'student:C']))
       graph.set('student:C', new Set(['interest:Y']))
 
-      const path = findPath(graph, 'A', 'C')
+      const path = GraphAlgorithms.findPath(graph, 'A', 'C')
       expect(path).not.toBeNull()
       expect(path?.hops).toBe(2)
       expect(path?.readable).toEqual(['A', 'X', 'B', 'Y', 'C'])
@@ -57,14 +52,14 @@ describe('Graph Algorithms', () => {
       graph.set('student:B', new Set(['interest:Y']))
       graph.set('interest:Y', new Set(['student:B']))
 
-      expect(findPath(graph, 'A', 'B')).toBeNull()
+      expect(GraphAlgorithms.findPath(graph, 'A', 'B')).toBeNull()
     })
 
     it('should handle start and end being same node', () => {
       const graph = new Map<string, Set<string>>()
       graph.set('student:A', new Set(['interest:X']))
 
-      const path = findPath(graph, 'A', 'A')
+      const path = GraphAlgorithms.findPath(graph, 'A', 'A')
       expect(path).not.toBeNull()
       expect(path?.hops).toBe(0)
       expect(path?.readable).toEqual(['A'])
@@ -86,7 +81,7 @@ describe('Graph Algorithms', () => {
       graph.set('student:C', new Set(['interest:Y', 'interest:Z', 'interest:W']))
 
       const promoted = new Set<string>(['Act2'])
-      const results = calculateJaccardSimilarity(graph, 'A', promoted)
+      const results = GraphAlgorithms.calculateJaccardSimilarity(graph, 'A', promoted)
 
       // Buddies should be ranked: B (0.667) then C (0.5)
       expect(results.buddies.length).toBe(2)
