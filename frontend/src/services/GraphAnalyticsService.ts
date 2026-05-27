@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { useGraphStore } from '@/stores/graph'
+import { useAuthStore } from '@/stores/auth'
 import { ADMIN_NAME } from '@/constants/interests'
 
 export interface CentralityResult {
@@ -213,6 +214,17 @@ export class GraphAnalyticsService {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer)
     }
+    // ✅ PERFORMANCE OPTIMIZATION: Do not perform heavy centrality calculations if no user is logged in.
+    // This prevents thread freezing on the login screen, keeping login tabs/buttons 100% responsive.
+    try {
+      if (!useAuthStore().currentUser) {
+        this.debounceTimer = null
+        return
+      }
+    } catch (err) {
+      // Pinia might not be active in unit testing environments
+    }
+
     this.debounceTimer = setTimeout(() => {
       this.topSocialStudents.value = this.calculateDegreeCentrality()
       this.bridgeStudents.value    = this.calculateBetweennessCentrality()
