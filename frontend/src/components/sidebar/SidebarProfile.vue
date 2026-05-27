@@ -1,67 +1,64 @@
 <template>
-  <!-- Profile Card: Left-Right Layout -->
   <div class="profile-card" :class="{ 'admin-card-border': currentUserRole === 'admin' }">
-    <div class="profile-main-layout">
 
-      <!-- LEFT: Avatar + Name + Persona -->
-      <div class="profile-left">
-        <div class="profile-avatar-wrap">
-          <span class="profile-avatar-big">{{ currentUserAvatar || '🧭' }}</span>
-          <div class="profile-avatar-ring"></div>
-          <!-- Privacy shield overlay on avatar when private mode is on -->
-          <div v-if="isPrivateMode && currentUserRole !== 'admin'" class="avatar-private-overlay">🔒</div>
-        </div>
+    <!-- TOP ROW: Avatar + Name/Persona + Logout button -->
+    <div class="profile-top-row">
+
+      <!-- Avatar -->
+      <div class="profile-avatar-wrap">
+        <span class="profile-avatar-big">{{ currentUserAvatar || '🧭' }}</span>
+        <div class="profile-avatar-ring"></div>
+        <div v-if="isPrivateMode && currentUserRole !== 'admin'" class="avatar-private-overlay">🔒</div>
+      </div>
+
+      <!-- Name + Persona (takes remaining space) -->
+      <div class="profile-identity">
         <div class="profile-name">{{ currentUser }}</div>
         <div class="profile-persona-badge" :class="personaBadgeClass">{{ userPersona }}</div>
       </div>
 
-      <!-- RIGHT: Mode Toggles + Logout -->
-      <div class="profile-right">
-        <!-- Admin Root access badge instead of toggles -->
-        <template v-if="currentUserRole === 'admin'">
-          <div class="admin-access-badge">
-            <span class="pulse-dot"></span>
-            <span class="badge-text">Root Access</span>
-          </div>
-        </template>
-
-        <!-- Student: Mode Buttons -->
-        <template v-else>
-          <!-- Privacy mode toggle -->
-          <button
-            class="mode-btn"
-            :class="isPrivateMode ? 'mode-btn-active-private' : 'mode-btn-inactive'"
-            @click="togglePrivacyMode"
-            :title="isPrivateMode ? '当前：隐身保护中，点击关闭' : '点击开启隐身保护模式（I人专属）'"
-          >
-            <span class="mode-icon">{{ isPrivateMode ? '🔒' : '🔓' }}</span>
-            <span class="mode-label">{{ isPrivateMode ? '隐身中' : '隐身模式' }}</span>
-          </button>
-
-          <!-- Social active mode toggle (E人模式) -->
-          <button
-            class="mode-btn"
-            :class="isSocialMode ? 'mode-btn-active-social' : 'mode-btn-inactive'"
-            @click="isSocialMode = !isSocialMode"
-            :title="isSocialMode ? '当前：社交达人模式开启中，点击关闭' : '点击开启社交达人模式（E人专属）'"
-          >
-            <span class="mode-icon">{{ isSocialMode ? '🌟' : '🌑' }}</span>
-            <span class="mode-label">{{ isSocialMode ? '达人中' : '达人模式' }}</span>
-          </button>
-
-          <!-- Spacer -->
-          <div class="mode-spacer"></div>
-        </template>
-
-        <!-- Logout button -->
-        <button @click="handleLogout" class="logout-btn" title="退出系统登录">
-          <span class="logout-icon">⏻</span>
-          <span class="logout-text">注销</span>
-        </button>
-      </div>
+      <!-- Logout button (icon-only, top-right) -->
+      <button @click="handleLogout" class="logout-btn" title="退出登录">
+        <span class="logout-icon">⏻</span>
+      </button>
     </div>
 
-    <!-- Status hint bar when private mode is on -->
+    <!-- BOTTOM ROW: Mode toggles (Student only) -->
+    <template v-if="currentUserRole !== 'admin'">
+      <div class="mode-toggle-row">
+        <!-- Privacy mode -->
+        <button
+          class="mode-btn"
+          :class="isPrivateMode ? 'mode-btn-active-private' : 'mode-btn-inactive'"
+          @click="togglePrivacyMode"
+          :title="isPrivateMode ? '隐身保护中，点击关闭' : '开启隐身模式（不被推荐给他人）'"
+        >
+          <span class="mode-icon">{{ isPrivateMode ? '🔒' : '🔓' }}</span>
+          <span class="mode-label">{{ isPrivateMode ? '隐身中' : '隐身模式' }}</span>
+        </button>
+
+        <!-- Social active mode -->
+        <button
+          class="mode-btn"
+          :class="isSocialMode ? 'mode-btn-active-social' : 'mode-btn-inactive'"
+          @click="isSocialMode = !isSocialMode"
+          :title="isSocialMode ? '达人模式开启中，点击关闭' : '开启达人模式（优先被推荐给有共同活动的同学）'"
+        >
+          <span class="mode-icon">{{ isSocialMode ? '🌟' : '🌑' }}</span>
+          <span class="mode-label">{{ isSocialMode ? '达人中' : '达人模式' }}</span>
+        </button>
+      </div>
+    </template>
+
+    <!-- Admin badge row -->
+    <template v-else>
+      <div class="admin-access-badge">
+        <span class="pulse-dot"></span>
+        <span class="badge-text">Root Access · 全局管理员</span>
+      </div>
+    </template>
+
+    <!-- Privacy status hint -->
     <div v-if="isPrivateMode && currentUserRole !== 'admin'" class="privacy-status-bar">
       <span class="privacy-status-dot"></span>
       <span>隐身保护中 · 您的社交关系已对他人隐藏</span>
@@ -92,7 +89,7 @@ const handleLogout = async () => {
   background: linear-gradient(135deg, rgba(253,151,31,0.06) 0%, rgba(255,255,255,0.02) 100%);
   border: 1px solid rgba(253,151,31,0.2);
   border-radius: 12px;
-  padding: 14px 12px;
+  padding: 12px 12px 10px;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
@@ -106,23 +103,21 @@ const handleLogout = async () => {
   pointer-events: none;
 }
 
-.profile-main-layout {
+/* ── TOP ROW ──────────────────────────────────── */
+.profile-top-row {
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-/* LEFT COLUMN */
-.profile-left {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
+/* Avatar */
+.profile-avatar-wrap {
+  position: relative;
   flex-shrink: 0;
 }
-.profile-avatar-wrap { position: relative; }
 .profile-avatar-big {
-  font-size: 34px;
+  font-size: 32px;
   line-height: 1;
   display: block;
   filter: drop-shadow(0 0 8px rgba(253,151,31,0.4));
@@ -142,7 +137,7 @@ const handleLogout = async () => {
   position: absolute;
   bottom: -4px;
   right: -4px;
-  font-size: 13px;
+  font-size: 12px;
   filter: drop-shadow(0 0 4px rgba(168,85,247,0.8));
   animation: privPulse 2s ease-in-out infinite;
 }
@@ -151,43 +146,71 @@ const handleLogout = async () => {
   50% { opacity: 1; transform: scale(1.15); }
 }
 @keyframes spinRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Identity: name + persona */
+.profile-identity {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .profile-name {
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #ffb74d;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 72px;
 }
 .profile-persona-badge {
   display: inline-block;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 600;
-  padding: 2px 6px;
+  padding: 2px 8px;
   border-radius: 20px;
   letter-spacing: 0.2px;
-  text-align: center;
-  max-width: 80px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  align-self: flex-start;
 }
 
-/* RIGHT COLUMN */
-.profile-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  align-items: stretch;
-  min-width: 0;
-}
-.mode-btn {
+/* Logout: icon-only pill */
+.logout-btn {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 8px;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  background: rgba(239,68,68,0.07);
+  border: 1px solid rgba(239,68,68,0.2);
+  color: rgba(255,255,255,0.55);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+}
+.logout-btn:hover {
+  background: rgba(239,68,68,0.18);
+  color: #ef4444;
+  border-color: rgba(239,68,68,0.55);
+  box-shadow: 0 0 8px rgba(239,68,68,0.2);
+}
+.logout-icon { line-height: 1; }
+
+/* ── MODE TOGGLE ROW ──────────────────────────── */
+.mode-toggle-row {
+  display: flex;
+  gap: 7px;
+}
+.mode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 6px;
   border-radius: 6px;
   font-size: 9.5px;
   font-weight: 600;
@@ -227,37 +250,11 @@ const handleLogout = async () => {
   border-color: rgba(253,151,31,0.5);
 }
 .mode-icon { font-size: 10px; line-height: 1; }
-.mode-label { flex: 1; }
-.mode-spacer { flex: 1; }
+.mode-label { line-height: 1; }
 
-.logout-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 5px 8px;
-  border-radius: 6px;
-  font-size: 9.5px;
-  font-weight: 600;
-  cursor: pointer;
-  background: rgba(239,68,68,0.08);
-  border: 1px solid rgba(239,68,68,0.22);
-  color: rgba(255,255,255,0.7);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: inherit;
-}
-.logout-btn:hover {
-  background: rgba(239,68,68,0.18);
-  color: #ef4444;
-  border-color: rgba(239,68,68,0.55);
-  box-shadow: 0 0 8px rgba(239,68,68,0.2);
-}
-.logout-icon { font-size: 10px; }
-.logout-text { font-family: inherit; }
-
-/* Privacy status bar */
+/* ── PRIVACY STATUS BAR ───────────────────────── */
 .privacy-status-bar {
-  margin-top: 10px;
+  margin-top: 8px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -283,7 +280,7 @@ const handleLogout = async () => {
   50% { opacity: 1; box-shadow: 0 0 8px rgba(168,85,247,0.9); }
 }
 
-/* Admin styles */
+/* ── ADMIN STYLES ─────────────────────────────── */
 .admin-card-border {
   border-color: rgba(6, 182, 212, 0.3) !important;
   background: linear-gradient(135deg, rgba(6, 182, 212, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%) !important;
@@ -296,7 +293,6 @@ const handleLogout = async () => {
   border: 1px solid rgba(6, 182, 212, 0.15);
   border-radius: 6px;
   padding: 5px 8px;
-  margin-bottom: 2px;
 }
 .admin-access-badge .pulse-dot {
   width: 6px; height: 6px;

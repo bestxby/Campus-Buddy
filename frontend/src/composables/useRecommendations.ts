@@ -149,6 +149,10 @@ export const matchedFriends = computed((): MatchedFriend[] => {
   return results.slice(0, 30)
 })
 
+// ✅ PERFORMANCE: Debounce Jaccard recommendation recalculation triggered by sign-up/cancel events.
+// Without debounce, each click synchronously runs O(N²) similarity calculations, freezing the UI.
+let _recalcDebounceTimer: ReturnType<typeof setTimeout> | null = null
+
 watch(
   () => {
     try {
@@ -158,9 +162,13 @@ watch(
     }
   },
   () => {
-    if (activeStudent.value) {
-      runRecommendations(activeStudent.value)
-    }
+    if (_recalcDebounceTimer) clearTimeout(_recalcDebounceTimer)
+    _recalcDebounceTimer = setTimeout(() => {
+      if (activeStudent.value) {
+        runRecommendations(activeStudent.value)
+      }
+      _recalcDebounceTimer = null
+    }, 300)
   },
   { deep: true }
 )

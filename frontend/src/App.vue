@@ -169,12 +169,9 @@ onMounted(async () => {
   await loadGraphData()
   restoreSession()
   graphAnalyticsService.initialize()
+  // updateStats() ensures admin panel stats are populated after restoreSession()
   updateStats()
-  if (currentUser.value && currentUserRole.value !== 'admin') {
-    selectStudent(currentUser.value)
-  } else {
-    clearSearch()
-  }
+  // selectStudent() is handled automatically by the watch([currentUser, currentUserRole]) above
 })
 </script>
 

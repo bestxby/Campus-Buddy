@@ -14,7 +14,7 @@
         </div>
 
         <!-- SVG graph lines (Phase 3) -->
-        <svg class="graph-svg" viewBox="-160 -160 320 320" v-if="phase >= 3">
+        <svg class="graph-svg" viewBox="-180 -180 360 360" v-if="phase >= 3">
           <g v-for="(line, i) in graphLines" :key="i">
             <line
               :x1="0" :y1="0"
@@ -23,7 +23,7 @@
               :style="{ animationDelay: line.delay + 'ms' }"
             />
             <circle
-              :cx="line.x2" :cy="line.y2" r="5"
+              :cx="line.x2" :cy="line.y2" r="6"
               class="graph-node"
               :style="{ animationDelay: (line.delay + 300) + 'ms', fill: line.color }"
             />
@@ -97,8 +97,8 @@ const statusMessages = [
 // ── Tag fly-in offsets (random, generated once) ──────────────────────────────
 const tagOffsets = computed(() =>
   props.interests.map(() => ({
-    dx: (Math.random() - 0.5) * 400,
-    dy: (Math.random() - 0.5) * 300,
+    dx: (Math.random() - 0.5) * 140,
+    dy: (Math.random() - 0.5) * 100,
   }))
 )
 
