@@ -9,6 +9,7 @@
         <span class="profile-avatar-big">{{ currentUserAvatar || '🧭' }}</span>
         <div class="profile-avatar-ring"></div>
         <div v-if="isPrivateMode && currentUserRole !== 'admin'" class="avatar-private-overlay">🔒</div>
+        <div v-if="isSocialMode && currentUserRole !== 'admin'" class="avatar-social-overlay">🌟</div>
       </div>
 
       <!-- Name + Persona (same row) -->
@@ -157,6 +158,18 @@ const handleLogout = async () => {
   animation: privPulse 2s ease-in-out infinite;
 }
 @keyframes privPulse {
+  0%,100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+.avatar-social-overlay {
+  position: absolute;
+  bottom: -4px;
+  left: -4px;
+  font-size: 12px;
+  filter: drop-shadow(0 0 4px rgba(253, 151, 31, 0.8));
+  animation: socialPulse 2s ease-in-out infinite;
+}
+@keyframes socialPulse {
   0%,100% { opacity: 0.8; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.15); }
 }

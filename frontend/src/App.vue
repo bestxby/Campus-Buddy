@@ -227,12 +227,12 @@ onMounted(async () => {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   background: linear-gradient(135deg, rgba(18, 24, 38, 0.98) 0%, rgba(30, 41, 59, 0.92) 100%) !important;
-  border: none !important;
+  border: 1.5px solid transparent !important;
   border-radius: 8px;
   flex-shrink: 0;
   user-select: none;
+  background-clip: padding-box !important;
   position: relative;
-  z-index: 0;
 }
 .student-graph-btn-card::before {
   content: '';
@@ -240,16 +240,19 @@ onMounted(async () => {
   inset: -1.5px;
   z-index: -1;
   border-radius: 9px;
-  background: conic-gradient(
-    from 0deg,
+  background: linear-gradient(
+    90deg,
     #fd971f,
     #ec4899,
     #8b5cf6,
     #06b6d4,
     #34d399,
-    #fd971f
+    #fd971f,
+    #ec4899,
+    #8b5cf6
   );
-  animation: borderSpin 4s linear infinite;
+  background-size: 300% 100%;
+  animation: gradientFlow 6s linear infinite;
   transition: inset 0.3s ease;
 }
 .student-graph-btn-card:hover {
@@ -259,9 +262,9 @@ onMounted(async () => {
   inset: -2.5px;
   border-radius: 10px;
 }
-@keyframes borderSpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
 }
 .student-card-content {
   display: flex;
