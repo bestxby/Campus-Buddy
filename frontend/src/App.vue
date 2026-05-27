@@ -42,7 +42,7 @@
           <!-- Student Entry: Full-width clickable card to open graph -->
           <div
             v-if="currentUserRole === 'student'"
-            class="student-graph-btn-card card glow-orange"
+            class="student-graph-btn-card card"
             @click="openGraph"
           >
             <div class="student-card-content">
@@ -225,37 +225,56 @@ onMounted(async () => {
   align-items: center;
   padding: 14px 20px !important;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  background: linear-gradient(135deg, rgba(18,24,38,0.95) 0%, rgba(30,41,59,0.85) 100%) !important;
-  border: 1px solid rgba(253,151,31,0.25) !important;
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: rgba(10, 15, 26, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px;
+  position: relative;
+  overflow: visible; /* Allows the glow to extend outside the box boundary */
   flex-shrink: 0;
   user-select: none;
-  animation: breathGlow 2.5s ease-in-out infinite;
+}
+.student-graph-btn-card::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  z-index: -1;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    #fd971f 0%,
+    #ec4899 25%,
+    #8b5cf6 50%,
+    #06b6d4 75%,
+    #fd971f 100%
+  );
+  border-radius: 12px;
+  filter: blur(18px);
+  opacity: 0.2;
+  transition: opacity 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), inset 0.5s ease, filter 0.5s ease;
+  animation: auroraRotate 8s linear infinite, auroraBreath 3.5s ease-in-out infinite;
 }
 .student-graph-btn-card:hover {
-  transform: translateY(-2.5px);
-  background: linear-gradient(135deg, rgba(253,151,31,0.08) 0%, rgba(18,24,38,0.98) 100%) !important;
-  animation: breathGlowHover 1.5s ease-in-out infinite;
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(10, 15, 26, 0.95) !important;
 }
-@keyframes breathGlow {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(253, 151, 31, 0.15), inset 0 0 6px rgba(253, 151, 31, 0.04);
-    border-color: rgba(253, 151, 31, 0.25) !important;
-  }
-  50% {
-    box-shadow: 0 0 22px rgba(253, 151, 31, 0.45), inset 0 0 12px rgba(253, 151, 31, 0.08);
-    border-color: rgba(253, 151, 31, 0.65) !important;
-  }
+.student-graph-btn-card:hover::before {
+  opacity: 0.65;
+  inset: -10px;
+  filter: blur(22px);
+  animation: auroraRotate 4s linear infinite, auroraBreathHover 1.5s ease-in-out infinite;
 }
-@keyframes breathGlowHover {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(253, 151, 31, 0.35), inset 0 0 10px rgba(253, 151, 31, 0.08);
-    border-color: rgba(253, 151, 31, 0.5) !important;
-  }
-  50% {
-    box-shadow: 0 0 35px rgba(253, 151, 31, 0.7), inset 0 0 18px rgba(253, 151, 31, 0.15);
-    border-color: rgba(253, 151, 31, 0.95) !important;
-  }
+@keyframes auroraRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes auroraBreath {
+  0%, 100% { opacity: 0.15; filter: blur(16px); }
+  50% { opacity: 0.35; filter: blur(20px); }
+}
+@keyframes auroraBreathHover {
+  0%, 100% { opacity: 0.5; filter: blur(20px); }
+  50% { opacity: 0.75; filter: blur(24px); }
 }
 .student-card-content {
   display: flex;
