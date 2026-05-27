@@ -130,7 +130,7 @@ watch(() => graph.value.size, (newSize, oldSize) => {
 /* Centrality cards have a compact height to fit exactly 5 items */
 .col-3-layout > :nth-child(2),
 .col-3-layout > :nth-child(3) {
-  height: 160px !important;
+  height: 175px !important;
 }
 
 /* Global Network Metrics Card stretches to fill the remaining vertical height */

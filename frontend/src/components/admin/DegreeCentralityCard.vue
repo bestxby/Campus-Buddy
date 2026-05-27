@@ -35,15 +35,15 @@ import { topSocialStudents } from '@/composables/useGraphInsights'
   overflow: visible;
   height: 100%;
   background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
-  padding: 10px 14px !important;
+  padding: 12px 16px !important;
 }
 .col-header {
   display: flex;
   flex-direction: column;
   gap: 2px;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 5px;
-  margin-bottom: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
   flex-shrink: 0;
 }
 .col-header h3 {
@@ -65,11 +65,11 @@ import { topSocialStudents } from '@/composables/useGraphInsights'
 .centrality-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   background: rgba(0, 0, 0, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.03);
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 8px 12px;
 }
 .centrality-item {
   display: flex;
@@ -77,7 +77,7 @@ import { topSocialStudents } from '@/composables/useGraphInsights'
   justify-content: space-between;
   font-size: 11px;
   color: var(--text-primary);
-  line-height: 1.3;
+  line-height: 1.4;
 }
 .centrality-rank {
   font-weight: 800;
