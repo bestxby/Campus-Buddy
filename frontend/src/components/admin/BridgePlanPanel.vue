@@ -1,13 +1,11 @@
 <template>
   <div class="bridge-plan-box card glow-orange fade-in">
     <div class="bridge-header">
-      <h4>⚡ 针对【{{ studentName }}】的人脉拓扑桥接方案</h4>
+      <h4>⚡ 人脉拓扑桥接方案</h4>
       <button @click="emit('close')" class="close-promo-btn">×</button>
     </div>
     
     <div class="bridge-body">
-      <p class="bridge-intro">系统计算出以下三种最小代价的拓扑连结方式，您可以选择一种应用到网络中：</p>
-      
       <div class="bridge-options-list">
         <!-- Option 1: Popular Interest -->
         <label class="bridge-option-item" :class="{ 'option-checked': bridgeOptionSelected === 'interest' }">
@@ -18,11 +16,8 @@
             class="hidden-radio"
           />
           <div class="option-content">
-            <div class="option-header-row">
-              <span class="option-badge opt-interest">方案一</span>
-              <span class="option-title">关联最热门兴趣圈</span>
-            </div>
-            <p class="option-desc">关联热门兴趣<b>【{{ mostPopularInterest.name }}】</b>，立刻与另外 <b>{{ mostPopularInterest.count }}</b> 名同学间接连通。</p>
+            <span class="option-badge opt-interest">兴趣圈</span>
+            <span class="option-title">关联 <b>{{ mostPopularInterest.name }}</b> <span class="opt-sub">({{ mostPopularInterest.count }}人)</span></span>
           </div>
         </label>
 
@@ -35,11 +30,8 @@
             class="hidden-radio"
           />
           <div class="option-content">
-            <div class="option-header-row">
-              <span class="option-badge opt-student">方案二</span>
-              <span class="option-title">结识全校社交核心达人</span>
-            </div>
-            <p class="option-desc">连通达人<b>【{{ topHubStudent.name }}】</b>（其直接关联 {{ topHubStudent.score }} 人），快速拓展社交圈。</p>
+            <span class="option-badge opt-student">社交达人</span>
+            <span class="option-title">结识 <b>{{ topHubStudent.name }}</b> <span class="opt-sub">(度:{{ topHubStudent.score }})</span></span>
           </div>
         </label>
 
@@ -52,11 +44,8 @@
             class="hidden-radio"
           />
           <div class="option-content">
-            <div class="option-header-row">
-              <span class="option-badge opt-activity">方案三</span>
-              <span class="option-title">报名最火爆校园活动</span>
-            </div>
-            <p class="option-desc">一键报名热门活动<b>【{{ mostPopularActivity.name }}】</b>（已有 <b>{{ mostPopularActivity.count }}</b> 人报名），提供即时的线下社交突破口。</p>
+            <span class="option-badge opt-activity">校园活动</span>
+            <span class="option-title">报名 <b>{{ mostPopularActivity.name }}</b> <span class="opt-sub">({{ mostPopularActivity.count }}人)</span></span>
           </div>
         </label>
       </div>
@@ -65,7 +54,7 @@
         @click="applyBridgePlan"
         class="btn btn-primary glow-orange apply-bridge-btn"
       >
-        📢 发送社交桥接建议，引导融入校园网
+        📢 一键发送桥接建议
       </button>
     </div>
   </div>
@@ -147,15 +136,20 @@ const applyBridgePlan = () => {
 .bridge-plan-box {
   background: linear-gradient(135deg, rgba(253, 151, 31, 0.04) 0%, rgba(18, 24, 38, 0.95) 100%) !important;
   border: 1px solid rgba(253, 151, 31, 0.2) !important;
-  padding: 10px !important;
+  padding: 8px !important;
   flex-shrink: 0;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
 }
 .bridge-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 4px;
+  flex-shrink: 0;
 }
 .bridge-header h4 {
   font-size: 10px;
@@ -176,23 +170,21 @@ const applyBridgePlan = () => {
 .bridge-body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   text-align: left;
-}
-.bridge-intro {
-  font-size: 9px;
-  color: var(--text-secondary);
-  margin: 0;
-  line-height: 1.3;
+  flex: 1;
+  min-height: 0;
+  justify-content: space-between;
 }
 .bridge-options-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 .bridge-option-item {
   display: flex;
-  padding: 6px;
+  align-items: center;
+  padding: 4px 6px;
   border: 1px solid rgba(255, 255, 255, 0.02);
   background-color: rgba(255, 255, 255, 0.005);
   border-radius: 4px;
@@ -207,45 +199,43 @@ const applyBridgePlan = () => {
   border-color: rgba(253, 151, 31, 0.2);
 }
 .hidden-radio {
-  margin-right: 8px;
+  margin-right: 6px;
   accent-color: var(--accent-orange);
   cursor: pointer;
 }
 .option-content {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.option-header-row {
-  display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 9.5px;
+  overflow: hidden;
 }
 .option-badge {
   font-size: 8px;
   font-weight: bold;
   padding: 1px 3px;
   border-radius: 3px;
+  flex-shrink: 0;
 }
 .option-badge.opt-interest { background-color: rgba(6, 182, 212, 0.1); color: #22d3ee; }
 .option-badge.opt-student { background-color: rgba(167, 139, 250, 0.1); color: #c084fc; }
 .option-badge.opt-activity { background-color: rgba(253, 151, 31, 0.12); color: #ffb74d; }
 .option-title {
-  font-size: 9.5px;
-  font-weight: bold;
-  color: var(--text-primary);
-}
-.option-desc {
   font-size: 9px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.opt-sub {
+  font-size: 8px;
   color: var(--text-secondary);
-  margin: 1px 0 0 0;
-  line-height: 1.3;
 }
 .apply-bridge-btn {
-  margin-top: 2px;
+  margin-top: 4px;
   width: 100%;
-  padding: 8px;
-  font-size: 11px;
+  padding: 4px;
+  font-size: 9.5px;
 }
 </style>

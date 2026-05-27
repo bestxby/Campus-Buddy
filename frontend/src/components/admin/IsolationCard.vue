@@ -14,43 +14,48 @@
     </div>
     
     <div class="flex-1-scroll">
-      <div class="isolation-diagnostic-summary">
-        <span class="isolated-alert-badge" :class="{ 'has-isolated-alert': isolatedStudents.length > 0 }">
-          当前社交孤立学生：{{ isolatedStudents.length }} 人
+      <!-- Compact diagnostic banner -->
+      <div class="isolation-diagnostic-summary" :class="{ 'has-isolated-alert': isolatedStudents.length > 0 }">
+        <span class="alert-icon">{{ isolatedStudents.length > 0 ? '⚠️' : '🎉' }}</span>
+        <span class="alert-text">
+          <template v-if="isolatedStudents.length > 0">
+            检测到 <strong>{{ isolatedStudents.length }}</strong> 名处于隔离状态的孤立学生
+          </template>
+          <template v-else>
+            全校社交网络连通率 100%，无孤立个体！
+          </template>
         </span>
-        <p class="isolated-desc">绝对孤立即无任何社交连接的学生，处于完全隔离的孤岛状态。</p>
       </div>
 
-      <div class="isolated-list-container">
-        <div class="list-title">👤 待帮扶孤立学生列表 (点击启动桥接)</div>
-        <div v-if="isolatedStudents.length > 0" class="isolated-students-list">
-          <div 
-            v-for="student in isolatedStudents" 
-            :key="student"
-            class="isolated-student-item"
-            :class="{ 'item-selected': selectedIsolatedStudent === student }"
-            @click="selectIsolatedStudent(student)"
-          >
-            <span class="student-avatar-icon">👤</span>
-            <div class="student-meta-info">
-              <span class="student-name-text">{{ student }}</span>
-              <span class="student-deg-badge">度数: 0 (绝对孤立)</span>
+      <div class="isolation-content-area" :class="{ 'has-selection': selectedIsolatedStudent }">
+        <div v-if="isolatedStudents.length > 0" class="isolated-list-container">
+          <div class="isolated-students-list">
+            <div 
+              v-for="student in isolatedStudents" 
+              :key="student"
+              class="isolated-student-item"
+              :class="{ 'item-selected': selectedIsolatedStudent === student }"
+              @click="selectIsolatedStudent(student)"
+            >
+              <div class="student-left">
+                <span class="student-avatar-icon">👤</span>
+                <span class="student-name-text">{{ student }}</span>
+                <span class="student-deg-badge">度数: 0</span>
+              </div>
+              <button class="btn btn-xs btn-secondary select-bridge-btn">⚡ 桥接</button>
             </div>
-            <button class="btn btn-xs btn-secondary select-bridge-btn">⚡ 桥接方案</button>
           </div>
         </div>
-        <div v-else class="isolated-empty-state">
-          🎉 全校学生社交图谱连通率 100%，没有检测到任何孤立个体！
-        </div>
-      </div>
 
-      <!-- Bridge execution box inside scrolling area -->
-      <BridgePlanPanel 
-        v-if="selectedIsolatedStudent"
-        :student-name="selectedIsolatedStudent"
-        @close="selectedIsolatedStudent = null"
-        @applied="selectedIsolatedStudent = null"
-      />
+        <!-- Bridge execution box inside scrolling area -->
+        <BridgePlanPanel 
+          v-if="selectedIsolatedStudent"
+          :student-name="selectedIsolatedStudent"
+          @close="selectedIsolatedStudent = null"
+          @applied="selectedIsolatedStudent = null"
+          class="bridge-panel-sidebar"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -85,15 +90,15 @@ const selectIsolatedStudent = (name: string) => {
   overflow: visible;
   height: 100%;
   background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
-  padding: 14px 18px !important;
+  padding: 10px 14px !important;
 }
 .col-header {
   display: flex;
   flex-direction: column;
   gap: 2px;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 8px;
-  margin-bottom: 8px;
+  padding-bottom: 4px;
+  margin-bottom: 6px;
   flex-shrink: 0;
 }
 .col-header h3 {
@@ -103,66 +108,68 @@ const selectIsolatedStudent = (name: string) => {
   font-weight: bold;
   text-align: left;
 }
-.col-header .header-sub {
-  font-size: 9px;
-  color: var(--text-secondary);
-  text-align: left;
-}
 .flex-1-scroll {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   padding-right: 4px;
 }
 .isolation-diagnostic-summary {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background-color: rgba(239, 68, 68, 0.02);
-  border: 1px solid rgba(239, 68, 68, 0.1);
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(52, 211, 153, 0.03);
+  border: 1px solid rgba(52, 211, 153, 0.15);
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 6px 10px;
   flex-shrink: 0;
-}
-.isolated-alert-badge {
-  font-size: 10px;
-  font-weight: bold;
-  color: var(--text-secondary);
   text-align: left;
 }
-.isolated-alert-badge.has-isolated-alert {
-  color: #f87171;
-  text-shadow: 0 0 6px rgba(239, 68, 68, 0.35);
+.isolation-diagnostic-summary.has-isolated-alert {
+  background-color: rgba(239, 68, 68, 0.03);
+  border-color: rgba(239, 68, 68, 0.15);
 }
-.isolated-desc {
-  font-size: 9px;
+.alert-icon {
+  font-size: 12px;
+}
+.alert-text {
+  font-size: 9.5px;
   color: var(--text-secondary);
-  margin: 0;
   line-height: 1.3;
-  text-align: left;
+}
+.alert-text strong {
+  color: #f87171;
+  text-shadow: 0 0 6px rgba(239, 68, 68, 0.3);
+}
+.isolation-content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+.isolation-content-area.has-selection {
+  flex-direction: row;
 }
 .isolated-list-container {
   display: flex;
   flex-direction: column;
-  gap: 4px;
   flex: 1;
-  min-height: 80px;
+  min-height: 0;
+  transition: all 0.3s ease;
 }
-.list-title {
-  font-size: 9.5px;
-  font-weight: bold;
-  color: var(--text-secondary);
-  text-align: left;
+.isolation-content-area.has-selection .isolated-list-container {
+  flex: 0 0 45%;
 }
 .isolated-students-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   overflow-y: auto;
   border: 1px solid var(--border-color);
-  padding: 4px;
+  padding: 3px;
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.1);
   flex: 1;
@@ -171,7 +178,7 @@ const selectIsolatedStudent = (name: string) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 5px 8px;
+  padding: 4px 8px;
   background-color: rgba(255, 255, 255, 0.008);
   border: 1px solid var(--border-color);
   border-radius: 4px;
@@ -187,16 +194,14 @@ const selectIsolatedStudent = (name: string) => {
   background-color: rgba(253, 151, 31, 0.06);
   border-color: rgba(253, 151, 31, 0.3);
 }
-.student-avatar-icon {
-  font-size: 14px;
-}
-.student-meta-info {
-  flex: 1;
+.student-left {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-left: 8px;
-  text-align: left;
+  align-items: center;
+  gap: 6px;
+}
+.student-avatar-icon {
+  font-size: 12px;
+  opacity: 0.8;
 }
 .student-name-text {
   font-size: 10px;
@@ -204,25 +209,20 @@ const selectIsolatedStudent = (name: string) => {
   color: var(--text-primary);
 }
 .student-deg-badge {
-  font-size: 8.5px;
+  font-size: 8px;
   color: #f87171;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  padding: 0px 4px;
+  border-radius: 3px;
 }
 .select-bridge-btn {
   font-size: 8px;
-  padding: 2px 4px;
+  padding: 2px 5px;
 }
-.isolated-empty-state {
-  font-size: 10px;
-  color: #34d399;
-  font-weight: bold;
-  padding: 20px 10px;
-  text-align: center;
-  border: 1px dashed rgba(52, 211, 153, 0.15);
-  border-radius: 6px;
-  background-color: rgba(52, 211, 153, 0.01);
+.bridge-panel-sidebar {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  min-height: 0;
+  overflow-y: auto;
 }
 </style>

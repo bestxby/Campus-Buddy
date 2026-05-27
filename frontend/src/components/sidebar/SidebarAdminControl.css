@@ -27,6 +27,8 @@
   background: var(--control-color);
   opacity: 0.6;
   transition: all 0.25s ease;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
 }
 
 .control-card-header {

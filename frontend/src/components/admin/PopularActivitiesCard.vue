@@ -86,15 +86,15 @@ const togglePromotion = (name: string) => {
   overflow: visible;
   height: 100%;
   background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
-  padding: 14px 18px !important;
+  padding: 10px 14px !important;
 }
 .col-header {
   display: flex;
   flex-direction: column;
   gap: 2px;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 8px;
-  margin-bottom: 8px;
+  padding-bottom: 4px;
+  margin-bottom: 6px;
   flex-shrink: 0;
 }
 .col-header h3 {
@@ -117,17 +117,17 @@ const togglePromotion = (name: string) => {
 .popularity-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 5px;
   padding: 2px;
 }
 .popularity-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.02);
   border-radius: 6px;
-  padding: 8px 10px;
+  padding: 4px 8px;
 }
 .popularity-item-header {
   display: flex;
@@ -162,27 +162,27 @@ const togglePromotion = (name: string) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 6px;
 }
 .progress-bar-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 1px;
   text-align: left;
 }
 .progress-bar-track {
-  height: 6px;
+  height: 4px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border-color);
-  border-radius: 3px;
+  border-radius: 2px;
   overflow: hidden;
 }
 .progress-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, #1e3a8a 0%, #06b6d4 100%);
   box-shadow: 0 0 6px rgba(6, 182, 212, 0.6);
-  border-radius: 3px;
+  border-radius: 2px;
   transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 .progress-value {
@@ -191,10 +191,10 @@ const togglePromotion = (name: string) => {
   font-weight: 600;
 }
 .action-btn {
-  font-size: 9px;
-  padding: 4px 6px;
+  font-size: 8.5px;
+  padding: 2px 5px;
   white-space: nowrap;
-  min-width: 80px;
+  min-width: 70px;
 }
 .btn-promoted {
   background-color: rgba(253, 151, 31, 0.12) !important;
