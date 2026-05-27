@@ -214,10 +214,10 @@ export class GraphAnalyticsService {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer)
     }
-    // ✅ PERFORMANCE OPTIMIZATION: Do not perform heavy centrality calculations if no user is logged in.
-    // This prevents thread freezing on the login screen, keeping login tabs/buttons 100% responsive.
+    // ✅ PERFORMANCE OPTIMIZATION: Do not perform heavy centrality calculations unless the admin is logged in.
+    // This prevents thread freezing on the student dashboard and login screen, keeping all action buttons 100% responsive.
     try {
-      if (!useAuthStore().currentUser) {
+      if (useAuthStore().currentUserRole !== 'admin') {
         this.debounceTimer = null
         return
       }
