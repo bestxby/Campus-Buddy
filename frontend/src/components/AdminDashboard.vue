@@ -8,8 +8,11 @@
       <!-- Grid Card 2: Activity Saturation Diagnostics & Precision Promo -->
       <ActivitySaturationCard @create-activity="emit('create-activity')" />
 
-      <!-- Grid Card 4: Isolation Diagnostics & Auto-Bridge (Spans 2 rows) -->
-      <IsolationCard class="span-2-rows" />
+      <!-- Grid Card 3: Theme Communities Classification -->
+      <ThemeCommunitiesCard />
+
+      <!-- Grid Card 4: Isolation Diagnostics & Auto-Bridge (1 row) -->
+      <IsolationCard />
 
       <!-- Grid Card 7: Popular Activities Ranking -->
       <PopularActivitiesCard />
@@ -50,6 +53,7 @@ import PopularInterestsCard from '@/components/admin/PopularInterestsCard.vue'
 import SystemLogsCard from '@/components/admin/SystemLogsCard.vue'
 import BetweennessCentralityCard from '@/components/admin/BetweennessCentralityCard.vue'
 import PopularActivitiesCard from '@/components/admin/PopularActivitiesCard.vue'
+import ThemeCommunitiesCard from '@/components/admin/ThemeCommunitiesCard.vue'
 import MatrixDiagnosticsCard from '@/components/admin/MatrixDiagnosticsCard.vue'
 import NetworkMetricsCard from '@/components/admin/NetworkMetricsCard.vue'
 
@@ -108,9 +112,7 @@ watch(() => graph.value.size, (newSize, oldSize) => {
   min-height: 0;
 }
 
-.span-2-rows {
-  grid-row: span 2;
-}
+
 
 .col-3-layout {
   grid-column: 3;

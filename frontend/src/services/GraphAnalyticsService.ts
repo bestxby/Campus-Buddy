@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { useGraphStore } from '@/stores/graph'
 import { useAuthStore } from '@/stores/auth'
-import { ADMIN_NAME } from '@/constants/interests'
+import { ADMIN_NAME, INTEREST_CATEGORIES, DOMAIN_META } from '@/constants/interests'
 
 export interface CentralityResult {
   name: string
@@ -19,6 +19,17 @@ export interface PopularActivityStat {
   count: number
 }
 
+export interface ThemeCommunityStat {
+  domain: string
+  label: string
+  icon: string
+  color: string
+  size: number
+  percentage: number
+  avgDegree: number
+  tagsCount: number
+}
+
 export class GraphAnalyticsService {
   private static instance: GraphAnalyticsService
 
@@ -27,6 +38,7 @@ export class GraphAnalyticsService {
   public readonly isolatedCount = ref(0)
   public readonly popularInterests = ref<InterestStat[]>([])
   public readonly popularActivities = ref<PopularActivityStat[]>([])
+  public readonly themeCommunities = ref<ThemeCommunityStat[]>([])
 
   public readonly connectivityRate = ref(0)
   public readonly averagePathLength = ref(0)
@@ -185,6 +197,55 @@ export class GraphAnalyticsService {
     return list.sort((a, b) => b.count - a.count).slice(0, 5)
   }
 
+  private calculateThemeCommunities(): ThemeCommunityStat[] {
+    const list: ThemeCommunityStat[] = []
+    const graph = useGraphStore().graph
+    const totalStudents = useGraphStore().stats.studentsCount || 1
+
+    for (const meta of DOMAIN_META) {
+      const tags = INTEREST_CATEGORIES[meta.key] || []
+      const tagsSet = new Set(tags.map(t => `interest:${t}`))
+
+      // Find all students who have at least one interest in this domain
+      const domainStudents = new Set<string>()
+      let totalDegree = 0
+
+      for (const [node, neighbors] of graph.entries()) {
+        if (!node.startsWith('student:')) continue
+        
+        let hasInterest = false
+        for (const n of neighbors) {
+          if (tagsSet.has(n)) {
+            hasInterest = true
+            break
+          }
+        }
+
+        if (hasInterest) {
+          domainStudents.add(node)
+          totalDegree += neighbors.size
+        }
+      }
+
+      const size = domainStudents.size
+      const percentage = Math.round((size / totalStudents) * 100)
+      const avgDegree = size > 0 ? Math.round((totalDegree / size) * 10) / 10 : 0
+
+      list.push({
+        domain: meta.key,
+        label: meta.label,
+        icon: meta.icon,
+        color: meta.color,
+        size,
+        percentage,
+        avgDegree,
+        tagsCount: tags.length
+      })
+    }
+
+    return list
+  }
+
   private calculateConnectivityRate(): number {
     const total = useGraphStore().stats.studentsCount
     if (!total) return 0
@@ -341,6 +402,7 @@ export class GraphAnalyticsService {
       }
       this.popularInterests.value = list.sort((a, b) => b.count - a.count)
       this.popularActivities.value = this.calculatePopularActivities()
+      this.themeCommunities.value = this.calculateThemeCommunities()
       this.debounceTimer = null
     }, 150)
   }
