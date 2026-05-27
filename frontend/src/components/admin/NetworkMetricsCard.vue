@@ -134,7 +134,7 @@ import {
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.02);
   border-radius: 6px;
-  padding: 6px 12px;
+  padding: 8px 12px;
   box-sizing: border-box;
   text-align: left;
   transition: all 0.3s ease;
