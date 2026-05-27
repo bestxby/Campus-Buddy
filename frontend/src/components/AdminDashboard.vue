@@ -2,6 +2,21 @@
   <div class="admin-dashboard fade-in">
     <!-- 3x3 Grid Layout (Fits exactly in viewport, no body scroll) -->
     <div class="dashboard-grid-layout">
+      <!-- Column 1 Layout (Spans all 3 rows) -->
+      <div class="col-1-layout">
+        <!-- Matrix Diagnostics Card (Height auto-contracts) -->
+        <MatrixDiagnosticsCard @open-graph="(forceGlobal, viewMode, matrixMode) => emit('open-graph', forceGlobal, viewMode, matrixMode)" />
+
+        <!-- Betweenness Centrality (Flex grow) -->
+        <BetweennessCentralityCard />
+
+        <!-- Degree Centrality (Flex grow) -->
+        <DegreeCentralityCard />
+
+        <!-- Network Metrics Card (Height auto-contracts) -->
+        <NetworkMetricsCard />
+      </div>
+
       <!-- Grid Card 1: Top Interests Chart (1 row) -->
       <PopularInterestsCard />
 
@@ -19,21 +34,6 @@
 
       <!-- Grid Card 5: System Logs -->
       <SystemLogsCard />
-
-      <!-- Column 3 Layout (Spans all 3 rows) -->
-      <div class="col-3-layout">
-        <!-- Matrix Diagnostics Card (Height auto-contracts) -->
-        <MatrixDiagnosticsCard @open-graph="(forceGlobal, viewMode, matrixMode) => emit('open-graph', forceGlobal, viewMode, matrixMode)" />
-
-        <!-- Betweenness Centrality (Flex grow) -->
-        <BetweennessCentralityCard />
-
-        <!-- Degree Centrality (Flex grow) -->
-        <DegreeCentralityCard />
-
-        <!-- Network Metrics Card (Height auto-contracts) -->
-        <NetworkMetricsCard />
-      </div>
     </div>
   </div>
 </template>
@@ -103,7 +103,7 @@ watch(() => graph.value.size, (newSize, oldSize) => {
   flex: 1;
   min-height: 0; /* Critical for grid children height constraint */
   display: grid;
-  grid-template-columns: 1fr 1.3fr 0.7fr;
+  grid-template-columns: 0.7fr 1fr 1.3fr;
   grid-template-rows: 1fr 1fr 1fr;
   gap: 16px;
 }
@@ -112,10 +112,8 @@ watch(() => graph.value.size, (newSize, oldSize) => {
   min-height: 0;
 }
 
-
-
-.col-3-layout {
-  grid-column: 3;
+.col-1-layout {
+  grid-column: 1;
   grid-row: 1 / span 3;
   display: flex;
   flex-direction: column;
@@ -125,18 +123,18 @@ watch(() => graph.value.size, (newSize, oldSize) => {
 }
 
 /* Diagnostics card height fits its 3 buttons */
-.col-3-layout > :nth-child(1) {
+.col-1-layout > :nth-child(1) {
   height: auto !important;
 }
 
 /* Centrality cards have a compact height to fit exactly 5 items */
-.col-3-layout > :nth-child(2),
-.col-3-layout > :nth-child(3) {
+.col-1-layout > :nth-child(2),
+.col-1-layout > :nth-child(3) {
   height: 175px !important;
 }
 
 /* Global Network Metrics Card stretches to fill the remaining vertical height */
-.col-3-layout > :nth-child(4) {
+.col-1-layout > :nth-child(4) {
   flex: 1;
   min-height: 0;
 }
@@ -154,14 +152,14 @@ watch(() => graph.value.size, (newSize, oldSize) => {
   .span-2-rows {
     grid-row: span 1;
   }
-  .col-3-layout {
+  .col-1-layout {
     grid-column: 1;
     grid-row: auto;
     height: auto;
     overflow: visible;
   }
-  .col-3-layout > :nth-child(2),
-  .col-3-layout > :nth-child(3) {
+  .col-1-layout > :nth-child(2),
+  .col-1-layout > :nth-child(3) {
     height: auto !important;
   }
 }
