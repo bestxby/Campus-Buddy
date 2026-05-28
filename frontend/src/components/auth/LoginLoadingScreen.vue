@@ -37,6 +37,7 @@
 
     <!-- Background Particle Canvas (Fresh 2D context) -->
     <canvas
+      v-if="!isAdmin"
       key="canvas2d"
       ref="particleCanvas2D"
       class="particle-canvas"
@@ -56,7 +57,7 @@
 
       <!-- Status text -->
       <div class="status-area">
-        <div class="status-name">{{ name || '同学' }}</div>
+        <div class="status-name" v-if="!isAdmin">{{ name || '同学' }}</div>
         
         <!-- Premium Neon Digital Counter -->
         <div class="progress-digital" :class="{ 'digital-success': progressPct >= 100 }">
@@ -65,24 +66,26 @@
         </div>
 
         <transition name="text-fade" mode="out-in">
-          <div class="status-msg" :key="progressPct >= 100 ? 'done' : phase">
+          <div class="status-msg" :key="progressPct >= 100 ? 'done' : phase" v-if="!isAdmin">
             {{ progressPct >= 100 ? '校园社交图谱接入已完成！' : (statusMessages[phase - 1] || '系统准备中...') }}
           </div>
         </transition>
         
-        <div class="status-sub" v-if="progressPct >= 100">
-          系统初始化就绪，正在载入系统...
-        </div>
-        <div class="status-sub" v-else-if="phase === 2">
-          已识别 {{ interests.length }} 个兴趣标签
-        </div>
-        <div class="status-sub" v-else-if="phase === 3">
-          正在接入 1,500+ 校园社交节点...
-        </div>
+        <template v-if="!isAdmin">
+          <div class="status-sub" v-if="progressPct >= 100">
+            系统初始化就绪，正在载入系统...
+          </div>
+          <div class="status-sub" v-else-if="phase === 2">
+            已识别 {{ interests.length }} 个兴趣标签
+          </div>
+          <div class="status-sub" v-else-if="phase === 3">
+            正在接入 1,500+ 校园社交节点...
+          </div>
+        </template>
       </div>
 
       <!-- Interest tags cloud (Phase 2+) -->
-      <div class="tags-cloud" v-if="phase >= 2">
+      <div class="tags-cloud" v-if="phase >= 2 && !isAdmin">
         <span
           v-for="(tag, i) in interests"
           :key="tag"
@@ -99,7 +102,7 @@
     </div>
 
     <!-- Progress bar -->
-    <div class="progress-bar-wrap">
+    <div class="progress-bar-wrap" v-if="!isAdmin">
       <div class="progress-track">
         <div class="progress-fill" :style="{ width: progressPct + '%' }" :class="{ 'progress-done': progressPct >= 100 }" />
       </div>
@@ -109,12 +112,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { LoadingParticleEngine } from '@/services/LoadingParticleEngine'
 
 const props = defineProps<{
   name: string
   avatar: string
   interests: string[]
+  isAdmin?: boolean
 }>()
 
 const emit = defineEmits<{ done: [] }>()
@@ -205,292 +210,32 @@ const runTimeline = () => {
 
 // ── Canvas References ─────────────────────────────────────────────────────────
 const particleCanvas2D = ref<HTMLCanvasElement | null>(null)
+let particleEngine: LoadingParticleEngine | null = null
 
-let animationFrameId: number | null = null
-let canvasWidth = 0
-let canvasHeight = 0
-
-// Mouse coordinates
-const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 }
 const handleMouseMove = (e: MouseEvent) => {
-  const canvas = particleCanvas2D.value
-  const rect = canvas?.getBoundingClientRect()
-  if (rect) {
-    mouse.targetX = ((e.clientX - rect.left) / rect.width) * 2 - 1
-    mouse.targetY = -(((e.clientY - rect.top) / rect.height) * 2 - 1)
-  }
+  particleEngine?.handleMouseMove(e.clientX, e.clientY)
 }
-
-// ── 2D Particle Definition ────────────────────────────────────────────────────
-interface Particle2D {
-  startX: number
-  startY: number
-  orbitRadius: number
-  orbitSpeed: number
-  angle: number
-  color: string
-  baseSize: number
-  alpha: number
-  swirlSpeed: number
-  x?: number
-  y?: number
-  currentDrawX?: number
-  currentDrawY?: number
-}
-
-let particles2D: Particle2D[] = []
-
-const initParticles2D = () => {
-  particles2D = []
-  const count = 600 // Increased count for richer visual presentation
-  const colors = ['#fd971f', '#06b6d4', '#ec4899', '#4ade80', '#a78bfa', '#facc15']
-  const w = canvasWidth || window.innerWidth
-  const h = canvasHeight || window.innerHeight
-
-  for (let i = 0; i < count; i++) {
-    const angle = Math.random() * Math.PI * 2
-    const startRadius = Math.max(w, h) * (0.55 + Math.random() * 0.3)
-    const startX = w / 2 + Math.cos(angle) * startRadius
-    const startY = h / 2 + Math.sin(angle) * startRadius
-    const orbitRadius = 60 + Math.random() * 185
-
-    particles2D.push({
-      startX,
-      startY,
-      orbitRadius,
-      orbitSpeed: 0.0015 + Math.random() * 0.004, // slightly slower, elegant rotation
-      angle: Math.random() * Math.PI * 2,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      baseSize: 1.1 + Math.random() * 2.2,
-      alpha: 0.35 + Math.random() * 0.65,
-      swirlSpeed: 1.5 + Math.random() * 2.5,
-    })
-  }
-}
-
-// ── Rendering Loop & Resize ──────────────────────────────────────────────────
-let lastTime = 0
-let fpsTicks = 0
-let fpsLastTime = 0
 
 const initRenderer = () => {
-  const canvas = particleCanvas2D.value
-  if (!canvas) return
-
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId)
-    animationFrameId = null
-  }
-
-  const dpr = window.devicePixelRatio || 1
-  const rect = canvas.getBoundingClientRect()
-  canvasWidth = rect.width
-  canvasHeight = rect.height
-
-  canvas.width = canvasWidth * dpr
-  canvas.height = canvasHeight * dpr
-
-  initParticles2D()
-
-  lastTime = performance.now()
-  fpsTicks = 0
-  fpsLastTime = lastTime
-  tick()
-}
-
-const tick = () => {
-  const now = performance.now()
-  fpsTicks++
-  if (now - fpsLastTime >= 1000) {
-    fps.value = Math.round((fpsTicks * 1000) / (now - fpsLastTime))
-    fpsTicks = 0
-    fpsLastTime = now
-  }
-
-  const canvas = particleCanvas2D.value
-  if (canvas) {
-    const ctx = canvas.getContext('2d')
-    const progress = progressPct.value / 100
-
-    if (ctx) {
-      // Semi-transparent background for fluid light trails
-      ctx.fillStyle = 'rgba(2, 6, 23, 0.18)'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-      const dpr = window.devicePixelRatio || 1
-      ctx.save()
-      ctx.scale(dpr, dpr)
-
-      // Smooth mouse coordinates
-      mouse.x += (mouse.targetX - mouse.x) * 0.08
-      mouse.y += (mouse.targetY - mouse.y) * 0.08
-      const mX = (mouse.x + 1) * (canvasWidth / 2)
-      const mY = (-mouse.y + 1) * (canvasHeight / 2)
-
-      // KEY ALIGNMENT: Dynamically find the exact center of the .avatar-node in pixels
-      let cx = canvasWidth / 2
-      let cy = canvasHeight / 2
-      const avatarEl = document.querySelector('.avatar-node')
-      if (avatarEl) {
-        const rect = avatarEl.getBoundingClientRect()
-        const canvasRect = canvas.getBoundingClientRect()
-        cx = rect.left + rect.width / 2 - canvasRect.left
-        cy = rect.top + rect.height / 2 - canvasRect.top
+  if (particleCanvas2D.value) {
+    particleEngine = new LoadingParticleEngine(particleCanvas2D.value, {
+      progressPctProvider: () => progressPct.value,
+      exitingProvider: () => exiting.value,
+      onFpsUpdate: (val) => {
+        fps.value = val
       }
-
-      // 1. Update and draw particles
-      for (let i = 0; i < particles2D.length; i++) {
-        const p = particles2D[i]
-        p.angle += p.orbitSpeed
-
-        const t = Math.min(Math.max(progress, 0), 1)
-
-        // Collapse orbit radius to 0 from 80% to 100% progress (spiral into center)
-        let targetRadius = p.orbitRadius
-        let swirlMultiplier = p.swirlSpeed
-        if (progress > 0.8) {
-          const collapseProgress = (progress - 0.8) / 0.2 // 0.0 to 1.0
-          targetRadius = p.orbitRadius * (1 - collapseProgress)
-          swirlMultiplier = p.swirlSpeed + collapseProgress * 5 // spin faster as they get sucked in
-        }
-
-        // Swirling inwards
-        const swirlAngle = p.angle + (1 - t) * swirlMultiplier * Math.PI
-        const rad = targetRadius * t + Math.max(canvasWidth, canvasHeight) * 0.55 * (1 - t)
-
-        const tx = cx + Math.cos(swirlAngle) * rad
-        const ty = cy + Math.sin(swirlAngle) * rad
-
-        if (progress === 0 && !exiting.value) {
-          p.x = tx
-          p.y = ty
-        } else {
-          const px = p.x ?? p.startX
-          const py = p.y ?? p.startY
-          p.x = px + (tx - px) * 0.09
-          p.y = py + (ty - py) * 0.09
-        }
-
-        // Mouse repulsion
-        const rx = p.x ?? p.startX
-        const ry = p.y ?? p.startY
-        const mdx = rx - mX
-        const mdy = ry - mY
-        const mDist = Math.sqrt(mdx * mdx + mdy * mdy)
-        let repelledX = 0
-        let repelledY = 0
-        if (mDist < 110) {
-          const force = (110 - mDist) * 0.14
-          repelledX = (mdx / (mDist || 1)) * force
-          repelledY = (mdy / (mDist || 1)) * force
-        }
-
-        const drawX = rx + repelledX
-        const drawY = ry + repelledY
-
-        p.currentDrawX = drawX
-        p.currentDrawY = drawY
-
-        // Dynamic Opacity calculation
-        // Calculate particle distance to the computed avatar center
-        const dxFromCenter = drawX - cx
-        const dyFromCenter = drawY - cy
-        const distFromCenter = Math.sqrt(dxFromCenter * dxFromCenter + dyFromCenter * dyFromCenter)
-
-        let alphaFade = 1.0
-        // Fade out as they fly deep inside the central avatar circle (radius ~ 70px)
-        if (distFromCenter < 60) {
-          alphaFade = Math.max(0, (distFromCenter - 6) / 54)
-        }
-        // Only fade out globally when the progress is at the absolute end (97%+),
-        // giving particles maximum time to reach the center!
-        if (progress > 0.97) {
-          alphaFade *= Math.max(0, (1 - progress) / 0.03)
-        }
-
-        // Render point
-        ctx.fillStyle = p.color
-        ctx.globalAlpha = p.alpha * Math.min(progress * 3, 1) * alphaFade
-        ctx.shadowBlur = 4
-        ctx.shadowColor = p.color
-
-        ctx.beginPath()
-        ctx.arc(drawX, drawY, p.baseSize, 0, Math.PI * 2)
-        ctx.fill()
-
-        ctx.shadowBlur = 0
-        ctx.globalAlpha = 1.0
-      }
-
-      // 2. Draw connections (network lines)
-      ctx.lineWidth = 0.8
-      const maxDist = 55 // tighter distance limit to keep constellation clean when dense
-      const maxDistSq = maxDist * maxDist
-
-      // To keep performance high with 600 particles, we step by 2 in both loops
-      for (let i = 0; i < particles2D.length; i += 2) {
-        const p1 = particles2D[i]
-        if (p1.currentDrawX === undefined || p1.currentDrawY === undefined) continue
-
-        for (let j = i + 1; j < particles2D.length; j += 2) {
-          const p2 = particles2D[j]
-          if (p2.currentDrawX === undefined || p2.currentDrawY === undefined) continue
-
-          const dx = p1.currentDrawX - p2.currentDrawX
-          const dy = p1.currentDrawY - p2.currentDrawY
-          const distSq = dx * dx + dy * dy
-
-          if (distSq < maxDistSq) {
-            const dist = Math.sqrt(distSq)
-            
-            // Calculate average distance from center to fade out connection lines near center
-            const avgDistFromCenter = (
-              Math.sqrt((p1.currentDrawX - cx) ** 2 + (p1.currentDrawY - cy) ** 2) +
-              Math.sqrt((p2.currentDrawX - cx) ** 2 + (p2.currentDrawY - cy) ** 2)
-            ) / 2
-            
-            let alphaFade = 1.0
-            if (avgDistFromCenter < 60) {
-              alphaFade = Math.max(0, (avgDistFromCenter - 6) / 54)
-            }
-            if (progress > 0.97) {
-              alphaFade *= Math.max(0, (1 - progress) / 0.03)
-            }
-
-            const alpha = (1 - dist / maxDist) * 0.15 * Math.min(progress * 2.5, 1) * alphaFade
-            if (alpha > 0.01) {
-              ctx.strokeStyle = `rgba(6, 182, 212, ${alpha})`
-              ctx.beginPath()
-              ctx.moveTo(p1.currentDrawX, p1.currentDrawY)
-              ctx.lineTo(p2.currentDrawX, p2.currentDrawY)
-              ctx.stroke()
-            }
-          }
-        }
-      }
-
-      ctx.restore()
-    }
+    })
+    particleEngine.init()
   }
-
-  animationFrameId = requestAnimationFrame(tick)
 }
 
 const handleResize = () => {
-  const canvas = particleCanvas2D.value
-  if (!canvas) return
-  const w = window.innerWidth
-  const h = window.innerHeight
-  canvasWidth = w
-  canvasHeight = h
-  const dpr = window.devicePixelRatio || 1
-  canvas.width = w * dpr
-  canvas.height = h * dpr
+  particleEngine?.resize()
 }
 
 const replayAnimation = () => {
   runTimeline()
-  initParticles2D()
+  particleEngine?.replay()
 }
 
 // ── Lifecycle Hooks ───────────────────────────────────────────────────────────
@@ -504,9 +249,9 @@ onUnmounted(() => {
   timers.forEach(clearTimeout)
   if (progressTimer) clearInterval(progressTimer)
   window.removeEventListener('resize', handleResize)
-
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId)
+  if (particleEngine) {
+    particleEngine.destroy()
+    particleEngine = null
   }
 })
 </script>

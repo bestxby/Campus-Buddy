@@ -1,7 +1,7 @@
 <template>
   <div class="admin-dashboard fade-in">
     <!-- 3x3 Grid Layout (Fits exactly in viewport, no body scroll) -->
-    <div class="dashboard-grid-layout">
+    <div v-if="isReady" class="dashboard-grid-layout">
       <!-- Column 1 Layout (Spans all 3 rows) -->
       <div class="col-1-layout">
         <!-- Matrix Diagnostics Card (Height auto-contracts) -->
@@ -35,11 +35,14 @@
       <!-- Grid Card 5: System Logs -->
       <SystemLogsCard />
     </div>
+
+    <!-- Smooth skeleton placeholder during transitions -->
+    <div v-else class="dashboard-grid-skeleton" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { watch, onMounted } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 import { stats, graph, updateStats } from '@/composables/useGraph'
 import { isolatedCount, recalculateGraphInsights } from '@/composables/useGraphInsights'
 import { activeStudent, recommendations } from '@/composables/useRecommendations'
@@ -62,11 +65,18 @@ const emit = defineEmits<{
   'open-graph': [forceGlobal: boolean, viewMode: 'network' | 'matrix', matrixMode: 'student-interest' | 'student-activity' | 'interest-cooccurrence']
 }>()
 
+const isReady = ref(false)
+
 // Seed initial logs
 onMounted(() => {
-  // Recalculate stats and insights immediately so that the logs and cards are populated without lag
-  updateStats(true)
-  recalculateGraphInsights(true)
+  // Defer heavy components rendering and stats calculation to prevent entry transition jank
+  setTimeout(() => {
+    isReady.value = true
+    nextTick(() => {
+      updateStats(true)
+      recalculateGraphInsights(true)
+    })
+  }, 350) // 350ms matches the fade transition of the login overlay
 
   addLog('info', '系统初始化完成，成功加载校园社交关系网图谱数据')
   addLog('info', `校园社交网络载入就绪：当前共包含 ${stats.value.studentsCount} 位同学，${stats.value.interestsCount} 种不同兴趣圈子，${stats.value.activitiesCount} 个校园活动`)
@@ -141,6 +151,32 @@ watch(() => graph.value.size, (newSize, oldSize) => {
 .col-1-layout > :nth-child(4) {
   flex: 1;
   min-height: 0;
+}
+
+/* Skeleton Loading styles */
+.dashboard-grid-skeleton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.skeleton-card {
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  color: var(--accent-cyan);
+  padding: 24px 48px;
+  background: rgba(9, 14, 26, 0.6);
+  border: 1px solid rgba(6, 182, 212, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.05);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
 @media (max-width: 1024px) {

@@ -6,6 +6,7 @@
       :name="loadingPayload.name"
       :avatar="loadingPayload.avatar"
       :interests="loadingPayload.interests"
+      :is-admin="loadingPayload.isAdmin"
       @done="onLoadingDone"
     />
 
@@ -62,11 +63,14 @@ const emit = defineEmits<{ submitted: [] }>()
 
 const activeTab = ref<'student' | 'admin'>('student')
 
-interface LoadingPayload { name: string; avatar: string; interests: string[] }
+interface LoadingPayload { name: string; avatar: string; interests: string[]; isAdmin?: boolean }
 const loadingPayload = ref<LoadingPayload | null>(null)
 
-const onLoadingStart = (payload: LoadingPayload) => {
-  loadingPayload.value = payload
+const onLoadingStart = (payload: { name: string; avatar: string; interests: string[] }) => {
+  loadingPayload.value = {
+    ...payload,
+    isAdmin: false
+  }
   submitRegistration()
 }
 
@@ -76,7 +80,12 @@ const onLoadingDone = () => {
 }
 
 const handleSubmitted = () => {
-  emit('submitted')
+  loadingPayload.value = {
+    name: '系统管理员',
+    avatar: '🤖',
+    interests: [],
+    isAdmin: true
+  }
 }
 </script>
 
@@ -85,7 +94,7 @@ const handleSubmitted = () => {
 .login-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(11, 15, 25, 0.96);
+  background-color: #020617; /* Solid dark color to prevent background leak/transparency */
   z-index: 100;
   display: flex;
   justify-content: center;

@@ -194,22 +194,44 @@ export function calculateClusteringCoefficient(graph: Map<string, Set<string>>, 
 
     let neighborEdges = 0
     const neighborArray = Array.from(neighbors)
+
+    // Pre-calculate filtered interest/activity sets for all 2-hop neighbors
+    const studentToInterestsMap = new Map<string, Set<string>>()
+    for (const student of neighborArray) {
+      const interests = new Set<string>()
+      const studentNeighbors = graph.get(student) ?? new Set()
+      for (const n of studentNeighbors) {
+        if (n.startsWith('interest:') || n.startsWith('activity:')) {
+          interests.add(n)
+        }
+      }
+      studentToInterestsMap.set(student, interests)
+    }
+
     for (let i = 0; i < neighborArray.length; i++) {
       const u = neighborArray[i]
-      const uNeighbors = graph.get(u) ?? new Set()
-      const uInterests = new Set<string>()
-      for (const item of uNeighbors) {
-        uInterests.add(item)
-      }
+      const uInterests = studentToInterestsMap.get(u)!
+      if (uInterests.size === 0) continue
 
       for (let j = i + 1; j < neighborArray.length; j++) {
         const v = neighborArray[j]
-        const vNeighbors = graph.get(v) ?? new Set()
+        const vInterests = studentToInterestsMap.get(v)!
+
         let shares = false
-        for (const item of vNeighbors) {
-          if (uInterests.has(item)) {
-            shares = true
-            break
+        // Intersect the smaller set to save comparisons
+        if (uInterests.size < vInterests.size) {
+          for (const item of uInterests) {
+            if (vInterests.has(item)) {
+              shares = true
+              break
+            }
+          }
+        } else {
+          for (const item of vInterests) {
+            if (uInterests.has(item)) {
+              shares = true
+              break
+            }
           }
         }
         if (shares) neighborEdges++

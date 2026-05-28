@@ -217,7 +217,6 @@ watch(
       }
       _recalcDebounceTimer = null
     }, DEBOUNCE_RECALC_MS)
-  },
-  { deep: true }
+  }
 )
 
