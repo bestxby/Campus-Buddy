@@ -41,8 +41,8 @@
 <script setup lang="ts">
 import { watch, onMounted } from 'vue'
 import { stats, graph } from '@/composables/useGraph'
-import { topSocialStudents, isolatedCount } from '@/composables/useGraphInsights'
-import { activeStudent } from '@/composables/useRecommendations'
+import { isolatedCount } from '@/composables/useGraphInsights'
+import { activeStudent, recommendations } from '@/composables/useRecommendations'
 import { addLog } from '@/composables/useLogs'
 
 // Import subcomponents
@@ -76,7 +76,7 @@ onMounted(() => {
 watch(activeStudent, (newVal) => {
   if (newVal) {
     addLog('query', `管理员已调取同学【${newVal}】的个人网络画像，正在计算社交匹配推荐...`)
-    addLog('info', `匹配计算完毕：成功为【${newVal}】找到推荐校园活动 ${graph.value.get(`student:${newVal}`)?.size || 0} 项，并匹配志同道合的活动搭子 ${topSocialStudents.value.length} 名`)
+    addLog('info', `匹配计算完毕：成功为【${newVal}】找到推荐校园活动 ${recommendations.value.activities.length} 项，并匹配志同道合的活动搭子 ${recommendations.value.buddies.length} 名`)
   }
 })
 

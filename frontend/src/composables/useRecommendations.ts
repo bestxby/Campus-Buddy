@@ -8,7 +8,12 @@ import { getActivePinia } from 'pinia'
 // Helper function to safely fetch from store without throwing when Pinia is unmounted (e.g. in tests)
 function getStoreSafe<T>(cb: () => T, fallback: T): T {
   if (!getActivePinia()) return fallback
-  return cb()
+  try {
+    return cb()
+  } catch (error) {
+    console.error('[useRecommendations] Error accessing store property:', error)
+    return fallback
+  }
 }
 
 // Named Constants

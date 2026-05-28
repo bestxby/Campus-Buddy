@@ -132,7 +132,7 @@ class CampusBuddyGraph:
         )
         return ranked
 
-    def find_path(self, student_a, student_b):
+    def find_path(self, student_a, student_b, private_students=None):
         """
         Finds the shortest path (BFS) between two student nodes in the graph.
         Demonstrates the "six degrees of separation" concept.
@@ -141,6 +141,9 @@ class CampusBuddyGraph:
         student_b (e.g. ['student:小明', 'interest:篮球', 'student:小红']).
         Returns None if no path exists between the two students.
         """
+        if private_students is None:
+            private_students = set()
+
         start = self.node("student", student_a)
         end = self.node("student", student_b)
 
@@ -148,6 +151,10 @@ class CampusBuddyGraph:
             return None
         if start == end:
             return [start]
+
+        # If target is private, do not allow pathfinding to them
+        if student_b in private_students:
+            return None
 
         # BFS with predecessor tracking for O(V) space complexity
         queue = deque([start])
@@ -160,6 +167,10 @@ class CampusBuddyGraph:
                 break
 
             for neighbor in self.graph[current]:
+                if neighbor.startswith("student:"):
+                    name = neighbor.removeprefix("student:")
+                    if name in private_students and neighbor != start:
+                        continue
                 if neighbor not in visited:
                     visited.add(neighbor)
                     parent[neighbor] = current

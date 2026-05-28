@@ -92,7 +92,7 @@ export class ForceGraphDataBuilder {
           }
           addLink(focalNode, neighbor)
           for (const sub of graph.get(neighbor) ?? []) {
-            const subName = sub.split(':')[1]
+            const subName = sub.substring(sub.indexOf(':') + 1)
             const isBuddy = sub.startsWith('student:') && !hideBuddies && allowedBuddies.has(subName)
             const isActivity = sub.startsWith('activity:') && !hideActivities && recommendations.activities.includes(subName)
             if (isBuddy || isActivity) {

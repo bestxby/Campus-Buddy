@@ -3,6 +3,7 @@ import { ref, reactive, computed, triggerRef } from 'vue'
 import type { GraphStats } from '@/types'
 import { GraphAlgorithms, nodeKey } from '@/utils/graph-algorithms'
 import { ADMIN_NAME, addInterestTagToTaxonomy } from '@/constants/interests'
+import { regenerateSessionSeed } from '@/utils/graph-metrics'
 
 
 function createSeededRandom(seed: number) {
@@ -120,8 +121,9 @@ export const useGraphStore = defineStore('graph', () => {
     registrations?: Array<[string, string]>
   }
 
-  async function loadGraphData(): Promise<void> {
+  async function loadGraphData(seed?: number): Promise<void> {
     try {
+      regenerateSessionSeed()
       const res = await fetch(`${(import.meta as any).env.BASE_URL}graph_data.json`)
       if (!res.ok) throw new Error('graph_data.json not found')
       const data = await res.json() as GraphDataSchema
@@ -138,7 +140,8 @@ export const useGraphStore = defineStore('graph', () => {
 
       socialStudents.value.clear()
       // Seed default social students dynamically: around 15% of the students with seeded random
-      const random = createSeededRandom(123456789)
+      const activeSeed = seed !== undefined ? seed : Math.floor(Math.random() * 1e9)
+      const random = createSeededRandom(activeSeed)
       for (const student of allStudentNames) {
         if (student !== '张子涵' && random() < 0.15) {
           socialStudents.value.add(student)

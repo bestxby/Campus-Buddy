@@ -3,6 +3,7 @@ import { ref, reactive, computed } from 'vue'
 import { useGraphStore } from './graph'
 import { AVATAR_OPTIONS, INTEREST_CATEGORIES, DOMAIN_META, ADMIN_NAME } from '@/constants/interests'
 import type { DomainBar, RegForm } from '@/types'
+import { computePersona, hashPassword, NAME_VALIDATION_REGEX } from '@/utils/auth-helpers'
 
 export const useAuthStore = defineStore('auth', () => {
   const currentUser = ref<string | null>(null)
@@ -57,20 +58,6 @@ export const useAuthStore = defineStore('auth', () => {
     selectedInterests: [],
   })
 
-  function computePersona(interests: string[]): string {
-    const counts = {
-      sports: interests.filter(x => (INTEREST_CATEGORIES.sports as readonly string[]).includes(x)).length,
-      tech:   interests.filter(x => (INTEREST_CATEGORIES.tech   as readonly string[]).includes(x)).length,
-      arts:   interests.filter(x => (INTEREST_CATEGORIES.arts   as readonly string[]).includes(x)).length,
-      social: interests.filter(x => (INTEREST_CATEGORIES.social as readonly string[]).includes(x)).length,
-    }
-    const max = Math.max(...Object.values(counts))
-    if (max === counts.tech)   return '科技极客'
-    if (max === counts.sports) return '运动健将'
-    if (max === counts.arts)   return '文艺青年'
-    return '社交达人'
-  }
-
   const userInterestTags = computed((): string[] => {
     if (!currentUser.value) return []
     const graphStore = useGraphStore()
@@ -116,9 +103,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   function submitRegistration(): void {
     const name = regForm.name.trim()
-    // Regular expression: 2-20 chars, allowing Chinese, English letters, numbers, spaces, and hyphens
-    const nameRegex = /^[\u4e00-\u9fa5a-zA-Z0-9\s-]{2,20}$/
-    if (!name || !nameRegex.test(name) || regForm.selectedInterests.length === 0) return
+    if (!name || !NAME_VALIDATION_REGEX.test(name) || regForm.selectedInterests.length === 0) return
 
     currentUser.value = name
     currentUserRole.value = 'student'
@@ -141,15 +126,6 @@ export const useAuthStore = defineStore('auth', () => {
       graphStore.addEdge(sNode, `interest:${interest}`)
     }
     graphStore.updateStats()
-  }
-
-  async function hashPassword(password: string): Promise<string> {
-    const encoder = new TextEncoder()
-    const data = encoder.encode(password)
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-    return Array.from(new Uint8Array(hashBuffer))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('')
   }
 
   async function submitAdminLogin(password: string): Promise<boolean> {
@@ -303,6 +279,5 @@ export const useAuthStore = defineStore('auth', () => {
     togglePrivacyMode,
     isSocialMode,
     toggleSocialMode,
-    hashPassword,
   }
 })

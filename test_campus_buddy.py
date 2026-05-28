@@ -128,6 +128,20 @@ def test_find_path_through_multiple_hops(sample_graph):
     # Path must exist and be >= 5 nodes
     assert len(path) >= 5
 
+def test_find_path_private_filtering(sample_graph):
+    """Test that pathfinding in Python skips private students."""
+    # Without private students, there is a path from 小刚 to 小赵 (bridged by 小明)
+    path = sample_graph.find_path("小刚", "小赵")
+    assert path is not None
+
+    # If "小明" is private, the path should be broken since "小明" is the only bridge from "小刚"
+    path_with_private = sample_graph.find_path("小刚", "小赵", private_students={"小明"})
+    assert path_with_private is None
+
+    # If the target student "小红" is private, path to them should be blocked
+    path_to_private_target = sample_graph.find_path("小明", "小红", private_students={"小红"})
+    assert path_to_private_target is None
+
 def test_connected_components(sample_graph):
     components = sample_graph.connected_components()
     # The lecture graph is fully connected
