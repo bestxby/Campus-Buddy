@@ -131,7 +131,6 @@ const progressPct = ref(0)
 const isPreviewMode = computed(() => {
   return typeof window !== 'undefined' && window.location.pathname.includes('loader-preview.html')
 })
-const renderMode = ref<'2d'>('2d')
 const fps = ref(60)
 
 const statusMessages = [
