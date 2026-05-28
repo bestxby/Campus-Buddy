@@ -6,13 +6,30 @@ import type { DomainBar, RegForm } from '@/types'
 import { computePersona, hashPassword, NAME_VALIDATION_REGEX } from '@/utils/auth-helpers'
 
 export const useAuthStore = defineStore('auth', () => {
-  const currentUser = ref<string | null>(null)
-  const currentUserRole = ref<'student' | 'admin' | null>(null)
-  const currentUserAvatar = ref<string>(AVATAR_OPTIONS[0])
-  const userPersona = ref<string>('未知')
-  const signedUpActivities = ref<string[]>([])
-  const isPrivateMode = ref<boolean>(false)
-  const isSocialMode = ref<boolean>(false)
+  // Synchronously initialize state from localStorage to prevent UI flashing (FOUC)
+  const savedUser = localStorage.getItem('campus_buddy_user')
+  const savedRole = localStorage.getItem('campus_buddy_role')
+  
+  const currentUser = ref<string | null>(savedUser)
+  const currentUserRole = ref<'student' | 'admin' | null>(
+    (savedRole === 'admin' || savedRole === 'student') ? savedRole : null
+  )
+  const currentUserAvatar = ref<string>(localStorage.getItem('campus_buddy_avatar') ?? AVATAR_OPTIONS[0])
+  const userPersona = ref<string>(localStorage.getItem('campus_buddy_persona') ?? '未知')
+
+  let initialSignups: string[] = []
+  try {
+    const rawSignups = localStorage.getItem('campus_buddy_signups')
+    if (rawSignups) {
+      initialSignups = JSON.parse(rawSignups)
+      if (!Array.isArray(initialSignups)) initialSignups = []
+    }
+  } catch (e) {}
+  
+  const signedUpActivities = ref<string[]>(initialSignups)
+  const isPrivateMode = ref<boolean>(localStorage.getItem('campus_buddy_private_mode') === 'true')
+  const isSocialMode = ref<boolean>(localStorage.getItem('campus_buddy_social_mode') === 'true')
+
 
   function togglePrivacyMode(): void {
     isPrivateMode.value = !isPrivateMode.value
