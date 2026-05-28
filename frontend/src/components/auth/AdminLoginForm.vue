@@ -8,6 +8,7 @@
         placeholder="请输入管理员授权密钥..."
         required
         style="width: 100%; margin-top: 10px;"
+        @keyup.enter="handleAdminSubmit"
       />
     </div>
     <div v-if="adminError" class="warning-text" style="margin-top: 10px;">

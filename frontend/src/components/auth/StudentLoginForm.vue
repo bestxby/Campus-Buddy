@@ -5,7 +5,7 @@
       <div class="form-left-col">
         <div class="form-group">
           <label class="label-bold">👤 请输入您的姓名</label>
-          <input v-model="regForm.name" placeholder="请输入姓名或代号..." required />
+          <input v-model="regForm.name" placeholder="请输入姓名或代号..." required @keyup.enter="handleStudentSubmit" />
         </div>
       </div>
       <div class="form-right-col">
