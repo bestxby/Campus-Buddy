@@ -8,6 +8,7 @@ __pycache__/
 # Node.js dependencies & builds
 node_modules/
 dist/
+dist-single/
 dist-ssr/
 *.local
 

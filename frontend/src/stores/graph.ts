@@ -130,9 +130,15 @@ export const useGraphStore = defineStore('graph', () => {
   async function loadGraphData(seed?: number): Promise<void> {
     try {
       regenerateSessionSeed()
-      const res = await fetch(`${(import.meta as any).env.BASE_URL}graph_data.json`)
-      if (!res.ok) throw new Error('graph_data.json not found')
-      const data = await res.json() as GraphDataSchema
+      let data: GraphDataSchema
+      try {
+        const res = await fetch(`${(import.meta as any).env.BASE_URL}graph_data.json`)
+        if (!res.ok) throw new Error('graph_data.json not found')
+        data = await res.json() as GraphDataSchema
+      } catch (fetchErr) {
+        console.warn('[GraphStore] Failed to fetch graph_data.json, using inlined fallback:', fetchErr)
+        data = fallbackGraphData as GraphDataSchema
+      }
 
       if (!data || !Array.isArray(data.students) || !Array.isArray(data.activities)) {
         throw new Error('Invalid graph data format: students and activities must be arrays')

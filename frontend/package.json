@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:single": "vite build --config vite.singlefile.config.ts && node -e \"require('fs').copyFileSync('dist-single/index.html', '../Campus-Buddy单网页版.html')\"",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
@@ -27,6 +28,7 @@
     "jsdom": "^29.1.1",
     "typescript": "^5.2.2",
     "vite": "^8.0.14",
+    "vite-plugin-singlefile": "^2.3.3",
     "vitest": "^4.1.7",
     "vue-tsc": "^2.0.21"
   }
