@@ -116,7 +116,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   function submitRegistration(): void {
     const name = regForm.name.trim()
-    if (!name || regForm.selectedInterests.length === 0) return
+    // Regular expression: 2-20 chars, allowing Chinese, English letters, numbers, spaces, and hyphens
+    const nameRegex = /^[\u4e00-\u9fa5a-zA-Z0-9\s-]{2,20}$/
+    if (!name || !nameRegex.test(name) || regForm.selectedInterests.length === 0) return
 
     currentUser.value = name
     currentUserRole.value = 'student'
@@ -181,13 +183,28 @@ export const useAuthStore = defineStore('auth', () => {
     userPersona.value = localStorage.getItem('campus_buddy_persona') ?? '普通同学'
 
     const graphStore = useGraphStore()
-    const savedInterests: string[] = JSON.parse(localStorage.getItem('campus_buddy_interests') ?? '[]')
+    
+    let savedInterests: string[] = []
+    try {
+      savedInterests = JSON.parse(localStorage.getItem('campus_buddy_interests') ?? '[]')
+      if (!Array.isArray(savedInterests)) savedInterests = []
+    } catch (e) {
+      console.warn('[AuthStore] Failed to parse saved interests from localStorage, falling back to empty list.', e)
+    }
+
     const sNode = `student:${savedUser}`
     for (const interest of savedInterests) {
       graphStore.addEdge(sNode, `interest:${interest}`)
     }
 
-    const savedSignups: string[] = JSON.parse(localStorage.getItem('campus_buddy_signups') ?? '[]')
+    let savedSignups: string[] = []
+    try {
+      savedSignups = JSON.parse(localStorage.getItem('campus_buddy_signups') ?? '[]')
+      if (!Array.isArray(savedSignups)) savedSignups = []
+    } catch (e) {
+      console.warn('[AuthStore] Failed to parse saved signups from localStorage, falling back to empty list.', e)
+    }
+
     signedUpActivities.value = savedSignups
     for (const act of savedSignups) {
       graphStore.addEdge(sNode, `activity:${act}`)
@@ -286,5 +303,6 @@ export const useAuthStore = defineStore('auth', () => {
     togglePrivacyMode,
     isSocialMode,
     toggleSocialMode,
+    hashPassword,
   }
 })

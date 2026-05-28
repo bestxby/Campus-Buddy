@@ -96,13 +96,17 @@
       </div>
     </div>
 
+    <div v-if="regForm.name.trim() && !isNameValid" class="warning-text">
+      ⚠️ 姓名格式不合法：只允许中文、英文字母、数字和空格/连字符（长度为2-20字）！
+    </div>
+
     <div v-if="regForm.selectedInterests.length === 0" class="warning-text">
       ⚠️ 请至少选择一个兴趣标签以建立连接！
     </div>
 
     <button 
       @click="handleStudentSubmit" 
-      :disabled="regForm.selectedInterests.length === 0" 
+      :disabled="regForm.selectedInterests.length === 0 || !isNameValid" 
       class="btn btn-primary glow-orange" 
       style="width: 100%;"
     >
@@ -112,6 +116,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { previewPersona, previewPersonaClass, toggleInterestTag } from '@/composables/useAuth'
 import { useAuthStore } from '@/stores/auth'
 import { AVATAR_OPTIONS, INTEREST_CATEGORIES } from '@/constants/interests'
@@ -125,8 +130,15 @@ const emit = defineEmits<{
   'loading-start': [payload: { name: string; avatar: string; interests: string[] }]
 }>()
 
+const isNameValid = computed(() => {
+  const name = regForm.name.trim()
+  if (!name) return false
+  const nameRegex = /^[\u4e00-\u9fa5a-zA-Z0-9\s-]{2,20}$/
+  return nameRegex.test(name)
+})
+
 const handleStudentSubmit = () => {
-  if (!regForm.name.trim() || regForm.selectedInterests.length === 0) return
+  if (!isNameValid.value || regForm.selectedInterests.length === 0) return
   emit('loading-start', {
     name: regForm.name.trim(),
     avatar: regForm.avatar,

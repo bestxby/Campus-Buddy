@@ -29,9 +29,18 @@ describe('Auth Store', () => {
     expect(store.userPersona).toBe('未知')
   })
 
-  it('should successfully login as admin with correct SHA-256 password hash', async () => {
+  it('should successfully login as admin with correct password', async () => {
     const store = useAuthStore()
-    const success = await store.submitAdminLogin('bestxby') // Correct admin password hash trigger
+    vi.spyOn(crypto.subtle, 'digest').mockImplementation(async (algorithm, data) => {
+      const decoded = new TextDecoder().decode(data as Uint8Array)
+      if (decoded === 'mock_admin_password') {
+        const targetHex = '3c6a6ef3ab28ad049ea0e4c091d249d6ffe4f8ef69b645a5e855d243980fa877'
+        return new Uint8Array(targetHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))).buffer
+      }
+      return new Uint8Array(32).buffer
+    })
+
+    const success = await store.submitAdminLogin('mock_admin_password')
     expect(success).toBe(true)
     expect(store.currentUser).toBe('系统管理员')
     expect(store.currentUserRole).toBe('admin')

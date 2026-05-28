@@ -4,6 +4,16 @@ import type { GraphStats } from '@/types'
 import { GraphAlgorithms, nodeKey } from '@/utils/graph-algorithms'
 import { ADMIN_NAME, addInterestTagToTaxonomy } from '@/constants/interests'
 
+
+function createSeededRandom(seed: number) {
+  let h = seed | 0;
+  return function() {
+    h = Math.imul(h ^ (h >>> 16), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return ((h ^= h >>> 16) >>> 0) / 4294967296;
+  }
+}
+
 export const useGraphStore = defineStore('graph', () => {
   const graph = ref<Map<string, Set<string>>>(new Map())
   const privateStudents = ref<Set<string>>(new Set())
@@ -127,9 +137,10 @@ export const useGraphStore = defineStore('graph', () => {
       const allStudentNames = Array.from(new Set(data.students.map((s: any) => s[0]))) as string[]
 
       socialStudents.value.clear()
-      // Seed default social students dynamically: around 15% of the students
+      // Seed default social students dynamically: around 15% of the students with seeded random
+      const random = createSeededRandom(123456789)
       for (const student of allStudentNames) {
-        if (student !== '张子涵' && Math.random() < 0.15) {
+        if (student !== '张子涵' && random() < 0.15) {
           socialStudents.value.add(student)
         }
       }
@@ -137,7 +148,7 @@ export const useGraphStore = defineStore('graph', () => {
       // 1. Select 4 random students to make them completely isolated (degree 0)
       const isolatedTargets = new Set<string>()
       while (isolatedTargets.size < 4 && allStudentNames.length > 10) {
-        const randomName = allStudentNames[Math.floor(Math.random() * allStudentNames.length)]
+        const randomName = allStudentNames[Math.floor(random() * allStudentNames.length)]
         if (randomName && randomName !== ADMIN_NAME) {
           isolatedTargets.add(randomName)
         }
@@ -164,7 +175,7 @@ export const useGraphStore = defineStore('graph', () => {
       if (data.registrations) {
         for (const [student, activity] of data.registrations) {
           if (isolatedTargets.has(student)) continue
-          if (Math.random() > 0.20) {
+          if (random() > 0.20) {
             addEdge(nodeKey('student', student), nodeKey('activity', activity))
           }
         }
@@ -173,18 +184,18 @@ export const useGraphStore = defineStore('graph', () => {
       // 5. Add random registrations
       for (const student of allStudentNames) {
         if (isolatedTargets.has(student)) continue
-        if (Math.random() < 0.25) {
+        if (random() < 0.25) {
           const sNode = nodeKey('student', student)
           const studentInterests = Array.from(graph.value.get(sNode) ?? [])
             .filter(n => n.startsWith('interest:'))
           
           if (studentInterests.length > 0) {
-            const randomIntNode = studentInterests[Math.floor(Math.random() * studentInterests.length)]
+            const randomIntNode = studentInterests[Math.floor(random() * studentInterests.length)]
             const activities = Array.from(graph.value.get(randomIntNode) ?? [])
               .filter(n => n.startsWith('activity:'))
             
             if (activities.length > 0) {
-              const randomActNode = activities[Math.floor(Math.random() * activities.length)]
+              const randomActNode = activities[Math.floor(random() * activities.length)]
               addEdge(sNode, randomActNode)
             }
           }

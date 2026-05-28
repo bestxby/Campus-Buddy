@@ -107,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import LoginOverlay  from '@/components/LoginOverlay.vue'
 import AppSidebar    from '@/components/AppSidebar.vue'
 import RecommendedActivities from '@/components/RecommendedActivities.vue'
@@ -172,11 +172,19 @@ watch(activeStudent, (newStudent) => {
 // ─── Sidebar Resize ────────────────────────────────────────────────────────────
 const sidebarWidth = ref(330)
 let _resizeStartX = 0, _resizeStartW = 0
+let activeOnMove: ((ev: MouseEvent) => void) | null = null
+let activeOnUp: (() => void) | null = null
 
 const startSidebarResize = (e: MouseEvent) => {
   _resizeStartX = e.clientX
   _resizeStartW = sidebarWidth.value
   document.body.style.userSelect = 'none'
+  
+  if (activeOnMove && activeOnUp) {
+    document.removeEventListener('mousemove', activeOnMove)
+    document.removeEventListener('mouseup', activeOnUp)
+  }
+
   const onMove = (ev: MouseEvent) => {
     const w = _resizeStartW + (ev.clientX - _resizeStartX)
     if (w >= 250 && w <= 450) sidebarWidth.value = w
@@ -185,10 +193,22 @@ const startSidebarResize = (e: MouseEvent) => {
     document.body.style.userSelect = ''
     document.removeEventListener('mousemove', onMove)
     document.removeEventListener('mouseup', onUp)
+    activeOnMove = null
+    activeOnUp = null
   }
+  
+  activeOnMove = onMove
+  activeOnUp = onUp
   document.addEventListener('mousemove', onMove)
   document.addEventListener('mouseup', onUp)
 }
+
+onUnmounted(() => {
+  if (activeOnMove && activeOnUp) {
+    document.removeEventListener('mousemove', activeOnMove)
+    document.removeEventListener('mouseup', activeOnUp)
+  }
+})
 
 // ─── Lifecycle ─────────────────────────────────────────────────────────────────
 onMounted(async () => {

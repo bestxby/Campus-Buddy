@@ -114,7 +114,8 @@ export class AdjacencyMatrixRenderer {
       // Check if clicked scrollbar
       if (mx >= scrollbarX && mx <= scrollbarX + this.scrollbarWidth && my >= gridY && my <= gridY + gridH) {
         const thumbH = this.getScrollbarThumbHeight(gridH, totalRows, cellHeight)
-        const thumbY = gridY + (this.scrollTop / this.maxScrollTop) * (gridH - thumbH)
+        const scrollRatio = this.maxScrollTop > 0 ? (this.scrollTop / this.maxScrollTop) : 0
+        const thumbY = gridY + scrollRatio * (gridH - thumbH)
 
         if (my >= thumbY && my <= thumbY + thumbH) {
           this.isDraggingScrollbar = true
@@ -228,7 +229,8 @@ export class AdjacencyMatrixRenderer {
     canvas.style.width = `${width}px`
     canvas.style.height = `${height}px`
 
-    const ctx = canvas.getContext('2d')!
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
     ctx.scale(dpi, dpi)
 
     // Clear Canvas

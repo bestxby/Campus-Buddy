@@ -1,7 +1,7 @@
 import type { PathResult, BuddyResult, NodeKind } from '@/types'
 
 const SOCIAL_BOOST_FACTOR = 1.3
-const BOOST_LIMIT = 1.0
+const BOOST_LIMIT = 0.95
 
 export function nodeKey(kind: NodeKind, name: string): string {
   return `${kind}:${name}`

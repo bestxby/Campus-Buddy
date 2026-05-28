@@ -3,6 +3,13 @@ import { computed, watch, customRef, ref } from 'vue'
 import type { MatchedFriend, PathResult } from '@/types'
 import { useGraphStore } from '@/stores/graph'
 import { nodeKey } from '@/composables/useGraph'
+import { getActivePinia } from 'pinia'
+
+// Helper function to safely fetch from store without throwing when Pinia is unmounted (e.g. in tests)
+function getStoreSafe<T>(cb: () => T, fallback: T): T {
+  if (!getActivePinia()) return fallback
+  return cb()
+}
 
 // Named Constants
 const DEBOUNCE_SEARCH_MS = 250
@@ -11,31 +18,31 @@ const FRIEND_MATCH_LIMIT = 30
 
 // Domain state delegates to Pinia store with writable computed for pathResult
 export const pathResult = computed<PathResult | null>({
-  get: () => useRecommendationStore().pathResult,
-  set: (val) => { useRecommendationStore().pathResult = val }
+  get: () => getStoreSafe(() => useRecommendationStore().pathResult, null),
+  set: (val) => { if (getActivePinia()) useRecommendationStore().pathResult = val }
 })
 export const promotedActivities = computed<Set<string>>({
-  get: () => useRecommendationStore().promotedActivities,
-  set: (val) => { useRecommendationStore().promotedActivities = val }
+  get: () => getStoreSafe(() => useRecommendationStore().promotedActivities, new Set()),
+  set: (val) => { if (getActivePinia()) useRecommendationStore().promotedActivities = val }
 })
-export const recommendations = computed(() => useRecommendationStore().recommendations)
+export const recommendations = computed(() => getStoreSafe(() => useRecommendationStore().recommendations, { activities: [], buddies: [] }))
 
 // UI State delegates dynamically to Pinia recommendation store using customRef (no global caching)
 export const activeStudent = customRef<string | null>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().activeStudent } catch (err) { console.error('[useRecommendations] Error getting activeStudent:', err); return null } },
-  set: (val) => { try { useRecommendationStore().activeStudent = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting activeStudent:', err) } }
+  get: () => { track(); return getStoreSafe(() => useRecommendationStore().activeStudent, null) },
+  set: (val) => { if (getActivePinia()) { useRecommendationStore().activeStudent = val; trigger() } }
 }))
 export const searchQuery = customRef<string>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().searchQuery } catch (err) { console.error('[useRecommendations] Error getting searchQuery:', err); return '' } },
-  set: (val) => { try { useRecommendationStore().searchQuery = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting searchQuery:', err) } }
+  get: () => { track(); return getStoreSafe(() => useRecommendationStore().searchQuery, '') },
+  set: (val) => { if (getActivePinia()) { useRecommendationStore().searchQuery = val; trigger() } }
 }))
 export const suggestions = customRef<string[]>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().suggestions } catch (err) { console.error('[useRecommendations] Error getting suggestions:', err); return [] } },
-  set: (val) => { try { useRecommendationStore().suggestions = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting suggestions:', err) } }
+  get: () => { track(); return getStoreSafe(() => useRecommendationStore().suggestions, []) },
+  set: (val) => { if (getActivePinia()) { useRecommendationStore().suggestions = val; trigger() } }
 }))
 export const searchFriendQuery = customRef<string>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().searchFriendQuery } catch (err) { console.error('[useRecommendations] Error getting searchFriendQuery:', err); return '' } },
-  set: (val) => { try { useRecommendationStore().searchFriendQuery = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting searchFriendQuery:', err) } }
+  get: () => { track(); return getStoreSafe(() => useRecommendationStore().searchFriendQuery, '') },
+  set: (val) => { if (getActivePinia()) { useRecommendationStore().searchFriendQuery = val; trigger() } }
 }))
 export const debouncedSearchFriendQuery = ref('')
 let _searchFriendDebounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -51,12 +58,12 @@ watch(
   { immediate: true }
 )
 export const activeFilter = customRef<string>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().activeFilter } catch (err) { console.error('[useRecommendations] Error getting activeFilter:', err); return '全部' } },
-  set: (val) => { try { useRecommendationStore().activeFilter = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting activeFilter:', err) } }
+  get: () => { track(); return getStoreSafe(() => useRecommendationStore().activeFilter, '全部') },
+  set: (val) => { if (getActivePinia()) { useRecommendationStore().activeFilter = val; trigger() } }
 }))
 export const expandedGroups = customRef<Record<string, boolean>>((track, trigger) => ({
-  get: () => { track(); try { return useRecommendationStore().expandedGroups } catch (err) { console.error('[useRecommendations] Error getting expandedGroups:', err); return {} } },
-  set: (val) => { try { useRecommendationStore().expandedGroups = val; trigger() } catch (err) { console.error('[useRecommendations] Error setting expandedGroups:', err) } }
+  get: () => { track(); return getStoreSafe(() => useRecommendationStore().expandedGroups, {}) },
+  set: (val) => { if (getActivePinia()) { useRecommendationStore().expandedGroups = val; trigger() } }
 }))
 
 // Helper functions/actions

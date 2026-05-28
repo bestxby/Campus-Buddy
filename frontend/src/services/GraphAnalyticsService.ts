@@ -85,7 +85,7 @@ export class GraphAnalyticsService {
     const graph = useGraphStore().graph
     for (const [node, neighbors] of graph.entries()) {
       if (node.startsWith('student:')) {
-        const name = node.split(':')[1]
+        const name = node.substring(8) // 'student:'.length is 8
         if (name === ADMIN_NAME) continue
         list.push({ name, score: neighbors.size })
       }
@@ -100,13 +100,9 @@ export class GraphAnalyticsService {
 
     const counts: Record<string, number> = {}
     students.forEach(s => { counts[s] = 0 })
-
-    // Fisher-Yates Shuffle for unbiased sampling
-    const shuffled = [...students]
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-    }
+ 
+    // Unbiased Fisher-Yates Shuffle with Seeded Random for stability
+    const shuffled = this.shuffle(students)
     const sample = shuffled.slice(0, Math.min(sampleSize, students.length))
 
     for (const start of sample) {
@@ -148,7 +144,7 @@ export class GraphAnalyticsService {
 
     return Object.entries(counts)
       .map(([key, score]) => ({
-        name: key.split(':')[1],
+        name: key.includes(':') ? key.substring(key.indexOf(':') + 1) : key,
         score: Math.round(score * 10) / 10
       }))
       .filter(x => x.name !== ADMIN_NAME)
@@ -256,10 +252,10 @@ export class GraphAnalyticsService {
       const diff = 100 - sumPercentages
       if (diff > 0) {
         const sorted = [...listWithRawPercents].sort((a, b) => b.error - a.error)
-        sorted[0].percentage += diff
+        if (sorted[0]) sorted[0].percentage += diff
       } else {
         const sorted = [...listWithRawPercents].sort((a, b) => a.error - b.error)
-        sorted[0].percentage += diff
+        if (sorted[0]) sorted[0].percentage += diff
       }
     }
 
@@ -285,22 +281,39 @@ export class GraphAnalyticsService {
     return Math.round((1 - this.isolatedCount.value / total) * 1000) / 10
   }
 
+  private shuffle<T>(array: T[]): T[] {
+    const copy = [...array]
+    let seed = 987654321
+    // A simple, fast LCG seeded random function to guarantee reproducible sampling
+    const random = () => {
+      seed = Math.imul(seed ^ (seed >>> 16), 2246822507)
+      seed = Math.imul(seed ^ (seed >>> 13), 3266489909)
+      return ((seed ^= seed >>> 16) >>> 0) / 4294967296
+    }
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]]
+    }
+    return copy
+  }
+
   private calculateAveragePathLength(sampleSize = 30): number {
     const graph = useGraphStore().graph
     const students = Array.from(graph.keys()).filter(n => n.startsWith('student:'))
     if (students.length < 2) return 0
-
-    const shuffled = [...students].sort(() => 0.5 - Math.random())
+ 
+    // Unbiased deterministic sampling shuffle
+    const shuffled = this.shuffle(students)
     const sample = shuffled.slice(0, Math.min(sampleSize, students.length))
-
+ 
     let totalDist = 0
     let pathCount = 0
-
+ 
     for (const start of sample) {
       const dist: Record<string, number> = { [start]: 0 }
       const queue = [start]
       let head = 0
-
+ 
       while (head < queue.length) {
         const u = queue[head++]
         const d = dist[u]
@@ -316,21 +329,30 @@ export class GraphAnalyticsService {
         }
       }
     }
-
+ 
     return pathCount > 0 ? Math.round((totalDist / pathCount) * 100) / 100 : 0
   }
-
+ 
+  /**
+   * Note on Clustering Coefficient definition in bipartite/tripartite networks:
+   * Since this is an affiliation/heterogeneous network (students connect only to interests/activities),
+   * direct triangles do not exist in the raw graph (clustering would be 0).
+   * Therefore, we project the network into a student-student social network (where an edge
+   * exists if two students share at least one interest or activity), and compute the local
+   * clustering coefficient on this projected unipartite graph.
+   */
   private calculateClusteringCoefficient(sampleSize = 30): number {
     const graph = useGraphStore().graph
     const students = Array.from(graph.keys()).filter(n => n.startsWith('student:'))
     if (students.length < 3) return 0
-
-    const shuffled = [...students].sort(() => 0.5 - Math.random())
+ 
+    // Unbiased deterministic sampling shuffle
+    const shuffled = this.shuffle(students)
     const sample = shuffled.slice(0, Math.min(sampleSize, students.length))
-
+ 
     let totalCoef = 0
     let validNodes = 0
-
+ 
     for (const s of sample) {
       const neighbors = new Set<string>()
       const sNeighbors = graph.get(s) ?? new Set()
@@ -377,6 +399,13 @@ export class GraphAnalyticsService {
     return validNodes > 0 ? Math.round((totalCoef / validNodes) * 100) / 100 : 0
   }
 
+  /**
+   * Note on Network Density definition:
+   * Since this is an affiliation/multipartite network (students are only connected to interests/activities,
+   * rather than each other), the maximum possible edges is studentNodes * (interestsCount + activitiesCount).
+   * Therefore, standard unipartite density 2E / N(N-1) is inappropriate. We compute the bipartite density
+   * of student affiliations, i.e., actual student-to-slot edges divided by max potential affiliation edges.
+   */
   private calculateNetworkDensity(): number {
     const graph = useGraphStore().graph
     let edgesCount = 0
@@ -412,31 +441,36 @@ export class GraphAnalyticsService {
     }
 
     this.debounceTimer = setTimeout(() => {
-      this.topSocialStudents.value = this.calculateDegreeCentrality()
-      this.bridgeStudents.value    = this.calculateBetweennessCentrality()
-      this.isolatedCount.value      = this.countIsolatedStudents()
+      try {
+        this.topSocialStudents.value = this.calculateDegreeCentrality()
+        this.bridgeStudents.value    = this.calculateBetweennessCentrality()
+        this.isolatedCount.value      = this.countIsolatedStudents()
 
-      this.connectivityRate.value = this.calculateConnectivityRate()
-      this.averagePathLength.value = this.calculateAveragePathLength()
-      this.clusteringCoefficient.value = this.calculateClusteringCoefficient()
-      this.networkDensity.value = this.calculateNetworkDensity()
+        this.connectivityRate.value = this.calculateConnectivityRate()
+        this.averagePathLength.value = this.calculateAveragePathLength()
+        this.clusteringCoefficient.value = this.calculateClusteringCoefficient()
+        this.networkDensity.value = this.calculateNetworkDensity()
 
-      const list: InterestStat[] = []
-      const graph = useGraphStore().graph
-      for (const [node, neighbors] of graph.entries()) {
-        if (node.startsWith('interest:')) {
-          const name = node.slice('interest:'.length)
-          let studentCount = 0
-          for (const n of neighbors) {
-            if (n.startsWith('student:')) studentCount++
+        const list: InterestStat[] = []
+        const graph = useGraphStore().graph
+        for (const [node, neighbors] of graph.entries()) {
+          if (node.startsWith('interest:')) {
+            const name = node.slice('interest:'.length)
+            let studentCount = 0
+            for (const n of neighbors) {
+              if (n.startsWith('student:')) studentCount++
+            }
+            list.push({ name, count: studentCount })
           }
-          list.push({ name, count: studentCount })
         }
+        this.popularInterests.value = list.sort((a, b) => b.count - a.count)
+        this.popularActivities.value = this.calculatePopularActivities()
+        this.themeCommunities.value = this.calculateThemeCommunities()
+      } catch (err) {
+        console.warn('[GraphAnalyticsService] Recalculate failed, probably during HMR or store unmount:', err)
+      } finally {
+        this.debounceTimer = null
       }
-      this.popularInterests.value = list.sort((a, b) => b.count - a.count)
-      this.popularActivities.value = this.calculatePopularActivities()
-      this.themeCommunities.value = this.calculateThemeCommunities()
-      this.debounceTimer = null
     }, 150)
   }
 }

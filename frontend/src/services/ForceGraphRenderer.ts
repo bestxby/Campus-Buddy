@@ -116,7 +116,11 @@ export class ForceGraphRenderer {
     canvas.style.width = `${width}px`
     canvas.style.height = `${height}px`
 
-    const ctx = canvas.getContext('2d')!
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      console.error('[ForceGraphRenderer] Failed to get 2D context')
+      return
+    }
     ctx.scale(dpi, dpi)
 
     const { nodes: nodesToDraw, links: linksToDraw } = ForceGraphDataBuilder.build(config)
@@ -237,16 +241,19 @@ export class ForceGraphRenderer {
         return simulation.find(simX, simY, HOVER_FIND_RADIUS)
       })
       .on('start', (event: any) => {
+        if (!event.subject) return
         if (!event.active) simulation.alphaTarget(0.3).restart()
         event.subject.fx = event.subject.x
         event.subject.fy = event.subject.y
       })
       .on('drag', (event: any) => {
+        if (!event.subject) return
         const [mx, my] = d3.pointer(event, canvas)
         event.subject.fx = this.transform.invertX(mx)
         event.subject.fy = this.transform.invertY(my)
       })
       .on('end', (event: any) => {
+        if (!event.subject) return
         if (!event.active) simulation.alphaTarget(0)
         event.subject.fx = null
         event.subject.fy = null

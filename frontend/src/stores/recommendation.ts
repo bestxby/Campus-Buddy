@@ -51,7 +51,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     return match ? match.replace('interest:', '') : ''
   }
 
-  function getBuddiesForActivity(_studentName: string, activityName: string): string[] {
+  function getBuddiesForActivity(studentName: string, activityName: string): string[] {
     const graphStore = useGraphStore()
     const actNode = nodeKey('activity', activityName)
     const actNeighbors = graphStore.graph.get(actNode) ?? new Set<string>()
@@ -60,7 +60,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     for (const n of actNeighbors) {
       if (n.startsWith('student:')) {
         const name = n.slice('student:'.length)
-        if (buddyNames.has(name)) result.push(name)
+        if (name !== studentName && buddyNames.has(name)) result.push(name)
       }
     }
     return result
