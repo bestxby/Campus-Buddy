@@ -131,13 +131,22 @@ export const useGraphStore = defineStore('graph', () => {
     try {
       regenerateSessionSeed()
       let data: GraphDataSchema
-      try {
-        const res = await fetch(`${(import.meta as any).env.BASE_URL}graph_data.json`)
-        if (!res.ok) throw new Error('graph_data.json not found')
-        data = await res.json() as GraphDataSchema
-      } catch (fetchErr) {
-        console.warn('[GraphStore] Failed to fetch graph_data.json, using inlined fallback:', fetchErr)
-        data = fallbackGraphData as GraphDataSchema
+      
+      const isLocalFile = typeof window !== 'undefined' && window.location.protocol === 'file:'
+      if (isLocalFile) {
+        const rawData = fallbackGraphData as any
+        data = (rawData && rawData.default ? rawData.default : rawData) as GraphDataSchema
+      } else {
+        try {
+          const baseUrl = typeof window !== 'undefined' ? (window as any).__CB_BASE_URL__ || '/' : '/'
+          const res = await fetch(`${baseUrl}graph_data.json`)
+          if (!res.ok) throw new Error('graph_data.json not found')
+          data = await res.json() as GraphDataSchema
+        } catch (fetchErr) {
+          console.warn('[GraphStore] Failed to fetch graph_data.json, using inlined fallback:', fetchErr)
+          const rawData = fallbackGraphData as any
+          data = (rawData && rawData.default ? rawData.default : rawData) as GraphDataSchema
+        }
       }
 
       if (!data || !Array.isArray(data.students) || !Array.isArray(data.activities)) {

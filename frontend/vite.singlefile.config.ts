@@ -21,6 +21,7 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
       },
       output: {
+        format: 'iife',
         inlineDynamicImports: true,
         dir: resolve(__dirname, 'dist-single'),
       },
