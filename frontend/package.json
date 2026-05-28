@@ -10,11 +10,14 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "verify": "python ../verify_project.py"
   },
   "dependencies": {
+    "@types/three": "^0.184.1",
     "d3": "^7.9.0",
     "pinia": "^3.0.4",
+    "three": "^0.184.0",
     "vue": "^3.4.21"
   },
   "devDependencies": {

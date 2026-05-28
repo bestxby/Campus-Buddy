@@ -1,17 +1,31 @@
 <template>
   <div class="sidebar-icebreaker-panel">
-    <div class="panel-title">💡 社交破冰小贴士</div>
-    <div class="tip-content">
-      <template v-if="tipData.hasBuddy">
-        建议与
-        <span class="highlight-buddy">{{ tipData.buddyName }}</span>
-        交流
-        <span class="highlight-interest"># {{ tipData.interest }}</span>
-        话题，你们有共同的兴趣契合点！
-      </template>
-      <template v-else>
-        {{ tipData.text }}
-      </template>
+    <div class="panel-title">
+      <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -1px;">
+        <path d="M9 18h6"></path>
+        <path d="M10 22h4"></path>
+        <path d="M15.09 14c.18-.33.3-.68.37-1.04A5 5 0 0 0 16 9a5 5 0 0 0-10 0 5 5 0 0 0 .54 2.96c.07.36.19.7.37 1.04l1.59 2h7l1.59-2z"></path>
+      </svg>
+      社交破冰小贴士
+    </div>
+    <div class="tip-content" style="display: flex; align-items: flex-start; gap: 6px;">
+      <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--accent-orange)" stroke-width="2" style="margin-top: 2px;">
+        <path d="M9 18h6"></path>
+        <path d="M10 22h4"></path>
+        <path d="M15.09 14c.18-.33.3-.68.37-1.04A5 5 0 0 0 16 9a5 5 0 0 0-10 0 5 5 0 0 0 .54 2.96c.07.36.19.7.37 1.04l1.59 2h7l1.59-2z"></path>
+      </svg>
+      <div style="flex: 1;">
+        <template v-if="tipData.hasBuddy">
+          建议与
+          <span class="highlight-buddy">{{ tipData.buddyName }}</span>
+          交流
+          <span class="highlight-interest"># {{ tipData.interest }}</span>
+          话题，你们有共同的兴趣契合点！
+        </template>
+        <template v-else>
+          {{ tipData.text }}
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -35,7 +49,7 @@ const tipData = computed(() => {
   }
   return {
     hasBuddy: false,
-    text: '💡 建议多去【智能推荐活动】一键报名心仪活动，偶遇更多契合的活动搭子！'
+    text: '建议多去【智能推荐活动】一键报名心仪活动，偶遇更多契合的活动搭子！'
   }
 })
 </script>

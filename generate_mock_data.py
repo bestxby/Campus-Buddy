@@ -3,6 +3,9 @@ import random
 import os
 
 def generate_data():
+    # Seed the random number generator for stable, reproducible mock data generation
+    random.seed(42)
+    
     # Pools of Chinese surnames and given names
     surnames = ["赵", "钱", "孙", "李", "周", "吴", "郑", "王", "冯", "陈", "卫", "蒋", "沈", "韩", "杨", "朱", "秦", "尤", "许", "何", "吕", "施", "张", "严"]
     given_names = ["强", "伟", "华", "平", "芳", "娜", "明", "刚", "杰", "娟", "艳", "勇", "军", "磊", "洋", "斌", "霞", "敏", "静", "丽", "涛", "超", "莉", "杰"]

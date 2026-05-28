@@ -3,14 +3,19 @@
     <!-- Logo Banner (Horizontal Layout) -->
     <a href="https://github.com/bestxby/Campus-Buddy" target="_blank" rel="noopener" class="sidebar-logo-banner" title="访问 GitHub 项目仓库">
       <div class="logo-main-group">
-        <div class="sidebar-logo-icon">🧭</div>
+        <div class="sidebar-logo-icon">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="var(--accent-orange)"></polygon>
+          </svg>
+        </div>
         <div class="sidebar-logo-text-wrap">
           <div class="sidebar-logo-title">Campus Buddy</div>
           <div class="sidebar-logo-sub">校园社交智能推荐系统</div>
         </div>
       </div>
       <div v-if="currentUserRole === 'admin'" class="admin-dashboard-title-badge">
-        <span class="pulse-dot">📡</span>
+        <span class="pulse-dot"></span>
         <span>管理端</span>
       </div>
     </a>

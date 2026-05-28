@@ -105,7 +105,7 @@ const togglePromotion = (name: string) => {
   text-align: left;
 }
 .col-header .header-sub {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-secondary);
   text-align: left;
 }
@@ -155,7 +155,7 @@ const togglePromotion = (name: string) => {
   color: #22d3ee;
   padding: 1px 4px;
   border-radius: 4px;
-  font-size: 9px;
+  font-size: 10px;
   flex-shrink: 0;
 }
 .popularity-item-body {
@@ -186,12 +186,12 @@ const togglePromotion = (name: string) => {
   transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 .progress-value {
-  font-size: 8.5px;
+  font-size: 10px;
   color: var(--text-secondary);
   font-weight: 600;
 }
 .action-btn {
-  font-size: 8.5px;
+  font-size: 10px;
   padding: 2px 5px;
   white-space: nowrap;
   min-width: 70px;

@@ -19,8 +19,8 @@ export const addEdge = (u: string, v: string): void => {
   useGraphStore().addEdge(u, v)
 }
 
-export const updateStats = (): void => {
-  useGraphStore().updateStats()
+export const updateStats = (immediate = false): void => {
+  useGraphStore().updateStats(immediate)
 }
 
 export const findPath = (studentA: string, studentB: string): PathResult | null =>

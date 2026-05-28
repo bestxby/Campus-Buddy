@@ -165,7 +165,7 @@ import {
 }
 
 .mini-icon {
-  font-size: 8px;
+  font-size: 10px;
   width: 11px;
   height: 11px;
   background: rgba(255, 255, 255, 0.1);
@@ -193,7 +193,7 @@ import {
 }
 
 .metric-desc {
-  font-size: 9px;
+  font-size: 10px;
   color: rgba(255, 255, 255, 0.35);
   line-height: 1.1;
   margin-top: 2px;

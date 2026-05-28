@@ -54,7 +54,7 @@ import { bridgeStudents } from '@/composables/useGraphInsights'
   text-align: left;
 }
 .col-header .header-sub {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-secondary);
   text-align: left;
 }

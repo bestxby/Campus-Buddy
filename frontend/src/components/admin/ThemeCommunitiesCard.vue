@@ -182,12 +182,12 @@ const slices = computed(() => {
   font-family: system-ui, -apple-system, sans-serif;
 }
 .center-title {
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   fill: var(--text-primary);
 }
 .center-value {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: bold;
   fill: #ffb74d;
 }
@@ -244,7 +244,7 @@ const slices = computed(() => {
 .legend-details {
   display: flex;
   gap: 8px;
-  font-size: 8px;
+  font-size: 10px;
   color: var(--text-secondary);
   padding-left: 12px;
 }

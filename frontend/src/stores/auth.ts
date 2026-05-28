@@ -161,7 +161,7 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('campus_buddy_interests', JSON.stringify([]))
 
     const graphStore = useGraphStore()
-    graphStore.updateStats()
+    graphStore.updateStats(true)
     return true
   }
 

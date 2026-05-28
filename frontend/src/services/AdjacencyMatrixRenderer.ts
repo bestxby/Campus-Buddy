@@ -1,5 +1,8 @@
 import type { HoveredConnectionDetail } from '@/types'
 import { AdjacencyMatrixPainter } from './AdjacencyMatrixPainter'
+import { MatrixLayoutCalculator } from './MatrixLayoutCalculator'
+import type { MatrixLayoutSpecs } from './MatrixLayoutCalculator'
+import { MatrixInteractionHandler } from './MatrixInteractionHandler'
 
 export interface MatrixCallbacks {
   onNodeClick?: (node: any) => void
@@ -11,205 +14,46 @@ export class AdjacencyMatrixRenderer {
   private callbacks: MatrixCallbacks
   private currentConfig: any = null
 
-  // Scroll state
+  // State variables synchronized with InteractionHandler
   private scrollTop: number = 0
   private maxScrollTop: number = 0
   private isDraggingScrollbar: boolean = false
-  private dragStartMouseY: number = 0
-  private dragStartScrollTop: number = 0
-
-  // Interactive Hover state
   private hoveredRowIdx: number | null = null
   private hoveredColIdx: number | null = null
 
-  // Fixed layout metrics (CSS pixels)
   private scrollbarWidth: number = 14
-
-  // Touch state
-  private touchStartClientY: number = 0
-  private touchStartScrollTop: number = 0
-  private isTouching: boolean = false
-
-  // Event handlers references for unbinding
-  private handleWheelFn: any = null
-  private handleMouseMoveFn: any = null
-  private handleMouseDownFn: any = null
-  private handleMouseUpFn: any = null
-  private handleMouseOutFn: any = null
-  private handleClickFn: any = null
-  private handleTouchStartFn: any = null
-  private handleTouchMoveFn: any = null
-  private handleTouchEndFn: any = null
+  private interactionHandler: MatrixInteractionHandler
 
   constructor(canvasElement: HTMLCanvasElement, callbacks: MatrixCallbacks = {}) {
     this.canvasElement = canvasElement
     this.callbacks = callbacks
-    this.bindEvents()
+
+    // Setup interaction handler
+    this.interactionHandler = new MatrixInteractionHandler(
+      canvasElement,
+      {
+        onRedraw: () => this.redraw(),
+        onHoverTrigger: (rowIdx, colIdx) => this.triggerHoverCallback(rowIdx, colIdx),
+        onNodeClick: (studentName) => this.handleNodeClick(studentName),
+        getLayoutSpecs: () => this.getLayoutSpecs(),
+        getMaxScrollTop: () => this.maxScrollTop,
+        getScrollTop: () => this.scrollTop,
+        setScrollTop: (val) => { this.scrollTop = val },
+        isDraggingScrollbar: () => this.isDraggingScrollbar,
+        setDraggingScrollbar: (val) => { this.isDraggingScrollbar = val },
+        getHoveredState: () => ({ rowIdx: this.hoveredRowIdx, colIdx: this.hoveredColIdx }),
+        setHoveredState: (rowIdx, colIdx) => {
+          this.hoveredRowIdx = rowIdx
+          this.hoveredColIdx = colIdx
+        }
+      },
+      this.scrollbarWidth
+    )
   }
 
   public destroy() {
-    this.unbindEvents()
+    this.interactionHandler.destroy()
     this.currentConfig = null
-  }
-
-  private bindEvents() {
-    const canvas = this.canvasElement
-
-    this.handleWheelFn = (e: WheelEvent) => {
-      if (!this.currentConfig || this.maxScrollTop <= 0) return
-      e.preventDefault()
-      this.scrollTop = Math.max(0, Math.min(this.maxScrollTop, this.scrollTop + e.deltaY))
-      this.redraw()
-    }
-
-    this.handleMouseMoveFn = (e: MouseEvent) => {
-      if (!this.currentConfig) return
-      const rect = canvas.getBoundingClientRect()
-      const mx = e.clientX - rect.left
-      const my = e.clientY - rect.top
-
-      const { totalRows, totalCols, gridY, gridX, gridH, gridW, cellWidth, cellHeight } = this.getLayoutSpecs()
-
-      // 1. Handle scrollbar dragging
-      if (this.isDraggingScrollbar) {
-        const dy = e.clientY - this.dragStartMouseY
-        const scrollRange = totalRows * cellHeight - gridH
-        const scrollbarRange = gridH - this.getScrollbarThumbHeight(gridH, totalRows, cellHeight)
-        if (scrollbarRange > 0) {
-          const deltaScroll = (dy / scrollbarRange) * scrollRange
-          this.scrollTop = Math.max(0, Math.min(this.maxScrollTop, this.dragStartScrollTop + deltaScroll))
-          this.redraw()
-        }
-        return
-      }
-
-      // 2. Identify hovered cell
-      let newHoveredRowIdx: number | null = null
-      let newHoveredColIdx: number | null = null
-
-      if (mx >= gridX && mx < gridX + gridW && my >= gridY && my < gridY + gridH) {
-        newHoveredRowIdx = Math.floor((my - gridY + this.scrollTop) / cellHeight)
-        newHoveredColIdx = Math.floor((mx - gridX) / cellWidth)
-
-        if (newHoveredRowIdx >= totalRows) newHoveredRowIdx = null
-        if (newHoveredColIdx >= totalCols) newHoveredColIdx = null
-      }
-
-      if (newHoveredRowIdx !== this.hoveredRowIdx || newHoveredColIdx !== this.hoveredColIdx) {
-        this.hoveredRowIdx = newHoveredRowIdx
-        this.hoveredColIdx = newHoveredColIdx
-        this.redraw()
-        this.triggerHoverCallback()
-      }
-    }
-
-    this.handleMouseDownFn = (e: MouseEvent) => {
-      if (!this.currentConfig) return
-      const rect = canvas.getBoundingClientRect()
-      const mx = e.clientX - rect.left
-      const my = e.clientY - rect.top
-
-      const { totalRows, gridY, gridH, cellHeight, gridX, gridW } = this.getLayoutSpecs()
-      const scrollbarX = gridX + gridW
-
-      // Check if clicked scrollbar
-      if (mx >= scrollbarX && mx <= scrollbarX + this.scrollbarWidth && my >= gridY && my <= gridY + gridH) {
-        const thumbH = this.getScrollbarThumbHeight(gridH, totalRows, cellHeight)
-        const scrollRatio = this.maxScrollTop > 0 ? (this.scrollTop / this.maxScrollTop) : 0
-        const thumbY = gridY + scrollRatio * (gridH - thumbH)
-
-        if (my >= thumbY && my <= thumbY + thumbH) {
-          this.isDraggingScrollbar = true
-          this.dragStartMouseY = e.clientY
-          this.dragStartScrollTop = this.scrollTop
-          e.preventDefault()
-        }
-      }
-    }
-
-    this.handleMouseUpFn = () => {
-      this.isDraggingScrollbar = false
-    }
-
-    this.handleMouseOutFn = () => {
-      this.isDraggingScrollbar = false
-      if (this.hoveredRowIdx !== null || this.hoveredColIdx !== null) {
-        this.hoveredRowIdx = null
-        this.hoveredColIdx = null
-        this.redraw()
-        if (this.callbacks.onHover) this.callbacks.onHover(null)
-      }
-    }
-
-    this.handleClickFn = (e: MouseEvent) => {
-      if (!this.currentConfig || this.isDraggingScrollbar) return
-      const rect = canvas.getBoundingClientRect()
-      const mx = e.clientX - rect.left
-      const my = e.clientY - rect.top
-
-      const { totalRows, gridY, gridX, gridH, gridW, rows, cellHeight } = this.getLayoutSpecs()
-
-      if (mx >= gridX && mx < gridX + gridW && my >= gridY && my < gridY + gridH) {
-        const clickedRow = Math.floor((my - gridY + this.scrollTop) / cellHeight)
-        if (clickedRow >= 0 && clickedRow < totalRows) {
-          const matrixMode = this.currentConfig.matrixMode || 'student-interest'
-          if (matrixMode !== 'interest-cooccurrence' && this.callbacks.onNodeClick) {
-            // Select student row
-            const studentName = rows[clickedRow]
-            this.callbacks.onNodeClick({ type: 'student', name: studentName })
-          }
-        }
-      }
-    }
-
-    this.handleTouchStartFn = (e: TouchEvent) => {
-      if (!this.currentConfig || e.touches.length !== 1) return
-      this.isTouching = true
-      this.touchStartClientY = e.touches[0].clientY
-      this.touchStartScrollTop = this.scrollTop
-    }
-
-    this.handleTouchMoveFn = (e: TouchEvent) => {
-      if (!this.isTouching || !this.currentConfig || e.touches.length !== 1 || this.maxScrollTop <= 0) return
-      const rect = canvas.getBoundingClientRect()
-      const mx = e.touches[0].clientX - rect.left
-      const my = e.touches[0].clientY - rect.top
-      const { gridY, gridH, gridX, gridW } = this.getLayoutSpecs()
-
-      if (mx >= gridX && mx < gridX + gridW && my >= gridY && my < gridY + gridH) {
-        e.preventDefault()
-        const dy = e.touches[0].clientY - this.touchStartClientY
-        this.scrollTop = Math.max(0, Math.min(this.maxScrollTop, this.touchStartScrollTop - dy))
-        this.redraw()
-      }
-    }
-
-    this.handleTouchEndFn = () => {
-      this.isTouching = false
-    }
-
-    canvas.addEventListener('wheel', this.handleWheelFn, { passive: false })
-    canvas.addEventListener('mousemove', this.handleMouseMoveFn)
-    canvas.addEventListener('mousedown', this.handleMouseDownFn)
-    window.addEventListener('mouseup', this.handleMouseUpFn)
-    canvas.addEventListener('mouseout', this.handleMouseOutFn)
-    canvas.addEventListener('click', this.handleClickFn)
-    canvas.addEventListener('touchstart', this.handleTouchStartFn, { passive: true })
-    canvas.addEventListener('touchmove', this.handleTouchMoveFn, { passive: false })
-    canvas.addEventListener('touchend', this.handleTouchEndFn, { passive: true })
-  }
-
-  private unbindEvents() {
-    const canvas = this.canvasElement
-    if (this.handleWheelFn) canvas.removeEventListener('wheel', this.handleWheelFn)
-    if (this.handleMouseMoveFn) canvas.removeEventListener('mousemove', this.handleMouseMoveFn)
-    if (this.handleMouseDownFn) canvas.removeEventListener('mousedown', this.handleMouseDownFn)
-    window.removeEventListener('mouseup', this.handleMouseUpFn)
-    if (this.handleMouseOutFn) canvas.removeEventListener('mouseout', this.handleMouseOutFn)
-    if (this.handleClickFn) canvas.removeEventListener('click', this.handleClickFn)
-    if (this.handleTouchStartFn) canvas.removeEventListener('touchstart', this.handleTouchStartFn)
-    if (this.handleTouchMoveFn) canvas.removeEventListener('touchmove', this.handleTouchMoveFn)
-    if (this.handleTouchEndFn) canvas.removeEventListener('touchend', this.handleTouchEndFn)
   }
 
   public draw(config: any) {
@@ -234,16 +78,14 @@ export class AdjacencyMatrixRenderer {
     if (!ctx) return
     ctx.scale(dpi, dpi)
 
-    // Clear Canvas
     ctx.clearRect(0, 0, width, height)
 
-    // Extract dataset & responsive dimensions
+    // Calculate specs via delegated Calculator
     const specs = this.getLayoutSpecs()
     const matrixMode = this.currentConfig.matrixMode || 'student-interest'
     const graph = this.currentConfig.graph
     const activeStudent = this.currentConfig.activeStudent || null
 
-    // Calculate maximum scroll boundaries
     const totalContentHeight = specs.totalRows * specs.cellHeight
     this.maxScrollTop = Math.max(0, totalContentHeight - specs.gridH)
     if (this.scrollTop > this.maxScrollTop) {
@@ -265,13 +107,7 @@ export class AdjacencyMatrixRenderer {
     )
   }
 
-  private getScrollbarThumbHeight(gridH: number, totalRows: number, cellHeight: number): number {
-    const ratio = gridH / (totalRows * cellHeight)
-    return Math.max(30, ratio * gridH)
-  }
-
-  // Calculate layout specifications reactively
-  private getLayoutSpecs() {
+  private getLayoutSpecs(): MatrixLayoutSpecs {
     const canvas = this.canvasElement
     const width = canvas.style.width ? parseInt(canvas.style.width) : canvas.clientWidth
     const height = canvas.style.height ? parseInt(canvas.style.height) : canvas.clientHeight
@@ -279,85 +115,33 @@ export class AdjacencyMatrixRenderer {
     const matrixMode = this.currentConfig?.matrixMode || 'student-interest'
     const graph = (this.currentConfig?.graph as Map<string, Set<string>>) || new Map<string, Set<string>>()
 
-    const isCooccurrence = matrixMode === 'interest-cooccurrence'
-    const rowHeaderWidth = isCooccurrence ? 115 : 75
-    const rightMargin = isCooccurrence ? 0 : 30
+    return MatrixLayoutCalculator.getLayoutSpecs(
+      width,
+      height,
+      matrixMode,
+      graph,
+      this.scrollbarWidth
+    )
+  }
 
-    const gridX = rowHeaderWidth
-    const colHeaderHeight = (matrixMode === 'student-interest' || matrixMode === 'interest-cooccurrence') ? 70 : 90
-    const gridY = colHeaderHeight
-    const gridW = width - gridX - this.scrollbarWidth - rightMargin
-    const gridH = height - gridY
-
-    let rows: string[] = []
-    let cols: string[] = []
-
-    if (matrixMode === 'student-interest') {
-      rows = Array.from(graph.keys())
-        .filter((n: string) => n.startsWith('student:') && !n.endsWith('Admin'))
-        .map((n: string) => n.replace('student:', ''))
-        .sort((a, b) => a.localeCompare(b, 'zh'))
-      cols = Array.from(graph.keys())
-        .filter((n: string) => n.startsWith('interest:'))
-        .map((n: string) => n.replace('interest:', ''))
-        .sort((a, b) => a.localeCompare(b, 'zh'))
-    } else if (matrixMode === 'student-activity') {
-      rows = Array.from(graph.keys())
-        .filter((n: string) => n.startsWith('student:') && !n.endsWith('Admin'))
-        .map((n: string) => n.replace('student:', ''))
-        .sort((a, b) => a.localeCompare(b, 'zh'))
-      cols = Array.from(graph.keys())
-        .filter((n: string) => n.startsWith('activity:'))
-        .map((n: string) => n.replace('activity:', ''))
-        .sort((a, b) => a.localeCompare(b, 'zh'))
-    } else {
-      // interest co-occurrence
-      rows = Array.from(graph.keys())
-        .filter((n: string) => n.startsWith('interest:'))
-        .map((n: string) => n.replace('interest:', ''))
-        .sort((a, b) => a.localeCompare(b, 'zh'))
-      cols = rows
-    }
-
-    const totalRows = rows.length
-    const totalCols = cols.length
-
-    // Dynamic cell width to span exactly the available grid width
-    const cellWidth = totalCols > 0 ? gridW / totalCols : 20
-
-    // Dynamic cell height: for interest co-occurrence, make it fit height exactly so no scrolling is needed.
-    // Otherwise, use a fixed comfortable height (18px) for long scrollable lists.
-    let cellHeight = 18
-    if (matrixMode === 'interest-cooccurrence' && totalRows > 0) {
-      cellHeight = gridH / totalRows
-    }
-
-    return {
-      rows,
-      cols,
-      totalRows,
-      totalCols,
-      gridX,
-      gridY,
-      gridW,
-      gridH,
-      cellWidth,
-      cellHeight
+  private handleNodeClick(studentName: string) {
+    const matrixMode = this.currentConfig?.matrixMode || 'student-interest'
+    if (matrixMode !== 'interest-cooccurrence' && this.callbacks.onNodeClick) {
+      this.callbacks.onNodeClick({ type: 'student', name: studentName })
     }
   }
 
-  // Trigger hover tooltip callback with customized text descriptions
-  private triggerHoverCallback() {
+  private triggerHoverCallback(rowIdx: number | null, colIdx: number | null) {
     if (!this.callbacks.onHover) return
 
-    if (this.hoveredRowIdx === null || this.hoveredColIdx === null) {
+    if (rowIdx === null || colIdx === null) {
       this.callbacks.onHover(null)
       return
     }
 
     const { rows, cols } = this.getLayoutSpecs()
-    const rowName = rows[this.hoveredRowIdx]
-    const colName = cols[this.hoveredColIdx]
+    const rowName = rows[rowIdx]
+    const colName = cols[colIdx]
     const matrixMode = this.currentConfig.matrixMode || 'student-interest'
     const graph = this.currentConfig.graph
 
@@ -383,7 +167,7 @@ export class AdjacencyMatrixRenderer {
       }
     } else {
       // Interest co-occurrence
-      if (this.hoveredRowIdx === this.hoveredColIdx) {
+      if (rowIdx === colIdx) {
         const count = Array.from(graph.get(`interest:${rowName}`) || []).filter((s: any) => s.startsWith('student:')).length
         details = {
           title: `🎯 ${rowName} (兴趣圈规模)`,

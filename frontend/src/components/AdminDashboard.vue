@@ -40,8 +40,8 @@
 
 <script setup lang="ts">
 import { watch, onMounted } from 'vue'
-import { stats, graph } from '@/composables/useGraph'
-import { isolatedCount } from '@/composables/useGraphInsights'
+import { stats, graph, updateStats } from '@/composables/useGraph'
+import { isolatedCount, recalculateGraphInsights } from '@/composables/useGraphInsights'
 import { activeStudent, recommendations } from '@/composables/useRecommendations'
 import { addLog } from '@/composables/useLogs'
 
@@ -64,6 +64,10 @@ const emit = defineEmits<{
 
 // Seed initial logs
 onMounted(() => {
+  // Recalculate stats and insights immediately so that the logs and cards are populated without lag
+  updateStats(true)
+  recalculateGraphInsights(true)
+
   addLog('info', '系统初始化完成，成功加载校园社交关系网图谱数据')
   addLog('info', `校园社交网络载入就绪：当前共包含 ${stats.value.studentsCount} 位同学，${stats.value.interestsCount} 种不同兴趣圈子，${stats.value.activitiesCount} 个校园活动`)
   addLog('info', `社群活跃度分析完成：共识别出 ${stats.value.componentsCount} 个相对独立的主题社群圈子`)

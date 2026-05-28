@@ -145,7 +145,7 @@
 }
 
 .action-hint {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-secondary);
   margin-top: 1px;
 }
@@ -187,7 +187,7 @@
   gap: 1px;
 }
 .selected-label {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-secondary);
 }
 .selected-name {

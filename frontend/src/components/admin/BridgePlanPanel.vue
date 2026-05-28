@@ -199,11 +199,11 @@ const applyBridgePlan = () => {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 9.5px;
+  font-size: 10px;
   overflow: hidden;
 }
 .option-badge {
-  font-size: 8px;
+  font-size: 10px;
   font-weight: bold;
   padding: 1px 3px;
   border-radius: 3px;
@@ -213,20 +213,20 @@ const applyBridgePlan = () => {
 .option-badge.opt-student { background-color: rgba(167, 139, 250, 0.1); color: #c084fc; }
 .option-badge.opt-activity { background-color: rgba(253, 151, 31, 0.12); color: #ffb74d; }
 .option-title {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .opt-sub {
-  font-size: 8px;
+  font-size: 10px;
   color: var(--text-secondary);
 }
 .apply-bridge-btn {
   margin-top: 4px;
   width: 100%;
   padding: 4px;
-  font-size: 9.5px;
+  font-size: 10px;
 }
 </style>

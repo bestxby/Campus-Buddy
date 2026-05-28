@@ -124,7 +124,7 @@ const sendTargetedPromotion = () => {
   text-align: left;
 }
 .promo-intro {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--text-secondary);
   margin: 0;
 }
@@ -138,12 +138,12 @@ const sendTargetedPromotion = () => {
   background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  font-size: 9.5px;
+  font-size: 10px;
   padding: 2px 6px;
   border-radius: 4px;
 }
 .promo-empty {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--text-secondary);
   font-style: italic;
 }

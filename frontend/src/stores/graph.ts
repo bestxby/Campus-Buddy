@@ -88,7 +88,7 @@ export const useGraphStore = defineStore('graph', () => {
 
   let componentsDebounceTimer: any = null
 
-  function updateStats(): void {
+  function updateStats(immediate = false): void {
     let s = 0, i = 0, a = 0
     for (const node of graph.value.keys()) {
       if (node.startsWith('student:'))       s++
@@ -108,11 +108,17 @@ export const useGraphStore = defineStore('graph', () => {
     // Debounce the heavy BFS connected components computation
     if (componentsDebounceTimer) {
       clearTimeout(componentsDebounceTimer)
-    }
-    componentsDebounceTimer = setTimeout(() => {
-      stats.componentsCount = GraphAlgorithms.countConnectedComponents(graph.value)
       componentsDebounceTimer = null
-    }, 100)
+    }
+
+    if (immediate) {
+      stats.componentsCount = GraphAlgorithms.countConnectedComponents(graph.value)
+    } else {
+      componentsDebounceTimer = setTimeout(() => {
+        stats.componentsCount = GraphAlgorithms.countConnectedComponents(graph.value)
+        componentsDebounceTimer = null
+      }, 100)
+    }
   }
 
   interface GraphDataSchema {

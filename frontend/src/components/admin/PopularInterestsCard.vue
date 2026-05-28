@@ -65,7 +65,7 @@ const maxInterestCount = computed(() => {
   text-align: left;
 }
 .col-header .header-sub {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-secondary);
   text-align: left;
 }
@@ -86,7 +86,7 @@ const maxInterestCount = computed(() => {
   font-size: 10px;
 }
 .rank-badge {
-  font-size: 8.5px;
+  font-size: 10px;
   color: var(--text-secondary);
   font-family: monospace;
   width: 18px;

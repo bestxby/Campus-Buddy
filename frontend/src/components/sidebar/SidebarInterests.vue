@@ -1,6 +1,12 @@
 <template>
   <div class="sidebar-interests-panel">
-    <div class="panel-title">🏷️ 我的兴趣标签</div>
+    <div class="panel-title">
+      <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -1px;">
+        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+        <line x1="7" y1="7" x2="7.01" y2="7"></line>
+      </svg>
+      我的兴趣标签
+    </div>
     <div class="profile-interests-strip" v-if="userInterestTags.length">
       <span
         v-for="tag in userInterestTags"
@@ -48,7 +54,7 @@ const getTagClass = (tag: string) => {
   gap: 6px;
 }
 .profile-interest-chip {
-  font-size: 9px;
+  font-size: 10px;
   padding: 2.5px 8px;
   border-radius: 12px;
   transition: all 0.2s ease;

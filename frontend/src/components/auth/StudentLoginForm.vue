@@ -97,7 +97,7 @@
     </div>
 
     <div v-if="regForm.name.trim() && !isNameValid" class="warning-text">
-      ⚠️ 姓名格式不合法：只允许中文、英文字母、数字和空格/连字符（长度为2-20字）！
+      ⚠️ 姓名格式不合法：只允许中文、英文字母和空格/连字符（长度为2-20字）！
     </div>
 
     <div v-if="regForm.selectedInterests.length === 0" class="warning-text">
@@ -133,7 +133,7 @@ const emit = defineEmits<{
 const isNameValid = computed(() => {
   const name = regForm.name.trim()
   if (!name) return false
-  const nameRegex = /^[\u4e00-\u9fa5a-zA-Z0-9\s-]{2,20}$/
+  const nameRegex = /^[\u4e00-\u9fa5a-zA-Z\s-]{2,20}$/
   return nameRegex.test(name)
 })
 
@@ -184,7 +184,7 @@ const handleStudentSubmit = () => {
 .live-name-preview { font-size: 13px; font-weight: bold; color: var(--text-primary); }
 .live-persona-preview { font-size: 11px; font-weight: bold; }
 .live-interests-preview { width: 100%; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 6px; }
-.preview-tag { background-color: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.2); color: #e9d5ff; font-size: 9px; padding: 1px 6px; border-radius: 12px; }
+.preview-tag { background-color: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.2); color: #e9d5ff; font-size: 10px; padding: 1px 6px; border-radius: 12px; }
 .placeholder-text { font-size: 11px; color: var(--text-secondary); font-style: italic; }
 .interests-picker-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
 .picker-section h5 { font-size: 11.5px; color: var(--text-secondary); margin: 0 0 3px 0; border-left: 2px solid var(--accent-cyan); padding-left: 6px; }

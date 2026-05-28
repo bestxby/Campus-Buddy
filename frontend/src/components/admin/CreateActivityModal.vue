@@ -193,7 +193,7 @@ const handleSubmit = () => {
 }
 
 .modal-subtitle {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--text-secondary);
   display: block;
   margin-top: 4px;
@@ -235,7 +235,7 @@ const handleSubmit = () => {
 }
 
 .form-hint {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-secondary);
 }
 
@@ -256,7 +256,7 @@ const handleSubmit = () => {
 }
 
 .error-text {
-  font-size: 9.5px;
+  font-size: 10px;
   color: #f87171;
   margin-top: 2px;
 }

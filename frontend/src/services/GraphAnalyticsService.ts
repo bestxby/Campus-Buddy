@@ -69,20 +69,20 @@ export class GraphAnalyticsService {
     return GraphAnalyticsService.instance
   }
 
-  public recalculateGraphInsights(): void {
+  public recalculateGraphInsights(immediate = false): void {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer)
+      this.debounceTimer = null
     }
     try {
       if (useAuthStore().currentUserRole !== 'admin') {
-        this.debounceTimer = null
         return
       }
     } catch (err) {
       // Pinia might not be active in unit testing environments
     }
 
-    this.debounceTimer = setTimeout(() => {
+    const run = () => {
       try {
         const graphStore = useGraphStore()
         const graph = graphStore.graph
@@ -121,7 +121,13 @@ export class GraphAnalyticsService {
       } finally {
         this.debounceTimer = null
       }
-    }, 150)
+    }
+
+    if (immediate) {
+      run()
+    } else {
+      this.debounceTimer = setTimeout(run, 150)
+    }
   }
 }
 

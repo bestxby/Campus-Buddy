@@ -24,6 +24,10 @@ export default defineConfig({
     // Browsers can cache d3 independently; only app code changes on each deploy.
     chunkSizeWarningLimit: 600,
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        preview: resolve(__dirname, 'loader-preview.html'),
+      },
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/d3')) {

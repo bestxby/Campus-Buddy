@@ -210,7 +210,7 @@ watch(activeStudent, () => {
   border: 1px solid rgba(255,255,255,0.02);
 }
 .pathfinder-node {
-  font-size: 9.5px;
+  font-size: 10px;
   padding: 2px 5px;
   border-radius: 4px;
   font-weight: 600;
@@ -227,14 +227,14 @@ watch(activeStudent, () => {
 }
 .pathfinder-arrow {
   color: var(--text-secondary);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: bold;
 }
 .path-highlight-btn {
   width: 100%;
   padding: 5px;
   font-weight: 700;
-  font-size: 9.5px;
+  font-size: 10px;
 }
 .pathfinder-error {
   font-size: 10px;

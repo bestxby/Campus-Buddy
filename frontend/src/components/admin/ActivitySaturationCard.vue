@@ -128,7 +128,7 @@ const allActivitiesStats = computed(() => {
   text-align: left;
 }
 .col-header .header-sub {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-secondary);
   text-align: left;
 }
@@ -192,13 +192,13 @@ const allActivitiesStats = computed(() => {
   color: #c084fc;
   padding: 1px 4px;
   border-radius: 4px;
-  font-size: 9px;
+  font-size: 10px;
 }
 .count-td {
   font-family: Consolas, monospace;
 }
 .status-pill {
-  font-size: 8.5px;
+  font-size: 10px;
   font-weight: bold;
   padding: 1px 4px;
   border-radius: 12px;

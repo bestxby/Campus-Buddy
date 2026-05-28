@@ -23,6 +23,6 @@ export const averagePathLength = graphAnalyticsService.averagePathLength
 export const clusteringCoefficient = graphAnalyticsService.clusteringCoefficient
 export const networkDensity = graphAnalyticsService.networkDensity
 
-export const recalculateGraphInsights = (): void => {
-  graphAnalyticsService.recalculateGraphInsights()
+export const recalculateGraphInsights = (immediate = false): void => {
+  graphAnalyticsService.recalculateGraphInsights(immediate)
 }

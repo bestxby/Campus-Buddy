@@ -66,13 +66,13 @@ const maxVisibleBuddies = computed(() => currentUserRole.value === 'admin' ? 30 
 .path-item { background-color: rgba(255,255,255,0.01); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 12px; }
 .buddy-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: nowrap; min-width: 0; }
 .path-flow { display: flex; align-items: center; gap: 6px; font-size: 10px; flex: 1; min-width: 0; }
-.node { padding: 4px 8px; border-radius: 4px; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 95px; }
+.node { padding: 4px 8px; border-radius: 4px; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: min(120px, 30%); }
 .node.student { background-color: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.2); color: #a5f3fc; }
 .node.interest { background-color: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #93c5fd; }
 .arrow { color: var(--text-secondary); font-weight: bold; flex-shrink: 0; }
 .jaccard-badge { display: flex; align-items: center; gap: 4px; background: rgba(253,151,31,0.08); border: 1px solid rgba(253,151,31,0.2); border-radius: 20px; padding: 3px 8px; flex-shrink: 0; }
 .jaccard-icon { font-size: 10px; }
-.jaccard-count { font-size: 9px; color: rgba(255,255,255,0.5); }
+.jaccard-count { font-size: 10px; color: rgba(255,255,255,0.55); }
 .jaccard-score { font-size: 10px; font-weight: 700; color: #ffb74d; font-family: monospace; }
 .empty-msg { font-size: 12px; color: var(--text-secondary); margin: 0; }
 
@@ -88,7 +88,7 @@ const maxVisibleBuddies = computed(() => currentUserRole.value === 'admin' ? 30 
   text-shadow: 0 0 4px rgba(253, 151, 31, 0.25);
 }
 .social-star {
-  font-size: 8px;
+  font-size: 10px;
   margin-left: 2px;
   vertical-align: middle;
 }

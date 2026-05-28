@@ -47,8 +47,8 @@ import { currentUserRole } from '@/composables/useAuth'
 .friend-match-item:hover { background-color: rgba(253,151,31,0.03); border-color: rgba(253,151,31,0.15); }
 .friend-match-info { display: flex; flex-direction: column; gap: 2px; text-align: left; }
 .friend-name { font-size: 11px; font-weight: bold; color: var(--text-primary); }
-.friend-shared-desc { font-size: 9px; color: var(--text-secondary); }
+.friend-shared-desc { font-size: 10px; color: var(--text-secondary); }
 .friend-no-matches { font-size: 10px; color: var(--text-secondary); text-align: center; padding: 10px 0 0 0; }
-.select-friend-btn { padding: 4px 8px; font-size: 9px; white-space: nowrap; }
+.select-friend-btn { padding: 4px 8px; font-size: 10px; white-space: nowrap; }
 .text-orange-light { color: #ffb74d; }
 </style>

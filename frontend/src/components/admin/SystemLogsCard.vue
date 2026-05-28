@@ -56,7 +56,7 @@ import { logs } from '@/composables/useLogs'
   text-align: left;
 }
 .col-header .header-sub {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-secondary);
   text-align: left;
 }
@@ -96,7 +96,7 @@ import { logs } from '@/composables/useLogs'
 }
 .console-line {
   font-family: Consolas, "Courier New", Courier, monospace;
-  font-size: 9.5px;
+  font-size: 10px;
   line-height: 1.35;
   white-space: pre-wrap;
   word-break: break-all;

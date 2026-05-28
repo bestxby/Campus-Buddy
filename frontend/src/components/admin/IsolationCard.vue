@@ -148,7 +148,7 @@ const handleApplied = (studentName: string) => {
   font-size: 12px;
 }
 .alert-text {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--text-secondary);
   line-height: 1.3;
 }
@@ -222,7 +222,7 @@ const handleApplied = (studentName: string) => {
   color: var(--text-primary);
 }
 .student-deg-badge {
-  font-size: 8px;
+  font-size: 10px;
   color: #f87171;
   background: rgba(239, 68, 68, 0.08);
   border: 1px solid rgba(239, 68, 68, 0.15);
@@ -230,7 +230,7 @@ const handleApplied = (studentName: string) => {
   border-radius: 3px;
 }
 .select-bridge-btn {
-  font-size: 8px;
+  font-size: 10px;
   padding: 2px 5px;
 }
 .select-bridge-btn.suggested-btn {

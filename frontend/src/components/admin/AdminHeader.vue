@@ -72,7 +72,7 @@
   box-shadow: 0 0 6px rgba(52, 211, 153, 0.6);
 }
 .status-text {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: bold;
   color: #6ee7b7;
 }
