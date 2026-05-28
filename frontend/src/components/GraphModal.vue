@@ -1,6 +1,5 @@
 <template>
-  <Transition name="modal">
-  <div v-if="visible" class="fullscreen-graph-overlay fade-in">
+  <div v-show="visible" class="fullscreen-graph-overlay fade-in">
     <div class="fullscreen-modal-card card glow-cyan">
       <!-- Header -->
       <div class="fullscreen-modal-header">
@@ -116,7 +115,8 @@
       </div>
 
       <!-- Canvas -->
-      <div class="fullscreen-canvas-container">
+      <div class="fullscreen-canvas-container" ref="canvasContainerRef">
+
         <canvas ref="canvasRef" style="width: 100%; height: 100%; display: block;"></canvas>
         
         <!-- Hover tooltip -->
@@ -136,7 +136,6 @@
       </div>
     </div>
   </div>
-  </Transition>
 </template>
 
 <script setup lang="ts">
@@ -150,18 +149,20 @@ import { ForceGraphRenderer } from '@/services/ForceGraphRenderer'
 import { AdjacencyMatrixRenderer } from '@/services/AdjacencyMatrixRenderer'
 
 // ─── Local State ───────────────────────────────────────────────────────────────
-const visible        = ref(false)
-const canvasRef      = ref<HTMLCanvasElement | null>(null)
-const hideBuddies    = ref(false)
-const hideActivities = ref(false)
-const maxLimit       = computed(() => currentUserRole.value === 'admin' ? 40 : 10)
-const buddyLimit     = ref(currentUserRole.value === 'admin' ? 30 : 10)
-const showGlobal     = ref(false)
-const hoveredDetail  = ref<HoveredConnectionDetail | null>(null)
-const viewMode       = ref<'network' | 'matrix'>('network')
-const matrixMode     = ref<'student-interest' | 'student-activity' | 'interest-cooccurrence'>('student-interest')
+const visible            = ref(false)
+const canvasRef          = ref<HTMLCanvasElement | null>(null)
+const canvasContainerRef = ref<HTMLDivElement | null>(null)
+const hideBuddies        = ref(false)
+const hideActivities     = ref(false)
+const maxLimit           = computed(() => currentUserRole.value === 'admin' ? 40 : 10)
+const buddyLimit         = ref(currentUserRole.value === 'admin' ? 30 : 10)
+const showGlobal         = ref(false)
+const hoveredDetail      = ref<HoveredConnectionDetail | null>(null)
+const viewMode           = ref<'network' | 'matrix'>('network')
+const matrixMode         = ref<'student-interest' | 'student-activity' | 'interest-cooccurrence'>('student-interest')
 let   graphRenderer: ForceGraphRenderer | null = null
 let   matrixRenderer: AdjacencyMatrixRenderer | null = null
+let   resizeObserver: ResizeObserver | null = null
 
 const isGlobalMode = computed(() => {
   if (currentUserRole.value !== 'admin') return false
@@ -174,6 +175,41 @@ watch(maxLimit, (newMax) => {
   }
 }, { immediate: true })
 
+// ─── Resize Observer Helper ───────────────────────────────────────────────────
+const startObserving = () => {
+  if (!canvasContainerRef.value) return
+  if (window.ResizeObserver) {
+    if (resizeObserver) {
+      resizeObserver.disconnect()
+    }
+    resizeObserver = new ResizeObserver((entries) => {
+      let hasValidSize = false
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect
+        if (width > 0 && height > 0) {
+          hasValidSize = true
+        }
+      }
+      if (hasValidSize) {
+        redraw()
+      }
+    })
+    resizeObserver.observe(canvasContainerRef.value)
+  } else {
+    window.addEventListener('resize', redraw)
+    redraw()
+  }
+}
+
+const stopObserving = () => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  } else {
+    window.removeEventListener('resize', redraw)
+  }
+}
+
 // ─── Public API ────────────────────────────────────────────────────────────────
 const open = (
   forceGlobal?: boolean,
@@ -181,6 +217,10 @@ const open = (
   initialMatrixMode?: 'student-interest' | 'student-activity' | 'interest-cooccurrence'
 ) => {
   visible.value = true
+  
+  // Lock body scroll to prevent viewport size shifting from toggling background scrollbars
+  document.body.style.overflow = 'hidden'
+
   if (forceGlobal === true && currentUserRole.value === 'admin') {
     showGlobal.value = true
   }
@@ -194,10 +234,17 @@ const open = (
   if (initialMatrixMode) {
     matrixMode.value = initialMatrixMode
   }
-  setTimeout(drawGraph, 50)
+  
+  nextTick(() => {
+    startObserving()
+  })
 }
 const close = () => {
   visible.value = false
+  
+  // Restore body scroll
+  document.body.style.overflow = ''
+  stopObserving()
   if (graphRenderer) {
     graphRenderer.destroy()
     graphRenderer = null
@@ -224,15 +271,18 @@ const resetZoom = () => {
   if (viewMode.value === 'network') graphRenderer?.resetZoom()
 }
 
-// ─── D3 Force-directed Graph Renderer Delegation ──────────────────────────────
-let drawScheduled = false
+// ─── D3 Force-directed Graph/Matrix Renderer Delegation ────────────────────────
+let drawFrameId: number | null = null
 const drawGraph = () => {
   if (!canvasRef.value) return
-  if (drawScheduled) return
-  drawScheduled = true
-
-  nextTick(() => {
-    drawScheduled = false
+  
+  // Cancel any previously scheduled draw in the current animation frame to collapse consecutive requests
+  if (drawFrameId !== null) {
+    cancelAnimationFrame(drawFrameId)
+  }
+  
+  drawFrameId = requestAnimationFrame(() => {
+    drawFrameId = null
     if (!canvasRef.value) return
 
     if (viewMode.value === 'network') {
@@ -322,11 +372,19 @@ watch(
 
 // ─── Lifecycle ─────────────────────────────────────────────────────────────────
 onMounted(() => {
-  window.addEventListener('resize', redraw)
+  if (visible.value) {
+    startObserving()
+  }
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', redraw)
+  // Ensure body scroll is unlocked in case modal is unmounted abruptly
+  document.body.style.overflow = ''
+
+  stopObserving()
+  if (drawFrameId !== null) {
+    cancelAnimationFrame(drawFrameId)
+  }
   if (graphRenderer) {
     graphRenderer.destroy()
     graphRenderer = null

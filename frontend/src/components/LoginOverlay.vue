@@ -67,11 +67,10 @@ const loadingPayload = ref<LoadingPayload | null>(null)
 
 const onLoadingStart = (payload: LoadingPayload) => {
   loadingPayload.value = payload
+  submitRegistration()
 }
 
 const onLoadingDone = () => {
-  // Animation finished — now commit auth state and proceed to dashboard
-  submitRegistration()
   loadingPayload.value = null
   emit('submitted')
 }

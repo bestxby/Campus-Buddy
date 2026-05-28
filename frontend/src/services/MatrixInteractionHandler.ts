@@ -4,11 +4,15 @@ import { MatrixLayoutCalculator } from './MatrixLayoutCalculator'
 export interface InteractionCallbacks {
   onRedraw: () => void
   onHoverTrigger: (rowIdx: number | null, colIdx: number | null) => void
-  onNodeClick: (studentName: string) => void
+  onRowClick: (rowName: string) => void
+  onColClick: (colName: string) => void
   getLayoutSpecs: () => MatrixLayoutSpecs
   getMaxScrollTop: () => number
   getScrollTop: () => number
   setScrollTop: (val: number) => void
+  getMaxScrollLeft: () => number
+  getScrollLeft: () => number
+  setScrollLeft: (val: number) => void
   isDraggingScrollbar: () => boolean
   setDraggingScrollbar: (val: boolean) => void
   getHoveredState: () => { rowIdx: number | null; colIdx: number | null }
@@ -25,8 +29,10 @@ export class MatrixInteractionHandler {
   private dragStartScrollTop = 0
 
   // Touch state
+  private touchStartClientX = 0
   private touchStartClientY = 0
   private touchStartScrollTop = 0
+  private touchStartScrollLeft = 0
   private isTouching = false
 
   // Listener function caches
@@ -55,11 +61,25 @@ export class MatrixInteractionHandler {
     const canvas = this.canvas
 
     this.handleWheelFn = (e: WheelEvent) => {
-      const maxScroll = this.callbacks.getMaxScrollTop()
-      if (maxScroll <= 0) return
+      const maxScrollV = this.callbacks.getMaxScrollTop()
+      const maxScrollH = this.callbacks.getMaxScrollLeft()
+      if (maxScrollV <= 0 && maxScrollH <= 0) return
       e.preventDefault()
-      const newScroll = Math.max(0, Math.min(maxScroll, this.callbacks.getScrollTop() + e.deltaY))
-      this.callbacks.setScrollTop(newScroll)
+
+      // Use deltaY for vertical, deltaX for horizontal
+      if (maxScrollV > 0 && Math.abs(e.deltaY) >= Math.abs(e.deltaX)) {
+        const newScroll = Math.max(0, Math.min(maxScrollV, this.callbacks.getScrollTop() + e.deltaY))
+        this.callbacks.setScrollTop(newScroll)
+      }
+      if (maxScrollH > 0 && Math.abs(e.deltaX) > 0) {
+        const newScroll = Math.max(0, Math.min(maxScrollH, this.callbacks.getScrollLeft() + e.deltaX))
+        this.callbacks.setScrollLeft(newScroll)
+      }
+      // Also allow shift+wheel for horizontal scroll
+      if (maxScrollH > 0 && e.shiftKey && Math.abs(e.deltaY) > 0) {
+        const newScroll = Math.max(0, Math.min(maxScrollH, this.callbacks.getScrollLeft() + e.deltaY))
+        this.callbacks.setScrollLeft(newScroll)
+      }
       this.callbacks.onRedraw()
     }
 
@@ -86,13 +106,14 @@ export class MatrixInteractionHandler {
         return
       }
 
-      // Identify hovered cell
+      // Identify hovered cell (accounting for horizontal scroll)
       let newHoveredRowIdx: number | null = null
       let newHoveredColIdx: number | null = null
 
+      const scrollLeft = this.callbacks.getScrollLeft()
       if (mx >= gridX && mx < gridX + gridW && my >= gridY && my < gridY + gridH) {
         newHoveredRowIdx = Math.floor((my - gridY + this.callbacks.getScrollTop()) / cellHeight)
-        newHoveredColIdx = Math.floor((mx - gridX) / cellWidth)
+        newHoveredColIdx = Math.floor((mx - gridX + scrollLeft) / cellWidth)
 
         if (newHoveredRowIdx >= totalRows) newHoveredRowIdx = null
         if (newHoveredColIdx >= totalCols) newHoveredColIdx = null
@@ -151,13 +172,23 @@ export class MatrixInteractionHandler {
       const my = e.clientY - rect.top
 
       const specs = this.callbacks.getLayoutSpecs()
-      const { totalRows, gridY, gridX, gridH, gridW, rows, cellHeight } = specs
+      const { totalRows, totalCols, gridY, gridX, gridH, gridW, rows, cols, cellWidth, cellHeight } = specs
+      const scrollLeft = this.callbacks.getScrollLeft()
 
-      if (mx >= gridX && mx < gridX + gridW && my >= gridY && my < gridY + gridH) {
+      // 1. Click on grid cells or row headers -> Row click
+      if (mx >= 0 && mx < gridX + gridW && my >= gridY && my < gridY + gridH) {
         const clickedRow = Math.floor((my - gridY + this.callbacks.getScrollTop()) / cellHeight)
         if (clickedRow >= 0 && clickedRow < totalRows) {
-          const studentName = rows[clickedRow]
-          this.callbacks.onNodeClick(studentName)
+          const rowName = rows[clickedRow]
+          this.callbacks.onRowClick(rowName)
+        }
+      }
+      // 2. Click on column headers -> Column click (accounting for scrollLeft)
+      else if (mx >= gridX && mx < gridX + gridW && my >= 0 && my < gridY) {
+        const clickedCol = Math.floor((mx - gridX + scrollLeft) / cellWidth)
+        if (clickedCol >= 0 && clickedCol < totalCols) {
+          const colName = cols[clickedCol]
+          this.callbacks.onColClick(colName)
         }
       }
     }
@@ -165,13 +196,16 @@ export class MatrixInteractionHandler {
     this.handleTouchStartFn = (e: TouchEvent) => {
       if (e.touches.length !== 1) return
       this.isTouching = true
+      this.touchStartClientX = e.touches[0].clientX
       this.touchStartClientY = e.touches[0].clientY
       this.touchStartScrollTop = this.callbacks.getScrollTop()
+      this.touchStartScrollLeft = this.callbacks.getScrollLeft()
     }
 
     this.handleTouchMoveFn = (e: TouchEvent) => {
-      const maxScroll = this.callbacks.getMaxScrollTop()
-      if (!this.isTouching || e.touches.length !== 1 || maxScroll <= 0) return
+      const maxScrollV = this.callbacks.getMaxScrollTop()
+      const maxScrollH = this.callbacks.getMaxScrollLeft()
+      if (!this.isTouching || e.touches.length !== 1 || (maxScrollV <= 0 && maxScrollH <= 0)) return
       const rect = canvas.getBoundingClientRect()
       const mx = e.touches[0].clientX - rect.left
       const my = e.touches[0].clientY - rect.top
@@ -180,8 +214,20 @@ export class MatrixInteractionHandler {
       if (mx >= gridX && mx < gridX + gridW && my >= gridY && my <= gridY + gridH) {
         e.preventDefault()
         const dy = e.touches[0].clientY - this.touchStartClientY
-        const newScroll = Math.max(0, Math.min(maxScroll, this.touchStartScrollTop - dy))
-        this.callbacks.setScrollTop(newScroll)
+        const dx = e.touches[0].clientX - this.touchStartClientX
+
+        // Vertical scroll
+        if (maxScrollV > 0) {
+          const newScrollV = Math.max(0, Math.min(maxScrollV, this.touchStartScrollTop - dy))
+          this.callbacks.setScrollTop(newScrollV)
+        }
+
+        // Horizontal scroll
+        if (maxScrollH > 0) {
+          const newScrollH = Math.max(0, Math.min(maxScrollH, this.touchStartScrollLeft - dx))
+          this.callbacks.setScrollLeft(newScrollH)
+        }
+
         this.callbacks.onRedraw()
       }
     }

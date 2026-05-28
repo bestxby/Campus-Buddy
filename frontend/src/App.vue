@@ -1,9 +1,17 @@
 <template>
-  <!-- Login overlay (shown when no active user) -->
-  <LoginOverlay v-if="!currentUser" @submitted="onRegistered" />
+  <div v-if="isInitializing" class="global-loading-screen">
+    <div class="spinner"></div>
+    <div class="loading-text">正在初始化系统资源...</div>
+  </div>
+  <template v-else>
+    <!-- Vue Transition for smooth entry/exit of login overlay -->
+    <Transition name="fade" mode="out-in">
+      <!-- Login overlay (shown when showLoginOverlay is true) -->
+      <LoginOverlay v-if="showLoginOverlay" @submitted="onRegistered" />
+    </Transition>
 
-  <!-- Main dashboard -->
-  <div v-else class="dashboard">
+    <!-- Main dashboard (rendered concurrently when currentUser is set to allow split panels to reveal it) -->
+    <div v-if="currentUser" class="dashboard">
     <AppSidebar 
       :width="sidebarWidth" 
       :class="{ 'sidebar-open': sidebarOpen }"
@@ -33,7 +41,7 @@
 
       <div class="content-grid">
         <!-- Welcome screen / Admin Dashboard (no student selected) -->
-        <template v-if="!activeStudent">
+        <div v-show="!activeStudent" class="welcome-screen-wrap" style="width: 100%; height: 100%;">
           <AdminDashboard 
             v-if="currentUserRole === 'admin'" 
             @create-activity="showCreateActivity = true" 
@@ -50,14 +58,14 @@
             <div class="tip-box">
               <strong>💡 D3.js 力导向画布提示：</strong>
               <p>
-                右侧画布将渲染您的专属<b>二步关系子图 (Focal Subgraph)</b>，支持拖拽节点和滚动缩放，悬停节点可高亮连接路径。
+                右侧画布将渲染您的专属<b>二步关系子图 (Focal Subgraph)</b>，支持拖拽节点 and 滚动缩放，悬停节点可高亮连接路径。
               </p>
             </div>
           </div>
-        </template>
+        </div>
 
         <!-- Recommendations panel -->
-        <div v-else class="recommendations fade-in">
+        <div v-show="activeStudent" class="recommendations fade-in">
           <!-- Student Entry: Full-width clickable card to open graph -->
           <div
             v-if="currentUserRole === 'student'"
@@ -108,10 +116,14 @@
       @created="onActivityCreated"
     />
   </div>
+  </template>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
+
+const isInitializing = ref(true)
+const showLoginOverlay = ref(true)
 import LoginOverlay  from '@/components/LoginOverlay.vue'
 import AppSidebar    from '@/components/AppSidebar.vue'
 import RecommendedActivities from '@/components/RecommendedActivities.vue'
@@ -146,13 +158,23 @@ const onActivityCreated = () => {
 }
 
 const onRegistered = () => {
+  showLoginOverlay.value = false
   if (currentUser.value && currentUserRole.value !== 'admin') {
     selectStudent(currentUser.value)
   } else {
     clearSearch()
   }
 }
-const onLogout     = () => clearSearch()
+const onLogout     = () => {
+  clearSearch()
+  showLoginOverlay.value = true
+}
+
+watch(currentUser, (newUser) => {
+  if (!newUser) {
+    showLoginOverlay.value = true
+  }
+})
 
 // Reset update prompt whenever the viewed student changes
 // Enforce student profile lock: if role is student, activeStudent MUST be currentUser
@@ -221,6 +243,11 @@ onMounted(async () => {
   graphAnalyticsService.initialize()
   // updateStats() ensures admin panel stats are populated after restoreSession()
   updateStats()
+  
+  if (currentUser.value) {
+    showLoginOverlay.value = false
+  }
+  isInitializing.value = false
   // selectStudent() is handled automatically by the watch([currentUser, currentUserRole]) above
 })
 </script>

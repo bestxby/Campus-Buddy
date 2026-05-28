@@ -9,6 +9,10 @@ export interface MatrixLayoutSpecs {
   gridH: number
   cellWidth: number
   cellHeight: number
+  /** Total pixel width of all columns (may exceed gridW on mobile) */
+  totalContentWidth: number
+  /** Whether horizontal scrolling is needed */
+  needsHorizontalScroll: boolean
 }
 
 export class MatrixLayoutCalculator {
@@ -62,8 +66,15 @@ export class MatrixLayoutCalculator {
     const totalRows = rows.length
     const totalCols = cols.length
 
-    // Dynamic cell width to span exactly the available grid width
-    const cellWidth = totalCols > 0 ? gridW / totalCols : 20
+    // Dynamic cell width: on narrow screens, enforce a minimum so cells stay readable.
+    // If the natural cell width (gridW / totalCols) is below the minimum, we use the minimum
+    // and allow horizontal scrolling.
+    const MIN_CELL_WIDTH = 28
+    const naturalCellWidth = totalCols > 0 ? gridW / totalCols : 20
+    const cellWidth = Math.max(MIN_CELL_WIDTH, naturalCellWidth)
+
+    const totalContentWidth = totalCols * cellWidth
+    const needsHorizontalScroll = totalContentWidth > gridW
 
     // Dynamic cell height: for interest co-occurrence, make it fit height exactly so no scrolling is needed.
     // Otherwise, use a fixed comfortable height (18px) for long scrollable lists.
@@ -82,7 +93,9 @@ export class MatrixLayoutCalculator {
       gridW,
       gridH,
       cellWidth,
-      cellHeight
+      cellHeight,
+      totalContentWidth,
+      needsHorizontalScroll
     }
   }
 

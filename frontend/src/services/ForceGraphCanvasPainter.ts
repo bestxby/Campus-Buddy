@@ -13,7 +13,12 @@ export class ForceGraphCanvasPainter {
     currentConfig: any,
     hoveredNode: ForceGraphNode | null
   ) {
-    ctx.clearRect(0, 0, width, height)
+    // Clear the absolute backing store of the canvas element
+    ctx.save()
+    ctx.resetTransform()
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    ctx.restore()
+
     ctx.save()
 
     // Apply transform matrix

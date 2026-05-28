@@ -1,3 +1,8 @@
+.global-loading-screen { position: fixed; inset: 0; background-color: var(--bg-dark, #0b0f19); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+.global-loading-screen .spinner { width: 40px; height: 40px; border: 3px solid rgba(6, 182, 212, 0.2); border-top-color: #06b6d4; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px; }
+.global-loading-screen .loading-text { color: #94a3b8; font-size: 13px; letter-spacing: 1px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* Layout */
 .dashboard { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
 .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; padding: 16px 16px 0 16px; }

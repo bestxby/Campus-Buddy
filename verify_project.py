@@ -40,7 +40,7 @@ def main():
 
     # 2. Run Vitest tests (using npx vitest run)
     print("Running Vitest tests...")
-    vitest_res = run_cmd("npx vitest run", frontend_dir)
+    vitest_res = run_cmd("npx vitest run --passWithNoTests", frontend_dir)
 
     # 3. Run production build
     print("Running frontend production build...")

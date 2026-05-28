@@ -12,27 +12,39 @@ export class AdjacencyMatrixPainter {
       gridH: number
       cellWidth: number
       cellHeight: number
+      totalContentWidth: number
+      needsHorizontalScroll: boolean
     },
     matrixMode: string,
     graph: Map<string, Set<string>>,
     activeStudent: string | null,
     scrollTop: number,
     maxScrollTop: number,
+    scrollLeft: number,
+    maxScrollLeft: number,
     isDraggingScrollbar: boolean,
     hoveredRowIdx: number | null,
     hoveredColIdx: number | null,
     scrollbarWidth: number
   ) {
-    const { rows, cols, totalRows, totalCols, gridX, gridY, gridW, gridH, cellWidth, cellHeight } = layoutSpecs
+    const { rows, cols, totalRows, totalCols, gridX, gridY, gridW, gridH, cellWidth, cellHeight, needsHorizontalScroll } = layoutSpecs
+
+    // Reserve space for horizontal scrollbar at bottom if needed
+    const hScrollbarHeight = needsHorizontalScroll ? 14 : 0
+    const effectiveGridH = gridH - hScrollbarHeight
 
     // 1.2 Render Virtualized Matrix Cells
     const startRow = Math.floor(scrollTop / cellHeight)
-    const endRow = Math.min(totalRows, Math.ceil((scrollTop + gridH) / cellHeight))
+    const endRow = Math.min(totalRows, Math.ceil((scrollTop + effectiveGridH) / cellHeight))
+
+    // Horizontal virtualization: only render visible columns
+    const startCol = Math.floor(scrollLeft / cellWidth)
+    const endCol = Math.min(totalCols, Math.ceil((scrollLeft + gridW) / cellWidth))
 
     // 1. Clip Grid Area to prevent cells overflowing above/below the table
     ctx.save()
     ctx.beginPath()
-    ctx.rect(gridX, gridY, gridW, gridH)
+    ctx.rect(gridX, gridY, gridW, effectiveGridH)
     ctx.clip()
 
     // 1.0 Draw Selected Student Row Background Highlight under cells
@@ -54,8 +66,8 @@ export class AdjacencyMatrixPainter {
       ctx.fillRect(gridX, hoverY, gridW, cellHeight)
 
       // Column highlight
-      const hoverX = gridX + hoveredColIdx * cellWidth
-      ctx.fillRect(hoverX, gridY, cellWidth, gridH)
+      const hoverX = gridX + hoveredColIdx * cellWidth - scrollLeft
+      ctx.fillRect(hoverX, gridY, cellWidth, effectiveGridH)
     }
 
     // Pre-calculate max co-occurrence overlap count for normalization in mode 3
@@ -85,9 +97,9 @@ export class AdjacencyMatrixPainter {
       const rowName = rows[r]
       const rowY = gridY + r * cellHeight - scrollTop
 
-      for (let c = 0; c < totalCols; c++) {
+      for (let c = startCol; c < endCol; c++) {
         const colName = cols[c]
-        const cellX = gridX + c * cellWidth
+        const cellX = gridX + c * cellWidth - scrollLeft
 
         let isActive = false
         let cellColor = 'rgba(255, 255, 255, 0.02)'
@@ -151,7 +163,7 @@ export class AdjacencyMatrixPainter {
     ctx.save()
     // Clip row headers container to avoid writing text out of bounds
     ctx.beginPath()
-    ctx.rect(0, gridY, gridX, gridH)
+    ctx.rect(0, gridY, gridX, effectiveGridH)
     ctx.clip()
 
     for (let r = startRow; r < endRow; r++) {
@@ -200,14 +212,14 @@ export class AdjacencyMatrixPainter {
 
     // 4. Draw Column Headers (Rotated 60 degrees to prevent overlapping)
     ctx.save()
-    // Clip col headers container
+    // Clip col headers container — clip to gridW to hide headers scrolled out of view
     ctx.beginPath()
-    ctx.rect(gridX, 0, gridW + scrollbarWidth, gridY)
+    ctx.rect(gridX, 0, gridW, gridY)
     ctx.clip()
 
-    for (let c = 0; c < totalCols; c++) {
+    for (let c = startCol; c < endCol; c++) {
       const colName = cols[c]
-      const colX = gridX + c * cellWidth + cellWidth / 2
+      const colX = gridX + c * cellWidth - scrollLeft + cellWidth / 2
       const isHovered = hoveredColIdx === c
 
       ctx.save()
@@ -230,16 +242,16 @@ export class AdjacencyMatrixPainter {
     }
     ctx.restore()
 
-    // 5. Draw Scrollbar
+    // 5. Draw Vertical Scrollbar
     if (maxScrollTop > 0) {
       const scrollbarX = gridX + gridW
-      const ratio = gridH / (totalRows * cellHeight)
-      const thumbH = Math.max(30, ratio * gridH)
-      const thumbY = gridY + (scrollTop / maxScrollTop) * (gridH - thumbH)
+      const ratio = effectiveGridH / (totalRows * cellHeight)
+      const thumbH = Math.max(30, ratio * effectiveGridH)
+      const thumbY = gridY + (scrollTop / maxScrollTop) * (effectiveGridH - thumbH)
 
       // Scrollbar Track
       ctx.fillStyle = 'rgba(255, 255, 255, 0.01)'
-      ctx.fillRect(scrollbarX, gridY, scrollbarWidth, gridH)
+      ctx.fillRect(scrollbarX, gridY, scrollbarWidth, effectiveGridH)
 
       // Scrollbar Thumb
       ctx.fillStyle = isDraggingScrollbar ? 'rgba(6, 182, 212, 0.5)' : 'rgba(255, 255, 255, 0.08)'
@@ -253,9 +265,31 @@ export class AdjacencyMatrixPainter {
       ctx.stroke()
     }
 
+    // 5b. Draw Horizontal Scrollbar (when content overflows horizontally)
+    if (needsHorizontalScroll && maxScrollLeft > 0) {
+      const hBarY = gridY + effectiveGridH
+      const hBarH = hScrollbarHeight
+      const hThumbRatio = gridW / layoutSpecs.totalContentWidth
+      const hThumbW = Math.max(30, hThumbRatio * gridW)
+      const hThumbX = gridX + (scrollLeft / maxScrollLeft) * (gridW - hThumbW)
+
+      // Track
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.01)'
+      ctx.fillRect(gridX, hBarY, gridW, hBarH)
+
+      // Thumb
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.roundRect(hThumbX, hBarY + 3, hThumbW, hBarH - 6, 4)
+      ctx.fill()
+      ctx.stroke()
+    }
+
     // 6. Draw Grid Border Lines
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
     ctx.lineWidth = 1
-    ctx.strokeRect(gridX, gridY, gridW, gridH)
+    ctx.strokeRect(gridX, gridY, gridW, effectiveGridH)
   }
 }

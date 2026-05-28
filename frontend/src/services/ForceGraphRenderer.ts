@@ -84,20 +84,42 @@ export class ForceGraphRenderer {
     this.canvasElement.setAttribute('data-focal-id', currentFocalId)
 
     const canvas = this.canvasElement
-    const width = canvas.parentElement?.clientWidth || canvas.clientWidth || 900
-    const height = canvas.parentElement?.clientHeight || canvas.clientHeight || 600
+    const parentWidth = canvas.parentElement?.clientWidth
+    const parentHeight = canvas.parentElement?.clientHeight
+
+    // If the parent element exists but is not yet laid out (width/height is 0),
+    // skip redraw to prevent initial visual glitches and redundant canvas resizes.
+    if (canvas.parentElement && (parentWidth === 0 || parentHeight === 0)) {
+      return
+    }
+
+    const width = parentWidth || canvas.clientWidth || 900
+    const height = parentHeight || canvas.clientHeight || 600
 
     const dpi = window.devicePixelRatio || 1
-    canvas.width = width * dpi
-    canvas.height = height * dpi
-    canvas.style.width = `${width}px`
-    canvas.style.height = `${height}px`
+    const targetW = width * dpi
+    const targetH = height * dpi
+
+    const currentW = canvas.width / dpi
+    const currentH = canvas.height / dpi
+    const diffW = Math.abs(currentW - width)
+    const diffH = Math.abs(currentH - height)
+
+    // Only resize canvas if dimensions are uninitialized (0) or have changed significantly (> 30px)
+    // to prevent visual flickering caused by subpixel layout shifts during CSS scale transitions.
+    if (canvas.width === 0 || canvas.height === 0 || diffW > 30 || diffH > 30) {
+      canvas.width = targetW
+      canvas.height = targetH
+      canvas.style.width = `${width}px`
+      canvas.style.height = `${height}px`
+    }
 
     const ctx = canvas.getContext('2d')
     if (!ctx) {
       console.error('[ForceGraphRenderer] Failed to get 2D context')
       return
     }
+    ctx.resetTransform()
     ctx.scale(dpi, dpi)
 
     const { nodes: nodesToDraw, links: linksToDraw } = ForceGraphDataBuilder.build(config)
