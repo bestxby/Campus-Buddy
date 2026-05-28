@@ -17,11 +17,11 @@ export default defineConfig({
     chunkSizeWarningLimit: 100000000,
     cssCodeSplit: false,
     rollupOptions: {
-      inlineDynamicImports: true,
       input: {
         main: resolve(__dirname, 'index.html'),
       },
       output: {
+        inlineDynamicImports: true,
         dir: resolve(__dirname, 'dist-single'),
       },
     },

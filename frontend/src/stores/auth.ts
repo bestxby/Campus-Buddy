@@ -5,21 +5,41 @@ import { AVATAR_OPTIONS, INTEREST_CATEGORIES, DOMAIN_META, ADMIN_NAME } from '@/
 import type { DomainBar, RegForm } from '@/types'
 import { computePersona, hashPassword, NAME_VALIDATION_REGEX } from '@/utils/auth-helpers'
 
+const safeStorage = {
+  getItem(key: string): string | null {
+    try {
+      return localStorage.getItem(key)
+    } catch (e) {
+      return null
+    }
+  },
+  setItem(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value)
+    } catch (e) {}
+  },
+  removeItem(key: string): void {
+    try {
+      localStorage.removeItem(key)
+    } catch (e) {}
+  }
+}
+
 export const useAuthStore = defineStore('auth', () => {
-  // Synchronously initialize state from localStorage to prevent UI flashing (FOUC)
-  const savedUser = localStorage.getItem('campus_buddy_user')
-  const savedRole = localStorage.getItem('campus_buddy_role')
+  // Synchronously initialize state from safeStorage to prevent UI flashing (FOUC)
+  const savedUser = safeStorage.getItem('campus_buddy_user')
+  const savedRole = safeStorage.getItem('campus_buddy_role')
   
   const currentUser = ref<string | null>(savedUser)
   const currentUserRole = ref<'student' | 'admin' | null>(
     (savedRole === 'admin' || savedRole === 'student') ? savedRole : null
   )
-  const currentUserAvatar = ref<string>(localStorage.getItem('campus_buddy_avatar') ?? AVATAR_OPTIONS[0])
-  const userPersona = ref<string>(localStorage.getItem('campus_buddy_persona') ?? '未知')
+  const currentUserAvatar = ref<string>(safeStorage.getItem('campus_buddy_avatar') ?? AVATAR_OPTIONS[0])
+  const userPersona = ref<string>(safeStorage.getItem('campus_buddy_persona') ?? '未知')
 
   let initialSignups: string[] = []
   try {
-    const rawSignups = localStorage.getItem('campus_buddy_signups')
+    const rawSignups = safeStorage.getItem('campus_buddy_signups')
     if (rawSignups) {
       initialSignups = JSON.parse(rawSignups)
       if (!Array.isArray(initialSignups)) initialSignups = []
@@ -27,17 +47,17 @@ export const useAuthStore = defineStore('auth', () => {
   } catch (e) {}
   
   const signedUpActivities = ref<string[]>(initialSignups)
-  const isPrivateMode = ref<boolean>(localStorage.getItem('campus_buddy_private_mode') === 'true')
-  const isSocialMode = ref<boolean>(localStorage.getItem('campus_buddy_social_mode') === 'true')
+  const isPrivateMode = ref<boolean>(safeStorage.getItem('campus_buddy_private_mode') === 'true')
+  const isSocialMode = ref<boolean>(safeStorage.getItem('campus_buddy_social_mode') === 'true')
 
 
   function togglePrivacyMode(): void {
     isPrivateMode.value = !isPrivateMode.value
-    localStorage.setItem('campus_buddy_private_mode', isPrivateMode.value ? 'true' : 'false')
+    safeStorage.setItem('campus_buddy_private_mode', isPrivateMode.value ? 'true' : 'false')
     
     if (isPrivateMode.value && isSocialMode.value) {
       isSocialMode.value = false
-      localStorage.setItem('campus_buddy_social_mode', 'false')
+      safeStorage.setItem('campus_buddy_social_mode', 'false')
       const graphStore = useGraphStore()
       if (currentUser.value) {
         graphStore.setStudentSocial(currentUser.value, false)
@@ -52,11 +72,11 @@ export const useAuthStore = defineStore('auth', () => {
 
   function toggleSocialMode(): void {
     isSocialMode.value = !isSocialMode.value
-    localStorage.setItem('campus_buddy_social_mode', isSocialMode.value ? 'true' : 'false')
+    safeStorage.setItem('campus_buddy_social_mode', isSocialMode.value ? 'true' : 'false')
 
     if (isSocialMode.value && isPrivateMode.value) {
       isPrivateMode.value = false
-      localStorage.setItem('campus_buddy_private_mode', 'false')
+      safeStorage.setItem('campus_buddy_private_mode', 'false')
       const graphStore = useGraphStore()
       if (currentUser.value) {
         graphStore.setStudentPrivacy(currentUser.value, false)
@@ -129,13 +149,13 @@ export const useAuthStore = defineStore('auth', () => {
     isPrivateMode.value = false
     isSocialMode.value = false
 
-    localStorage.setItem('campus_buddy_user',      name)
-    localStorage.setItem('campus_buddy_role',      'student')
-    localStorage.setItem('campus_buddy_avatar',    regForm.avatar)
-    localStorage.setItem('campus_buddy_persona',   userPersona.value)
-    localStorage.setItem('campus_buddy_interests', JSON.stringify(regForm.selectedInterests))
-    localStorage.setItem('campus_buddy_private_mode', 'false')
-    localStorage.setItem('campus_buddy_social_mode', 'false')
+    safeStorage.setItem('campus_buddy_user',      name)
+    safeStorage.setItem('campus_buddy_role',      'student')
+    safeStorage.setItem('campus_buddy_avatar',    regForm.avatar)
+    safeStorage.setItem('campus_buddy_persona',   userPersona.value)
+    safeStorage.setItem('campus_buddy_interests', JSON.stringify(regForm.selectedInterests))
+    safeStorage.setItem('campus_buddy_private_mode', 'false')
+    safeStorage.setItem('campus_buddy_social_mode', 'false')
 
     const graphStore = useGraphStore()
     const sNode = `student:${name}`
@@ -154,11 +174,11 @@ export const useAuthStore = defineStore('auth', () => {
     currentUserAvatar.value = '🤖'
     userPersona.value = ADMIN_NAME
 
-    localStorage.setItem('campus_buddy_user',      ADMIN_NAME)
-    localStorage.setItem('campus_buddy_role',      'admin')
-    localStorage.setItem('campus_buddy_avatar',    '🤖')
-    localStorage.setItem('campus_buddy_persona',   userPersona.value)
-    localStorage.setItem('campus_buddy_interests', JSON.stringify([]))
+    safeStorage.setItem('campus_buddy_user',      ADMIN_NAME)
+    safeStorage.setItem('campus_buddy_role',      'admin')
+    safeStorage.setItem('campus_buddy_avatar',    '🤖')
+    safeStorage.setItem('campus_buddy_persona',   userPersona.value)
+    safeStorage.setItem('campus_buddy_interests', JSON.stringify([]))
 
     const graphStore = useGraphStore()
     graphStore.updateStats()
@@ -166,20 +186,20 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function restoreSession(): void {
-    const savedUser = localStorage.getItem('campus_buddy_user')
+    const savedUser = safeStorage.getItem('campus_buddy_user')
     if (!savedUser) return
 
     currentUser.value = savedUser
-    const savedRole = localStorage.getItem('campus_buddy_role')
+    const savedRole = safeStorage.getItem('campus_buddy_role')
     currentUserRole.value = (savedRole === 'admin' || savedRole === 'student') ? savedRole : 'student'
-    currentUserAvatar.value = localStorage.getItem('campus_buddy_avatar') ?? '🧭'
-    userPersona.value = localStorage.getItem('campus_buddy_persona') ?? '普通同学'
+    currentUserAvatar.value = safeStorage.getItem('campus_buddy_avatar') ?? '🧭'
+    userPersona.value = safeStorage.getItem('campus_buddy_persona') ?? '普通同学'
 
     const graphStore = useGraphStore()
     
     let savedInterests: string[] = []
     try {
-      savedInterests = JSON.parse(localStorage.getItem('campus_buddy_interests') ?? '[]')
+      savedInterests = JSON.parse(safeStorage.getItem('campus_buddy_interests') ?? '[]')
       if (!Array.isArray(savedInterests)) savedInterests = []
     } catch (e) {
       console.warn('[AuthStore] Failed to parse saved interests from localStorage, falling back to empty list.', e)
@@ -192,7 +212,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     let savedSignups: string[] = []
     try {
-      savedSignups = JSON.parse(localStorage.getItem('campus_buddy_signups') ?? '[]')
+      savedSignups = JSON.parse(safeStorage.getItem('campus_buddy_signups') ?? '[]')
       if (!Array.isArray(savedSignups)) savedSignups = []
     } catch (e) {
       console.warn('[AuthStore] Failed to parse saved signups from localStorage, falling back to empty list.', e)
@@ -203,23 +223,25 @@ export const useAuthStore = defineStore('auth', () => {
       graphStore.addEdge(sNode, `activity:${act}`)
     }
 
-    isPrivateMode.value = localStorage.getItem('campus_buddy_private_mode') === 'true'
+    isPrivateMode.value = safeStorage.getItem('campus_buddy_private_mode') === 'true'
     if (isPrivateMode.value) {
       graphStore.setStudentPrivacy(savedUser, true)
     }
 
-    isSocialMode.value = localStorage.getItem('campus_buddy_social_mode') === 'true'
+    isSocialMode.value = safeStorage.getItem('campus_buddy_social_mode') === 'true'
     if (isSocialMode.value) {
       graphStore.setStudentSocial(savedUser, true)
     }
   }
 
   async function logout(): Promise<void> {
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith('campus_buddy_')) {
-        localStorage.removeItem(key)
-      }
-    })
+    try {
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('campus_buddy_')) {
+          localStorage.removeItem(key)
+        }
+      })
+    } catch (e) {}
     currentUser.value = null
     currentUserRole.value = null
     currentUserAvatar.value = AVATAR_OPTIONS[0]
@@ -243,7 +265,7 @@ export const useAuthStore = defineStore('auth', () => {
     graphStore.addEdge(sNode, `activity:${activity}`)
     if (!signedUpActivities.value.includes(activity)) {
       signedUpActivities.value.push(activity)
-      localStorage.setItem('campus_buddy_signups', JSON.stringify(signedUpActivities.value))
+      safeStorage.setItem('campus_buddy_signups', JSON.stringify(signedUpActivities.value))
     }
     graphStore.updateStats()
   }
@@ -262,7 +284,7 @@ export const useAuthStore = defineStore('auth', () => {
     const idx = signedUpActivities.value.indexOf(activity)
     if (idx > -1) {
       signedUpActivities.value.splice(idx, 1)
-      localStorage.setItem('campus_buddy_signups', JSON.stringify(signedUpActivities.value))
+      safeStorage.setItem('campus_buddy_signups', JSON.stringify(signedUpActivities.value))
     }
     graphStore.updateStats()
   }
