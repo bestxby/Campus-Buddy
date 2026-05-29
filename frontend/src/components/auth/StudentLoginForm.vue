@@ -97,7 +97,7 @@
     </div>
 
     <div v-if="regForm.name.trim() && !isNameValid" class="warning-text">
-      ⚠️ 姓名格式不合法：只允许中文、英文字母和空格/连字符（长度为2-20字）！
+      ⚠️ 姓名格式不合法：只允许中文、英文字母、数字和空格/连字符（长度为2-20字）！
     </div>
 
     <div v-if="regForm.selectedInterests.length === 0" class="warning-text">
@@ -120,6 +120,7 @@ import { computed } from 'vue'
 import { previewPersona, previewPersonaClass, toggleInterestTag } from '@/composables/useAuth'
 import { useAuthStore } from '@/stores/auth'
 import { AVATAR_OPTIONS, INTEREST_CATEGORIES } from '@/constants/interests'
+import { NAME_VALIDATION_REGEX } from '@/utils/auth-helpers'
 
 const authStore = useAuthStore()
 const regForm = authStore.regForm
@@ -133,8 +134,7 @@ const emit = defineEmits<{
 const isNameValid = computed(() => {
   const name = regForm.name.trim()
   if (!name) return false
-  const nameRegex = /^[\u4e00-\u9fa5a-zA-Z\s-]{2,20}$/
-  return nameRegex.test(name)
+  return NAME_VALIDATION_REGEX.test(name)
 })
 
 const handleStudentSubmit = () => {
