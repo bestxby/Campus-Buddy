@@ -5,6 +5,25 @@ import { GraphAlgorithms, nodeKey } from '@/utils/graph-algorithms'
 import { ADMIN_NAME, addInterestTagToTaxonomy } from '@/constants/interests'
 import { regenerateSessionSeed } from '@/utils/graph-metrics'
 
+const safeStorage = {
+  getItem(key: string): string | null {
+    try {
+      return localStorage.getItem(key)
+    } catch (e) {
+      return null
+    }
+  },
+  setItem(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value)
+    } catch (e) {}
+  },
+  removeItem(key: string): void {
+    try {
+      localStorage.removeItem(key)
+    } catch (e) {}
+  }
+}
 
 function createSeededRandom(seed: number) {
   let h = seed | 0;
@@ -211,13 +230,72 @@ export const useGraphStore = defineStore('graph', () => {
         }
       }
 
+      // Load custom interest taxonomy additions
+      let customInterests: { name: string, domain: 'sports'|'arts'|'tech'|'social' }[] = []
+      try {
+        customInterests = JSON.parse(safeStorage.getItem('campus_buddy_custom_interests') || '[]')
+      } catch (e) {}
+      for (const item of customInterests) {
+        addInterestTagToTaxonomy(item.name, item.domain)
+        const interestNode = `interest:${item.name}`
+        if (!graph.value.has(interestNode)) {
+          graph.value.set(interestNode, new Set())
+        }
+      }
+
+      // Load custom activities
+      let customActivities: { name: string, interests: string[] }[] = []
+      try {
+        customActivities = JSON.parse(safeStorage.getItem('campus_buddy_custom_activities') || '[]')
+      } catch (e) {}
+      for (const item of customActivities) {
+        addActivity(item.name, item.interests, false)
+      }
+
+      // Remove deleted default activities
+      let deletedActivities: string[] = []
+      try {
+        deletedActivities = JSON.parse(safeStorage.getItem('campus_buddy_deleted_activities') || '[]')
+      } catch (e) {}
+      for (const name of deletedActivities) {
+        deleteActivity(name, false)
+      }
+
+      // Load registered students
+      let registeredStudents: { name: string, avatar: string, interests: string[], signups: string[], privateMode: boolean, socialMode: boolean }[] = []
+      try {
+        registeredStudents = JSON.parse(safeStorage.getItem('campus_buddy_registered_students') || '[]')
+      } catch (e) {}
+      for (const student of registeredStudents) {
+        const sNode = `student:${student.name}`
+        if (!graph.value.has(sNode)) {
+          graph.value.set(sNode, new Set())
+        }
+        for (const interest of student.interests) {
+          addEdge(sNode, `interest:${interest}`)
+        }
+        for (const act of student.signups) {
+          addEdge(sNode, `activity:${act}`)
+        }
+        if (student.privateMode) {
+          privateStudents.value.add(student.name)
+        } else {
+          privateStudents.value.delete(student.name)
+        }
+        if (student.socialMode) {
+          socialStudents.value.add(student.name)
+        } else {
+          socialStudents.value.delete(student.name)
+        }
+      }
+
       updateStats()
     } catch (err) {
       console.error('[GraphStore] Failed to load graph data:', err)
     }
   }
 
-  function addActivity(name: string, interests: string[]): void {
+  function addActivity(name: string, interests: string[], persist = true): void {
     const actNode = `activity:${name}`
     if (!graph.value.has(actNode)) {
       graph.value.set(actNode, new Set())
@@ -225,10 +303,22 @@ export const useGraphStore = defineStore('graph', () => {
     for (const interest of interests) {
       addEdge(actNode, `interest:${interest}`)
     }
+    if (persist) {
+      try {
+        const custom = JSON.parse(safeStorage.getItem('campus_buddy_custom_activities') || '[]')
+        if (!custom.some((a: any) => a.name === name)) {
+          custom.push({ name, interests })
+          safeStorage.setItem('campus_buddy_custom_activities', JSON.stringify(custom))
+        }
+        const deleted = JSON.parse(safeStorage.getItem('campus_buddy_deleted_activities') || '[]')
+        const updatedDeleted = deleted.filter((n: string) => n !== name)
+        safeStorage.setItem('campus_buddy_deleted_activities', JSON.stringify(updatedDeleted))
+      } catch (e) {}
+    }
     updateStats()
   }
 
-  function deleteActivity(name: string): void {
+  function deleteActivity(name: string, persist = true): void {
     const actNode = `activity:${name}`
     if (!graph.value.has(actNode)) return
     const neighbors = graph.value.get(actNode) ?? new Set()
@@ -239,15 +329,40 @@ export const useGraphStore = defineStore('graph', () => {
       }
     }
     graph.value.delete(actNode)
+    if (persist) {
+      try {
+        const custom = JSON.parse(safeStorage.getItem('campus_buddy_custom_activities') || '[]')
+        const isCustom = custom.some((a: any) => a.name === name)
+        if (isCustom) {
+          const updated = custom.filter((a: any) => a.name !== name)
+          safeStorage.setItem('campus_buddy_custom_activities', JSON.stringify(updated))
+        } else {
+          const deleted = JSON.parse(safeStorage.getItem('campus_buddy_deleted_activities') || '[]')
+          if (!deleted.includes(name)) {
+            deleted.push(name)
+            safeStorage.setItem('campus_buddy_deleted_activities', JSON.stringify(deleted))
+          }
+        }
+      } catch (e) {}
+    }
     updateStats()
   }
 
-  function addInterestNode(name: string, domain: 'sports' | 'arts' | 'tech' | 'social'): void {
+  function addInterestNode(name: string, domain: 'sports' | 'arts' | 'tech' | 'social', persist = true): void {
     const interestNode = `interest:${name}`
     if (!graph.value.has(interestNode)) {
       graph.value.set(interestNode, new Set())
     }
     addInterestTagToTaxonomy(name, domain)
+    if (persist) {
+      try {
+        const custom = JSON.parse(safeStorage.getItem('campus_buddy_custom_interests') || '[]')
+        if (!custom.some((i: any) => i.name === name)) {
+          custom.push({ name, domain })
+          safeStorage.setItem('campus_buddy_custom_interests', JSON.stringify(custom))
+        }
+      } catch (e) {}
+    }
     updateStats()
   }
 

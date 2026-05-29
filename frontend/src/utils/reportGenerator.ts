@@ -142,7 +142,8 @@ function computeAdminDiagnosticData(name: string, useHtmlMarkup: boolean): Admin
         const kind = k.substring(0, colonIdx)
         const label = k.substring(colonIdx + 1)
         const icon = kind === 'student' ? '👤' : (kind === 'interest' ? '🎯' : '🎉')
-        return `${icon}${label}`
+        const safeLabel = useHtmlMarkup ? escapeHtml(label) : label
+        return `${icon}${safeLabel}`
       })
       hubPathStr = elements.join(' ➔ ')
     } else {
