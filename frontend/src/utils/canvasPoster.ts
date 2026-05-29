@@ -29,13 +29,13 @@ export function drawAndDownloadPng(
   persona: string,
   getSharedInterest: (name: string, actName: string, type: 'activity' | 'student') => string
 ): void {
-  // Poster Size (Ultra High-Res 2400x3600)
+  // Poster Size (4K Ultra-HD 3600x5400)
   const canvas = document.createElement('canvas')
-  canvas.width = 2400
-  canvas.height = 3600
+  canvas.width = 3600
+  canvas.height = 5400
   const ctx = canvas.getContext('2d')
   if (!ctx) return
-  ctx.scale(2, 2)
+  ctx.scale(3, 3)
   ctx.imageSmoothingEnabled = true
   ctx.imageSmoothingQuality = 'high'
 
