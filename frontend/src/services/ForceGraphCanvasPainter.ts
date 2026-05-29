@@ -241,15 +241,8 @@ export class ForceGraphCanvasPainter {
       const inPath = pathResult && pathResult.path.includes(d.id)
       const isHovered = hoveredNode && d.id === hoveredNode.id
 
-      // LOD visibility rules:
-      // - Interest and Activity labels are always shown.
-      // - Student labels are only shown when zoomed in (scale >= 1.3), or if they are focal/hovered/part of path/connected to hover.
+      // Student, Interest, and Activity labels are always shown directly for immediate visibility.
       let showLabel = true
-      if (d.type === 'student') {
-        showLabel = (transform.k >= 1.3) || isFocal || isHovered || (pathResult && inPath) || (isFaded && connectedNodeIds.has(d.id))
-      }
-
-      if (!showLabel) continue
 
       const dx = isFocal ? 26 : d.type === 'interest' ? 18 : 14
 

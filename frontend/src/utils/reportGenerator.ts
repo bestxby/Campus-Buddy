@@ -973,6 +973,38 @@ export function generateAdminHtmlReport(
       float: right;
       font-weight: 600;
     }
+    .diag-card {
+      border-color: #ffb74d !important;
+      background: rgba(255, 183, 77, 0.04) !important;
+    }
+    .diag-card h2 {
+      color: #ffb74d !important;
+      border-color: rgba(255, 183, 77, 0.15) !important;
+    }
+    .diag-note-box, .diag-status-box {
+      margin-top: 12px;
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+    .diag-note-box {
+      margin-top: 18px;
+    }
+    .path-container {
+      padding: 12px;
+      background: rgba(0,0,0,0.25);
+      border-left: 3px solid #ffb74d;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #e2e8f0;
+      font-family: monospace;
+      overflow-x: auto;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
@@ -983,8 +1015,8 @@ export function generateAdminHtmlReport(
     </div>
 
     <!-- Diagnostic Panel -->
-    <div class="card" style="border-color: #ffb74d; background: rgba(255, 183, 77, 0.04);">
-      <h2 style="color: #ffb74d; border-color: rgba(255, 183, 77, 0.15)">🧭 校园社交定位与分析指标</h2>
+    <div class="card diag-card">
+      <h2>🧭 校园社交定位与分析指标</h2>
       <div class="diag-grid">
         <div class="diag-item-cell">
           <strong>网络位置定位</strong>
@@ -1003,10 +1035,10 @@ export function generateAdminHtmlReport(
           <span>${d.compPct}% (共 ${d.componentSize} 人)</span>
         </div>
       </div>
-      <div style="margin-top: 18px; padding: 12px; background: rgba(15, 23, 42, 0.5); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; line-height: 1.5; color: #cbd5e1;">
+      <div class="diag-note-box">
         <strong>分析建议：</strong>${d.diagnosisNote}
       </div>
-      <div style="margin-top: 12px; padding: 12px; background: rgba(15, 23, 42, 0.5); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; line-height: 1.5; color: #cbd5e1;">
+      <div class="diag-status-box">
         <strong>连通状态：</strong>${d.communityDiagnosis}
       </div>
     </div>
@@ -1014,7 +1046,7 @@ export function generateAdminHtmlReport(
     <!-- Relationship Path to Hub -->
     <div class="card">
       <h2>🔗 与全校核心社交人物的关联路径</h2>
-      <div style="padding: 12px; background: rgba(0,0,0,0.25); border-left: 3px solid #ffb74d; border-radius: 6px; font-size: 13px; color: #e2e8f0; font-family: monospace; overflow-x: auto; line-height: 1.4;">
+      <div class="path-container">
         ${d.hubPathStr}
       </div>
       <p style="font-size: 11px; color: #64748b; margin-top: 6px; margin-bottom: 0;">* 注：路径通过广度优先搜索 (BFS) 遍历，已自动避开途中开启了隐私保护模式的同学节点。</p>

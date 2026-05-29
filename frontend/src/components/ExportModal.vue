@@ -234,6 +234,7 @@ const exportPdf = () => {
   if (!iframe) return
 
   const htmlContent = runHtmlGeneration()
+  const primaryThemeColor = props.isAdminMode ? '#ffb74d' : '#0ea5e9'
   
   const printStyles = `
     <style>
@@ -253,16 +254,18 @@ const exportPdf = () => {
         .header {
           background: #ffffff !important;
           border: 1px solid #e2e8f0 !important;
+          border-top: 4px solid ${primaryThemeColor} !important;
           border-radius: 12px !important;
-          padding: 20px 24px !important;
+          padding: 24px 30px !important;
           box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
-          margin-bottom: 20px !important;
+          margin-bottom: 24px !important;
         }
         .header h1 {
           color: #0f172a !important;
           font-size: 22px !important;
           font-weight: 800 !important;
           margin-bottom: 6px !important;
+          margin-top: 0 !important;
         }
         .header p {
           color: #64748b !important;
@@ -272,8 +275,8 @@ const exportPdf = () => {
           background: #ffffff !important;
           border: 1px solid #e2e8f0 !important;
           border-radius: 12px !important;
-          padding: 20px 24px !important;
-          margin-bottom: 20px !important;
+          padding: 24px 30px !important;
+          margin-bottom: 24px !important;
           box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
           page-break-inside: avoid !important;
         }
@@ -353,13 +356,41 @@ const exportPdf = () => {
           display: none !important;
         }
         #interactive-canvas {
-          background-color: #f8fafc !important;
+          background-color: #ffffff !important;
           border: 1px solid #e2e8f0 !important;
           border-radius: 12px !important;
           max-width: 100% !important;
           height: auto !important;
           display: block !important;
           margin: 0 auto !important;
+        }
+        .diag-card {
+          border-color: #ffb74d !important;
+          background-color: #fffbeb !important;
+        }
+        .diag-card h2 {
+          color: #b45309 !important;
+          border-bottom: 1px solid #fde68a !important;
+        }
+        .diag-item-cell {
+          border-bottom: 1px solid #f3f4f6 !important;
+        }
+        .diag-item-cell strong {
+          color: #4b5563 !important;
+        }
+        .diag-item-cell span {
+          color: #111827 !important;
+        }
+        .diag-note-box, .diag-status-box {
+          background-color: #fffdf5 !important;
+          border: 1px solid #fde68a !important;
+          color: #1f2937 !important;
+        }
+        .path-container {
+          background-color: #f9fafb !important;
+          border: 1px solid #e5e7eb !important;
+          border-left: 4px solid #ffb74d !important;
+          color: #1f2937 !important;
         }
       }
     </style>
