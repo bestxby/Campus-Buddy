@@ -12,10 +12,10 @@
       <!-- Header -->
       <div class="export-modal-header">
         <h3>
-          <span class="export-header-glow">🧭</span>
-          导出个性化匹配与方向推荐报告
+          <span class="export-header-glow">{{ isAdminMode ? '📊' : '🧭' }}</span>
+          {{ isAdminMode ? '导出专业级社交诊断与学术匹配报告' : '导出个性化匹配与方向推荐报告' }}
         </h3>
-        <p>支持将您的专属画像、活动匹配路径、相似搭子及社区拓扑指标一键保存至本地</p>
+        <p>{{ isAdminMode ? '包含全局网络中心度分析、社群归属占比、搭子推荐及最密连通分量指标诊断' : '支持将您的专属画像、活动匹配路径、相似搭子及社区拓扑指标一键保存至本地' }}</p>
       </div>
 
       <!-- Options -->
@@ -34,8 +34,8 @@
             </svg>
           </div>
           <div class="export-option-info">
-            <span class="export-option-title">Markdown 文档 (.md)</span>
-            <span class="export-option-desc">便于导入 Obsidian 或 Notion 知识库，轻量纯文本</span>
+            <span class="export-option-title">Markdown 诊断报告 (.md)</span>
+            <span class="export-option-desc">{{ isAdminMode ? '包含该生中心度诊断、连通社群归属以及隐私关系链路径' : '便于导入 Obsidian 或 Notion 知识库，轻量纯文本' }}</span>
           </div>
         </div>
 
@@ -50,7 +50,7 @@
           </div>
           <div class="export-option-info">
             <span class="export-option-title">离线 HTML 网页 (.html)</span>
-            <span class="export-option-desc">包含苹果风卡片式排版与色彩设计，支持双击离线浏览</span>
+            <span class="export-option-desc">{{ isAdminMode ? '集成全局网络拓扑对比、介数中心度统计及交互图谱' : '包含苹果风卡片式排版与色彩设计，支持双击离线浏览' }}</span>
           </div>
         </div>
 
@@ -67,7 +67,7 @@
           </div>
           <div class="export-option-info">
             <span class="export-option-title">学术 PDF 报告 (.pdf)</span>
-            <span class="export-option-desc">高对比度分页排版，自动调起浏览器打印，完美输出为PDF文件</span>
+            <span class="export-option-desc">{{ isAdminMode ? '专业级网络诊断报告排版，高对比度双栏学术样式' : '高对比度分页排版，自动调起浏览器打印，完美输出为PDF文件' }}</span>
           </div>
         </div>
 
@@ -83,8 +83,8 @@
             </svg>
           </div>
           <div class="export-option-info">
-            <span class="export-option-title">精美分享海报 (.png)</span>
-            <span class="export-option-desc">生成极具科技感的立体点云匹配海报，适合朋友圈及群分享</span>
+            <span class="export-option-title">专业级分享海报 (.png)</span>
+            <span class="export-option-desc">{{ isAdminMode ? '生成高对比度诊断海报，包含网络位置及关键路径诊断分析' : '生成极具科技感的立体点云匹配海报，适合朋友圈及群分享' }}</span>
           </div>
         </div>
       </div>
@@ -100,11 +100,20 @@ import { ref } from 'vue'
 import { currentUser, userInterestTags, userPersona } from '@/composables/useAuth'
 import { recommendations } from '@/composables/useRecommendations'
 import { useRecommendationStore } from '@/stores/recommendation'
-import { generateMarkdownReport, generateHtmlReport } from '@/utils/reportGenerator'
+import { useGraphStore } from '@/stores/graph'
+import { computePersona } from '@/utils/auth-helpers'
+import { 
+  generateMarkdownReport, 
+  generateHtmlReport, 
+  generateAdminMarkdownReport, 
+  generateAdminHtmlReport 
+} from '@/utils/reportGenerator'
 import { drawAndDownloadPng } from '@/utils/canvasPoster'
 
-defineProps<{
+const props = defineProps<{
   visible: boolean
+  isAdminMode?: boolean
+  studentName?: string
 }>()
 
 const emit = defineEmits<{
@@ -117,6 +126,33 @@ const close = () => {
   emit('close')
 }
 
+// Helpers to get target student details dynamically
+const getTargetStudentName = () => {
+  return props.studentName || currentUser.value || ''
+}
+
+const getTargetStudentInterests = () => {
+  if (props.isAdminMode && props.studentName) {
+    const sNode = `student:${props.studentName}`
+    try {
+      const graphStore = useGraphStore()
+      return Array.from(graphStore.graph.get(sNode) ?? [])
+        .filter(n => n.startsWith('interest:'))
+        .map(n => n.replace('interest:', ''))
+    } catch (e) {
+      return []
+    }
+  }
+  return userInterestTags.value
+}
+
+const getTargetStudentPersona = () => {
+  if (props.isAdminMode && props.studentName) {
+    return computePersona(getTargetStudentInterests())
+  }
+  return userPersona.value || '校园探索者'
+}
+
 // Helper to bridge store method to report generator
 const getSharedInterestCallback = (name: string, targetName: string, type: 'activity' | 'student') => {
   const recStore = useRecommendationStore()
@@ -125,21 +161,29 @@ const getSharedInterestCallback = (name: string, targetName: string, type: 'acti
 
 // ─── 1. Run Report Generators with Current State ───────────────────────────
 const runMarkdownGeneration = () => {
-  const name = currentUser.value
+  const name = getTargetStudentName()
   if (!name) return ''
-  const userInterests = userInterestTags.value
+  const interests = getTargetStudentInterests()
   const acts = recommendations.value.activities
   const buddiesList = recommendations.value.buddies.slice(0, 10)
-  return generateMarkdownReport(name, userInterests, acts, buddiesList, getSharedInterestCallback)
+  
+  if (props.isAdminMode) {
+    return generateAdminMarkdownReport(name, interests, acts, buddiesList, getSharedInterestCallback)
+  }
+  return generateMarkdownReport(name, interests, acts, buddiesList, getSharedInterestCallback)
 }
 
 const runHtmlGeneration = () => {
-  const name = currentUser.value
+  const name = getTargetStudentName()
   if (!name) return ''
-  const userInterests = userInterestTags.value
+  const interests = getTargetStudentInterests()
   const acts = recommendations.value.activities
   const buddiesList = recommendations.value.buddies.slice(0, 10)
-  return generateHtmlReport(name, userInterests, acts, buddiesList, getSharedInterestCallback)
+  
+  if (props.isAdminMode) {
+    return generateAdminHtmlReport(name, interests, acts, buddiesList, getSharedInterestCallback)
+  }
+  return generateHtmlReport(name, interests, acts, buddiesList, getSharedInterestCallback)
 }
 
 // ─── 2. Export Actions ──────────────────────────────────────────────────────
@@ -151,7 +195,12 @@ const exportMarkdown = () => {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.setAttribute('download', `${currentUser.value}_校园活动搭子匹配推荐报告.md`)
+  
+  const filename = props.isAdminMode 
+    ? `${getTargetStudentName()}_专业级社交诊断与学术匹配报告.md`
+    : `${getTargetStudentName()}_校园活动搭子匹配推荐报告.md`
+    
+  link.setAttribute('download', filename)
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -166,7 +215,12 @@ const exportHtml = () => {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.setAttribute('download', `${currentUser.value}_校园活动搭子匹配推荐报告.html`)
+  
+  const filename = props.isAdminMode 
+    ? `${getTargetStudentName()}_专业级社交诊断与学术匹配报告.html`
+    : `${getTargetStudentName()}_校园活动搭子匹配推荐报告.html`
+    
+  link.setAttribute('download', filename)
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -174,7 +228,7 @@ const exportHtml = () => {
 }
 
 const exportPdf = () => {
-  const name = currentUser.value
+  const name = getTargetStudentName()
   if (!name) return
 
   const iframe = printIframeRef.value
@@ -232,6 +286,9 @@ const exportPdf = () => {
           padding-bottom: 10px !important;
           margin-top: 0 !important;
           margin-bottom: 15px !important;
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
         .tag {
           border: 1px solid #e2e8f0 !important;
@@ -327,13 +384,13 @@ const exportPdf = () => {
 }
 
 const exportPng = () => {
-  const name = currentUser.value
+  const name = getTargetStudentName()
   if (!name) return
 
-  const userInterests = userInterestTags.value
+  const userInterests = getTargetStudentInterests()
   const acts = recommendations.value.activities
   const buddiesList = recommendations.value.buddies.slice(0, 10)
-  const persona = userPersona.value || '校园探索者'
+  const persona = getTargetStudentPersona()
 
   drawAndDownloadPng(
     name,
@@ -341,7 +398,8 @@ const exportPng = () => {
     acts,
     buddiesList,
     persona,
-    getSharedInterestCallback
+    getSharedInterestCallback,
+    props.isAdminMode
   )
 }
 </script>

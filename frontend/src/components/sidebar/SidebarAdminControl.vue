@@ -141,22 +141,44 @@
             </div>
           </div>
           <div class="selected-buttons-row">
-            <button @click="triggerOpenIndividualGraph" class="btn btn-xs btn-secondary glow-cyan" style="display: flex; align-items: center; gap: 4px;">
-              <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-              </svg>
-              查看拓扑图
-            </button>
+            <div style="display: flex; gap: 6px;">
+              <button @click="triggerOpenIndividualGraph" class="btn btn-xs btn-secondary glow-cyan" style="display: flex; align-items: center; gap: 4px;">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                查看拓扑图
+              </button>
+              <button @click="isExportModalVisible = true" class="btn btn-xs btn-primary glow-orange" style="display: flex; align-items: center; gap: 4px;">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                导出诊断报告
+              </button>
+            </div>
             <button @click="clearSearch" class="btn-text btn-xs">清除</button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Export Modal Overlay for Admin Mode -->
+    <ExportModal 
+      :visible="isExportModalVisible" 
+      :isAdminMode="true" 
+      :studentName="activeStudent || ''" 
+      @close="isExportModalVisible = false" 
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import ExportModal from '@/components/ExportModal.vue'
 import { loadGraphData } from '@/composables/useGraph'
+
+const isExportModalVisible = ref(false)
 import { searchQuery, suggestions, onSearchInput, selectStudent, activeStudent, clearSearch } from '@/composables/useRecommendations'
 import { addLog } from '@/composables/useLogs'
 
