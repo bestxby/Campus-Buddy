@@ -24,8 +24,11 @@ export class MatrixLayoutCalculator {
     scrollbarWidth: number
   ): MatrixLayoutSpecs {
     const isCooccurrence = matrixMode === 'interest-cooccurrence'
-    const rowHeaderWidth = isCooccurrence ? 115 : 75
-    const rightMargin = isCooccurrence ? 0 : 30
+    const isMobile = canvasWidth < 768
+    const rowHeaderWidth = isCooccurrence 
+      ? (isMobile ? 65 : 85) 
+      : (isMobile ? 45 : 65)
+    const rightMargin = isCooccurrence ? 0 : (isMobile ? 5 : 15)
 
     const gridX = rowHeaderWidth
     const colHeaderHeight = (matrixMode === 'student-interest' || matrixMode === 'interest-cooccurrence') ? 70 : 90

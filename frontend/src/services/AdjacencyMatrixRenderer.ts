@@ -223,7 +223,7 @@ export class AdjacencyMatrixRenderer {
     if (matrixMode === 'student-interest') {
       const hasInterest = graph.get(`student:${rowName}`)?.has(`interest:${colName}`) || false
       details = {
-        title: `👤 ${rowName} 与 🎯 ${colName}`,
+        title: `${rowName} 与 ${colName}`,
         type: 'student',
         details: hasInterest
           ? `【关联】${rowName} 对兴趣“${colName}”表现出浓厚的兴趣，并在关系网中通过此兴趣建立连线。`
@@ -232,7 +232,7 @@ export class AdjacencyMatrixRenderer {
     } else if (matrixMode === 'student-activity') {
       const hasReg = graph.get(`student:${rowName}`)?.has(`activity:${colName}`) || false
       details = {
-        title: `👤 ${rowName} 与 🎉 ${colName}`,
+        title: `${rowName} 与 ${colName}`,
         type: 'activity',
         details: hasReg
           ? `【报名】${rowName} 已经成功报名参与了校园活动“${colName}”，是活跃的参与者。`
@@ -243,7 +243,7 @@ export class AdjacencyMatrixRenderer {
       if (rowIdx === colIdx) {
         const count = Array.from(graph.get(`interest:${rowName}`) || []).filter((s: any) => s.startsWith('student:')).length
         details = {
-          title: `🎯 ${rowName} (兴趣圈规模)`,
+          title: `${rowName} (兴趣圈规模)`,
           type: 'interest',
           details: `全校共有 ${count} 位同学勾选了“${rowName}”作为自己的兴趣爱好圈子。`
         }
@@ -267,7 +267,7 @@ export class AdjacencyMatrixRenderer {
         }
 
         details = {
-          title: `🎯 ${rowName} 与 🎯 ${colName}`,
+          title: `${rowName} 与 ${colName}`,
           type: 'interest',
           details: detailsStr
         }
