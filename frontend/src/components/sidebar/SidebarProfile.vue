@@ -203,7 +203,7 @@ const generateMarkdownReport = () => {
       const buddy = buddiesList[rank]
       const pct = `${(buddy.jaccard * 100).toFixed(1)}%`
       const sharedStr = buddy.sharedInterests.join('、')
-      md.push(`| #${rank + 1} | **${buddy.name}** | {pct} | {sharedStr} |`)
+      md.push(`| #${rank + 1} | **${buddy.name}** | ${pct} | ${sharedStr} |`)
     }
   } else {
     md.push(`暂时没有找到与您拥有共同兴趣的学生。`)
