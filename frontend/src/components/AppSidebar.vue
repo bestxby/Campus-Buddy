@@ -4,9 +4,14 @@
     <a href="https://github.com/bestxby/Campus-Buddy" target="_blank" rel="noopener" class="sidebar-logo-banner" title="访问 GitHub 项目仓库">
       <div class="logo-main-group">
         <div class="sidebar-logo-icon">
-          <svg class="icon-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="var(--accent-orange)"></polygon>
+          <svg class="icon-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" stroke="var(--accent-neon-cyan)" stroke-width="1.5"></circle>
+            <!-- Needle split into two halves for a premium 3D neon compass effect -->
+            <polygon points="12,12 16.24,7.76 14.12,14.12" fill="var(--accent-neon-pink)" stroke="var(--accent-neon-pink)" stroke-width="0.5"></polygon>
+            <polygon points="12,12 16.24,7.76 9.88,9.88" fill="#b30059" stroke="#b30059" stroke-width="0.5"></polygon>
+            <polygon points="12,12 7.76,16.24 9.88,9.88" fill="var(--accent-neon-cyan)" stroke="var(--accent-neon-cyan)" stroke-width="0.5"></polygon>
+            <polygon points="12,12 7.76,16.24 14.12,14.12" fill="#0099ab" stroke="#0099ab" stroke-width="0.5"></polygon>
+            <circle cx="12" cy="12" r="1.5" fill="#ffffff" stroke="none"></circle>
           </svg>
         </div>
         <div class="sidebar-logo-text-wrap">

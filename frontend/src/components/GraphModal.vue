@@ -1,6 +1,14 @@
 <template>
   <div v-show="visible" class="fullscreen-graph-overlay fade-in">
     <div class="fullscreen-modal-card card glow-cyan">
+      <!-- Close Button (decoupled from header flow) -->
+      <button @click="close" class="close-modal-btn" title="关闭拓扑图" aria-label="关闭">
+        <svg class="icon-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
       <!-- Header -->
       <div class="fullscreen-modal-header">
         <div class="vis-title-group">
@@ -105,12 +113,6 @@
               </svg>
             </button>
           </div>
-          <button @click="close" class="close-modal-btn" title="关闭拓扑图" aria-label="关闭" style="display: inline-flex; align-items: center; justify-content: center;">
-            <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
         </div>
       </div>
 
