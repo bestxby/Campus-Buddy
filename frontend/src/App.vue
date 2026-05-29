@@ -234,6 +234,7 @@ onUnmounted(() => {
     document.removeEventListener('mousemove', activeOnMove)
     document.removeEventListener('mouseup', activeOnUp)
   }
+  graphAnalyticsService.destroy()
 })
 
 // ─── Lifecycle ─────────────────────────────────────────────────────────────────
