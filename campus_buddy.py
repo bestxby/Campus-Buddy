@@ -171,15 +171,6 @@ class CampusBuddyGraph:
         # 3. Get buddy recommendations (ranked by Jaccard similarity)
         buddies = self.recommend_buddies_ranked(student)
 
-        # 4. Find community stats (connected component)
-        student_component = None
-        for comp in self.connected_components():
-            if start in comp:
-                student_component = comp
-                break
-        comp_size = len(student_component) if student_component else 0
-        comp_students = len([n for n in student_component if n.startswith("student:")]) if student_component else 0
-
         # Build Markdown content
         md = []
         md.append(f"# 🧭 Campus Buddy 个性化校园推荐报告 — {student}")
@@ -211,26 +202,19 @@ class CampusBuddyGraph:
             md.append("暂时没有基于您的兴趣推荐的活动。您可以尝试添加更多兴趣标签！")
         md.append("\n---\n")
 
-        # Section 3: Recommended Buddies
-        md.append("## 🤝 志同道合的活动搭子（按 Jaccard 相似度排序）")
+        # Section 3: Recommended Buddies (Limit to top 10)
+        md.append("## 🤝 志同道合的活动搭子（按 Jaccard 相似度排序，至多推荐 10 位）")
         if buddies:
             md.append("系统为您匹配了拥有共同兴趣圈子的同学，最匹配的排在最前：\n")
             md.append("| 排名 | 搭子姓名 | 兴趣重合度 | 共同的兴趣 |")
             md.append("| --- | --- | --- | --- |")
-            for rank, (buddy_name, score, shared) in enumerate(buddies, 1):
+            for rank, (buddy_name, score, shared) in enumerate(buddies[:10], 1):
                 pct = f"{score * 100:.1f}%"
                 shared_str = "、".join(shared)
                 md.append(f"| #{rank} | **{buddy_name}** | {pct} | {shared_str} |")
         else:
             md.append("暂时没有找到与您拥有共同兴趣的学生。")
         md.append("\n---\n")
-
-        # Section 4: Community Metrics
-        md.append("## 🌐 社交网络社区洞察")
-        md.append(f"根据社交网络拓扑分析，您当前所属的**连通社区**包含：")
-        md.append(f"* 该独立社群节点总数: `{comp_size}` 个")
-        md.append(f"* 该社区内活跃学生数: `{comp_students}` 位")
-        md.append("\n*快叫上新匹配的搭子，一起报名参加推荐的活动吧！*")
 
         report_content = "\n".join(md)
 
@@ -240,7 +224,7 @@ class CampusBuddyGraph:
             dir_name = os.path.dirname(file_path)
             if dir_name:
                 os.makedirs(dir_name, exist_ok=True)
-            with open(file_path, "w", encoding="utf-8") as f:
+            with open(file_path, "w", encoding="utf-8-sig") as f:
                 f.write(report_content)
 
         return report_content

@@ -113,26 +113,30 @@
     <!-- Export Report button (Student only) -->
     <template v-if="currentUserRole !== 'admin'">
       <div class="export-report-row">
-        <button class="export-report-btn" @click="downloadReport" title="导出我的个性化匹配与方向推荐报告">
+        <button class="export-report-btn" @click="isExportModalVisible = true" title="导出我的个性化匹配与方向推荐报告">
           <span class="export-icon">📥</span>
           <span class="export-label">导出我的个性化匹配报告</span>
         </button>
       </div>
     </template>
+
+    <!-- Export Modal Overlay -->
+    <ExportModal :visible="isExportModalVisible" @close="isExportModalVisible = false" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import ExportModal from '@/components/ExportModal.vue'
 import { currentUser, currentUserAvatar, userPersona, personaBadgeClass,
          logout, currentUserRole, isPrivateMode, togglePrivacyMode,
-         isSocialMode, toggleSocialMode, userInterestTags } from '@/composables/useAuth'
-import { useGraphStore } from '@/stores/graph'
-import { useRecommendationStore } from '@/stores/recommendation'
-import { recommendations } from '@/composables/useRecommendations'
+         isSocialMode, toggleSocialMode } from '@/composables/useAuth'
 
 const emit = defineEmits<{
   logout: []
 }>()
+
+const isExportModalVisible = ref(false)
 
 // Mutually exclusive behavior handled globally in store/composable
 const togglePrivate = () => {
@@ -146,93 +150,6 @@ const toggleSocial = () => {
 const handleLogout = async () => {
   await logout()
   emit('logout')
-}
-
-// Generate Personalized Markdown Report
-const generateMarkdownReport = () => {
-  const name = currentUser.value
-  if (!name) return ''
-
-  const userInterests = userInterestTags.value
-  const recStore = useRecommendationStore()
-  const graphStore = useGraphStore()
-  
-  const acts = recommendations.value.activities
-  const buddiesList = recommendations.value.buddies
-
-  let md: string[] = []
-  md.push(`# 🧭 Campus Buddy 个性化校园推荐报告 — ${name}`)
-  md.push(`\n> **报告生成时间**: ${new Date().toLocaleDateString('zh-CN')}`)
-  md.push(`\n---\n`)
-
-  md.push(`## 👤 个人画像与标签`)
-  if (userInterests.length > 0) {
-    md.push(`您目前在系统登记的兴趣倾向：\n`)
-    for (const interest of userInterests) {
-      md.push(`* **${interest}** (兴趣等级: \`已设定\`)`)
-    }
-  } else {
-    md.push(`您目前尚未登记任何兴趣。`)
-  }
-  md.push(`\n---\n`)
-
-  md.push(`## 🎉 智能活动推荐（两跳推荐路径）`)
-  if (acts.length > 0) {
-    md.push(`系统根据您的兴趣，为您推荐了以下尚未报名的活动，并附带了关系链推荐路径：\n`)
-    for (let idx = 0; idx < acts.length; idx++) {
-      const actName = acts[idx]
-      const shared = recStore.getSharedInterest(name, actName, 'activity')
-      const pathStr = `student:${name} ----> interest:${shared} ----> activity:${actName}`
-      
-      md.push(`### ${idx + 1}. ${actName}`)
-      md.push(`* **所属兴趣圈**: 🎯 \`${shared}\``)
-      md.push(`* **推荐路径解释**:`)
-      md.push(`  \`${pathStr}\`\n`)
-    }
-  } else {
-    md.push(`暂时没有基于您的兴趣推荐的活动。您可以尝试在侧边栏添加更多兴趣标签！`)
-  }
-  md.push(`\n---\n`)
-
-  md.push(`## 🤝 志同道合的活动搭子（按 Jaccard 相似度排序）`)
-  if (buddiesList.length > 0) {
-    md.push(`系统为您匹配了拥有共同兴趣圈子的同学，最匹配的排在最前：\n`)
-    md.push(`| 排名 | 搭子姓名 | 兴趣重合度 | 共同的兴趣 |`)
-    md.push(`| --- | --- | --- | --- |`)
-    for (let rank = 0; rank < buddiesList.length; rank++) {
-      const buddy = buddiesList[rank]
-      const pct = `${(buddy.jaccard * 100).toFixed(1)}%`
-      const sharedStr = buddy.sharedInterests.join('、')
-      md.push(`| #${rank + 1} | **${buddy.name}** | ${pct} | ${sharedStr} |`)
-    }
-  } else {
-    md.push(`暂时没有找到与您拥有共同兴趣的学生。`)
-  }
-  md.push(`\n---\n`)
-
-  md.push(`## 🌐 社交网络社区洞察`)
-  md.push(`根据社交网络拓扑分析：`)
-  md.push(`* 全校活跃学生总数: \`${graphStore.stats.studentsCount}\` 位`)
-  md.push(`* 连通社群数量: \`${graphStore.stats.componentsCount}\` 个`)
-  md.push(`\n*快叫上新匹配的搭子，一起报名参加推荐的活动吧！*`)
-
-  return md.join('\n')
-}
-
-// Download Markdown report file client-side
-const downloadReport = () => {
-  const content = generateMarkdownReport()
-  if (!content) return
-  
-  const blob = new Blob([content], { type: 'text/markdown;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.setAttribute('download', `${currentUser.value}_校园活动搭子匹配推荐报告.md`)
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
 }
 </script>
 
