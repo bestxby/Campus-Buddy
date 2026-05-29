@@ -82,7 +82,7 @@
         <div class="git-divider"></div>
         
         <a href="https://github.com/bestxby" target="_blank" rel="noopener" class="login-github-item author-link" title="访问作者 GitHub 主页">
-          <img :src="'/avatar_developer.png'" class="git-avatar-img" alt="bestxby avatar" />
+          <img :src="avatarDeveloper" class="git-avatar-img" alt="bestxby avatar" />
           <div class="git-info">
             <span class="git-title">bestxby</span>
             <span class="git-desc">开发者主页 ➔</span>
@@ -95,6 +95,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import avatarDeveloper from '@/assets/avatar_developer.png'
 import StudentLoginForm from '@/components/auth/StudentLoginForm.vue'
 import AdminLoginForm from '@/components/auth/AdminLoginForm.vue'
 import LoginLoadingScreen from '@/components/auth/LoginLoadingScreen.vue'
