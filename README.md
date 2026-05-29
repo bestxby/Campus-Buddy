@@ -202,10 +202,12 @@ Campus-Buddy/
         │   └── LoadingParticleEngine.ts     # 登录等待界面的霓虹离子特效引擎
         ├── utils/                    # Stateless Pure Functions (纯图论算法与辅助工具)
         │   ├── auth-helpers.ts              # 管理员登录及全能画像“斜杠青年”判定逻辑
+        │   ├── canvasPoster.ts              # Canvas 像素分享海报生成与保存
         │   ├── graph-algorithms.ts          # 核心 BFS 最短路径与 Jaccard 相似度推荐算法
         │   ├── graph-metrics.ts             # 拓扑密度、聚类系数、平均路径算法
         │   ├── graph-metrics-structure.ts   # 极大连通子群算法
         │   ├── graph-metrics-centrality.ts  # 度中心性与介数中心性算法
+        │   ├── reportGenerator.ts           # 报告文本生成器 (Markdown/HTML/PDF 数据编排与安全过滤)
         │   └── seeded-shuffle.ts            # 基于种子的伪随机打乱工具（确保 UI 刷新的一致性）
         └── components/               # Vue UI 纯渲染组件层
             ├── LoginOverlay.vue             # 登录遮罩层容器
@@ -214,6 +216,8 @@ Campus-Buddy/
             ├── BuddyList.vue                # Jaccard 推荐搭子列表
             ├── GraphModal.vue               # 全屏拓扑网络模态弹窗
             ├── AdminDashboard.vue           # 管理员诊断后台大面板
+            ├── AllActivities.vue            # 系统全部活动综合看板 (支持快速报名与兴趣分类筛选)
+            ├── ExportModal.vue              # 多格式个性化匹配报告与社交海报导出模态框
             ├── auth/                        # 鉴权组件
             │   ├── StudentLoginForm.vue     # 学生登录表单（兴趣多选）
             │   ├── AdminLoginForm.vue       # 管理员密码表单
@@ -327,4 +331,14 @@ npm run deploy
 
 5. **D3.js 全屏力导向拓扑网络与人脉路径高亮**
    * 支持关系网的无限缩放与平移，拖拽任意节点可看清与其他关联边的拉力。
-   * 输入两个学生姓名即可执行 BFS 寻路算法，在力导图上高亮显示跨越兴趣圈的人脉路径，形象展示“六度分隔”理论。
+   * 输入两个学生姓名即可执行 BFS 寻路算法，在力导图上高亮显示跨越兴趣圈的人脉路径，形象展示“六度分隔”理论。该寻路面板由于包含潜在的全局人脉网络与隐私分析，目前已限制为仅管理员可见与操作。
+
+6. **多格式匹配报告一键导出 (Multi-format Report)**
+   * 提供面向学生及管理员的多格式报告导出，支持 **Markdown 格式**（快速导入 Notion 等工具）、**离线 HTML 网页格式**（集成炫酷的 Apple Glassmorphism 设计与离线图谱交互）以及 **高清晰度 PDF 格式**（自动应用优化的双栏纸张打印样式，一键唤醒浏览器打印另存为 PDF）。
+   * 报告模块已进行了严格的转义过滤，以确保导出内容不带有 HTML/Markdown 注入安全风险。
+
+7. **Sleek Neon 主题 Canvas 海报保存 (Canvas Share Poster)**
+   * 支持学生一键渲染生成精美的 Canvas 图片分享海报，内容整合了该生的个人头像、推荐搭子匹配率（Top 10）、活动报名时间线等关键指标，视觉风格与 Slate & Neon 主题高度一致，支持直接下载并发送到移动设备分享。
+
+8. **全部活动综合探索列表 (All Activities Panel)**
+   * 主界面整合了单独的“全部活动列表”检索面板，支持学生实时查看系统所有的活动安排。提供多标签极速分类检索、一键报名机制，且状态同步在 Ego-network 图谱和搭子推荐排序中实时刷新。
