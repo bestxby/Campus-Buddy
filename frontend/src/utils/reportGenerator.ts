@@ -8,6 +8,223 @@ export interface RecommendedBuddy {
   sharedInterests: string[];
 }
 
+// ─── Defensive HTML Escaping ────────────────────────────────────────────────
+/**
+ * Escapes HTML special characters in user-controlled strings to prevent XSS injection.
+ * Applied to all user data (names, interests, activities) before interpolation into HTML templates.
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+// ─── Admin Diagnostic Data (shared between MD and HTML admin reports) ────────
+interface AdminDiagnosticData {
+  studentsList: { name: string; degree: number }[]
+  studentRank: number
+  studentDegree: number
+  studentPercentile: string
+  isBridge: boolean
+  bridgeScore: number
+  socialRole: string
+  socialRoleIcon: string
+  diagnosisNote: string
+  componentSize: number
+  totalStudents: number
+  compPct: string
+  communityDiagnosis: string
+  hubStudent: string | undefined
+  hubPathStr: string
+  graph: Map<string, Set<string>>
+  privateStudents: Set<string>
+}
+
+/**
+ * Computes all shared admin diagnostic metrics (social role, BFS component, hub path, etc.)
+ * from the graph store. Used by both generateAdminMarkdownReport and generateAdminHtmlReport
+ * to eliminate ~150 lines of duplicated logic.
+ */
+function computeAdminDiagnosticData(name: string, useHtmlMarkup: boolean): AdminDiagnosticData {
+  let graph: Map<string, Set<string>> = new Map()
+  let privateStudents: Set<string> = new Set()
+  let bridgeStudents: any[] = []
+
+  try {
+    const graphStore = useGraphStore()
+    graph = graphStore.graph
+    privateStudents = graphStore.privateStudents
+    bridgeStudents = graphAnalyticsService.bridgeStudents.value
+  } catch (_e) {
+    // Fallback
+  }
+
+  // 1. Gather all student degree stats to compute rank/percentile
+  const studentsList = Array.from(graph.keys())
+    .filter(k => k.startsWith('student:'))
+    .map(k => {
+      const studentName = k.substring(8)
+      return { name: studentName, degree: graph.get(k)?.size || 0 }
+    })
+    .sort((a, b) => b.degree - a.degree)
+
+  const studentRank = studentsList.findIndex(s => s.name === name) + 1
+  const studentDegree = graph.get(`student:${name}`)?.size || 0
+  const studentPercentile = studentsList.length > 0
+    ? ((studentsList.length - studentRank) / studentsList.length * 100).toFixed(1)
+    : '0.0'
+
+  const isBridge = bridgeStudents.some(b => b.name === name)
+  const bridgeScore = bridgeStudents.find(b => b.name === name)?.score || 0
+
+  let socialRole = '普通社交参与者'
+  let socialRoleIcon = '🟡'
+  let diagnosisNote = '该生社交连接度一般，建议鼓励其参与更多跨学科活动，拓展人脉边界。'
+
+  if (studentDegree === 0) {
+    socialRole = '社交孤立个体 (重点帮扶对象)'
+    socialRoleIcon = '🚨'
+    diagnosisNote = '警告：该生目前在校园社交图谱中处于完全社交孤立状态（度中心度为0）。建议辅导员/班主任主动介入，引导其进行兴趣登记或推荐加入活动社群，提供社交关怀。'
+  } else if (studentRank <= 15) {
+    socialRole = '校园领袖型社交达人 (Opinion Leader)'
+    socialRoleIcon = '👑'
+    diagnosisNote = '诊断：该生在网络中具有极高的度中心性，属于校园社交活跃分子。建议可推荐其担任班组织管理职位，发挥其社交影响力带动周边同学。'
+  } else if (isBridge) {
+    socialRole = '跨社群社交中介桥梁 (Network Broker)'
+    socialRoleIcon = '🌉'
+    diagnosisNote = `诊断：该生介数中心性突出（桥梁指数: ${bridgeScore}），处于不同社交群体/兴趣圈子的枢纽位置，起着沟通和桥梁作用。可利用其传播特质，进行跨社群信息分发或活动推广。`
+  } else if (studentDegree >= 6) {
+    socialRole = '积极社交参与者 (Social Explorer)'
+    socialRoleIcon = '🟢'
+    diagnosisNote = '诊断：该生积极参与多项活动，兴趣广泛，社交连接度良好。建议保持目前社交习惯，继续深入探索。'
+  }
+
+  // Find connected component size using BFS
+  const visited = new Set<string>()
+  const queue = [`student:${name}`]
+  let head = 0
+  visited.add(`student:${name}`)
+  while (head < queue.length) {
+    const curr = queue[head++]
+    for (const neighbor of graph.get(curr) ?? []) {
+      if (!visited.has(neighbor)) {
+        visited.add(neighbor)
+        queue.push(neighbor)
+      }
+    }
+  }
+  const componentSize = Array.from(visited).filter(k => k.startsWith('student:')).length
+  const totalStudents = studentsList.length
+  const compPct = totalStudents > 0 ? ((componentSize / totalStudents) * 100).toFixed(1) : '0.0'
+
+  // Community diagnosis text (with HTML or Markdown markup)
+  const bold = (text: string) => useHtmlMarkup ? `<strong>${text}</strong>` : `**${text}**`
+  let communityDiagnosis = ''
+  if (componentSize === 1) {
+    communityDiagnosis = `🚨 ${bold('连通状态警告')}：该生属于网络中的完全孤立点，社交覆盖率为 0.0%（1/${totalStudents}）。其未被包含在校园任何社交活动与圈子中，建议提供心理关注和定向活动引流。`
+  } else if (Number(compPct) >= 80) {
+    communityDiagnosis = `✅ ${bold('连通状态良好')}：该生已融入全校的核心主社交网络，该网络共覆盖 ${componentSize} 名学生，占全校人数的 ${bold(compPct + '%')}。在全局拓扑网络中，该生具备优秀的人脉通达性和社交覆盖面。`
+  } else {
+    communityDiagnosis = `⚠️ ${bold('局部社群隔离')}：该生当前被局限在一个包含 ${componentSize} 人（全校占比 ${bold(compPct + '%')}）的局部兴趣小团体中。该圈子与全校主连通社交网络不连通，可能存在信息壁垒或局部社交闭环。`
+  }
+
+  // Path to Social Hub Student
+  const hubStudent = studentsList[0]?.name
+  let hubPathStr = ''
+  if (hubStudent && hubStudent !== name) {
+    const pathResult = GraphAlgorithms.findPath(graph, name, hubStudent, privateStudents)
+    if (pathResult) {
+      const elements = pathResult.path.map(k => {
+        const colonIdx = k.indexOf(':')
+        const kind = k.substring(0, colonIdx)
+        const label = k.substring(colonIdx + 1)
+        const icon = kind === 'student' ? '👤' : (kind === 'interest' ? '🎯' : '🎉')
+        return `${icon}${label}`
+      })
+      hubPathStr = elements.join(' ➔ ')
+    } else {
+      hubPathStr = '❌ 无法建立联系：该生与学校核心达人处于两个互不连通的社交孤立分支中。'
+    }
+  } else {
+    hubPathStr = '👑 该生本身即为全校社交活跃度最高的 Opinion Leader。'
+  }
+
+  return {
+    studentsList, studentRank, studentDegree, studentPercentile,
+    isBridge, bridgeScore, socialRole, socialRoleIcon, diagnosisNote,
+    componentSize, totalStudents, compPct, communityDiagnosis,
+    hubStudent, hubPathStr, graph, privateStudents,
+  }
+}
+
+// ─── Shared HTML Content Builders ───────────────────────────────────────────
+function buildInterestsHtml(userInterests: string[], emptyMessage: string): string {
+  if (userInterests.length > 0) {
+    return userInterests.map(interest => `<span class="tag tag-primary">${escapeHtml(interest)}</span>`).join('')
+  }
+  return `<p class="empty-state">${emptyMessage}</p>`
+}
+
+function buildActivitiesHtml(
+  name: string,
+  acts: string[],
+  getSharedInterest: (name: string, actName: string, type: 'activity' | 'student') => string,
+  emptyMessage: string
+): string {
+  if (acts.length === 0) return `<p class="empty-state">${emptyMessage}</p>`
+  let html = ''
+  acts.forEach((actName, idx) => {
+    const shared = getSharedInterest(name, actName, 'activity')
+    const safeName = escapeHtml(name)
+    const safeAct = escapeHtml(actName)
+    const safeShared = escapeHtml(shared)
+    const pathStr = `student:${safeName} --(🎯${safeShared})--&gt; activity:${safeAct}`
+    html += `
+      <div class="activity-item">
+        <div class="activity-name">${idx + 1}. ${safeAct}</div>
+        <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">所属兴趣圈: 🎯 <strong>${safeShared}</strong></div>
+        <div class="activity-path">推荐纽带: ${pathStr}</div>
+      </div>
+    `
+  })
+  return html
+}
+
+function buildBuddiesHtml(buddiesList: RecommendedBuddy[], emptyMessage: string): string {
+  if (buddiesList.length === 0) return `<p class="empty-state">${emptyMessage}</p>`
+  let rows = ''
+  buddiesList.forEach((buddy, rank) => {
+    const pct = `${(buddy.jaccard * 100).toFixed(1)}%`
+    const sharedStr = buddy.sharedInterests.map(s => escapeHtml(s)).join('、')
+    rows += `
+      <tr>
+        <td>#${rank + 1}</td>
+        <td><strong>${escapeHtml(buddy.name)}</strong></td>
+        <td><span class="badge-percent">${pct}</span></td>
+        <td>${sharedStr}</td>
+      </tr>
+    `
+  })
+  return `
+    <table>
+      <thead>
+        <tr>
+          <th>排名</th>
+          <th>推荐搭子</th>
+          <th>匹配契合度</th>
+          <th>共同兴趣</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+  `
+}
+
 export function generateMarkdownReport(
   name: string,
   userInterests: string[],
@@ -72,63 +289,9 @@ export function generateHtmlReport(
   buddiesList: RecommendedBuddy[],
   getSharedInterest: (name: string, actName: string, type: 'activity' | 'student') => string
 ): string {
-  let interestsHtml = ''
-  if (userInterests.length > 0) {
-    interestsHtml = userInterests.map(interest => `<span class="tag tag-primary">${interest}</span>`).join('')
-  } else {
-    interestsHtml = '<p class="empty-state">您目前尚未登记 any 兴趣。</p>'
-  }
-
-  let actsHtml = ''
-  if (acts.length > 0) {
-    acts.forEach((actName, idx) => {
-      const shared = getSharedInterest(name, actName, 'activity')
-      const pathStr = `student:${name} --(🎯${shared})--> activity:${actName}`
-      actsHtml += `
-        <div class="activity-item">
-          <div class="activity-name">${idx + 1}. ${actName}</div>
-          <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">所属兴趣圈: 🎯 <strong>${shared}</strong></div>
-          <div class="activity-path">推荐纽带: ${pathStr}</div>
-        </div>
-      `
-    })
-  } else {
-    actsHtml = '<p class="empty-state">暂时没有基于您的兴趣推荐的活动。</p>'
-  }
-
-  let buddiesHtml = ''
-  if (buddiesList.length > 0) {
-    let rows = ''
-    buddiesList.forEach((buddy, rank) => {
-      const pct = `${(buddy.jaccard * 100).toFixed(1)}%`
-      const sharedStr = buddy.sharedInterests.join('、')
-      rows += `
-        <tr>
-          <td>#${rank + 1}</td>
-          <td><strong>${buddy.name}</strong></td>
-          <td><span class="badge-percent">${pct}</span></td>
-          <td>${sharedStr}</td>
-        </tr>
-      `
-    })
-    buddiesHtml = `
-      <table>
-        <thead>
-          <tr>
-            <th>排名</th>
-            <th>推荐搭子</th>
-            <th>匹配契合度</th>
-            <th>共同兴趣</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
-    `
-  } else {
-    buddiesHtml = '<p class="empty-state">暂时没有找到与您拥有共同兴趣的学生。</p>'
-  }
+  const interestsHtml = buildInterestsHtml(userInterests, '您目前尚未登记 any 兴趣。')
+  const actsHtml = buildActivitiesHtml(name, acts, getSharedInterest, '暂时没有基于您的兴趣推荐的活动。')
+  const buddiesHtml = buildBuddiesHtml(buddiesList, '暂时没有找到与您拥有共同兴趣的学生。')
 
   const displayInterests = userInterests.slice(0, 4)
   const nodesData: any[] = [
@@ -171,7 +334,7 @@ export function generateHtmlReport(
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>Campus Buddy 个性化校园推荐报告 — ${name}</title>
+  <title>Campus Buddy 个性化校园推荐报告 — ${escapeHtml(name)}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -328,7 +491,7 @@ export function generateHtmlReport(
   <div class="container">
     <div class="header">
       <h1>🧭 Campus Buddy 匹配推荐报告</h1>
-      <p>报告学生: <strong>${name}</strong> &nbsp;|&nbsp; 生成时间: ${new Date().toLocaleDateString('zh-CN')}</p>
+      <p>报告学生: <strong>${escapeHtml(name)}</strong> &nbsp;|&nbsp; 生成时间: ${new Date().toLocaleDateString('zh-CN')}</p>
     </div>
     
     <div class="card">
@@ -522,106 +685,7 @@ export function generateAdminMarkdownReport(
   buddiesList: RecommendedBuddy[],
   getSharedInterest: (name: string, actName: string, type: 'activity' | 'student') => string
 ): string {
-  let graph: Map<string, Set<string>> = new Map()
-  let privateStudents: Set<string> = new Set()
-  let bridgeStudents: any[] = []
-  
-  try {
-    const graphStore = useGraphStore()
-    graph = graphStore.graph
-    privateStudents = graphStore.privateStudents
-    bridgeStudents = graphAnalyticsService.bridgeStudents.value
-  } catch (e) {
-    // Fallback
-  }
-
-  // 1. Gather all student degree stats to compute rank/percentile
-  const studentsList = Array.from(graph.keys())
-    .filter(k => k.startsWith('student:'))
-    .map(k => {
-      const studentName = k.substring(8)
-      return { name: studentName, degree: graph.get(k)?.size || 0 }
-    })
-    .sort((a, b) => b.degree - a.degree)
-
-  const studentRank = studentsList.findIndex(s => s.name === name) + 1
-  const studentDegree = graph.get(`student:${name}`)?.size || 0
-  const studentPercentile = studentsList.length > 0 
-    ? ((studentsList.length - studentRank) / studentsList.length * 100).toFixed(1)
-    : '0.0'
-
-  const isBridge = bridgeStudents.some(b => b.name === name)
-  const bridgeScore = bridgeStudents.find(b => b.name === name)?.score || 0
-
-  let socialRole = '普通社交参与者'
-  let socialRoleIcon = '🟡'
-  let diagnosisNote = '该生社交连接度一般，建议鼓励其参与更多跨学科活动，拓展人脉边界。'
-
-  if (studentDegree === 0) {
-    socialRole = '社交孤立个体 (重点帮扶对象)'
-    socialRoleIcon = '🚨'
-    diagnosisNote = '警告：该生目前在校园社交图谱中处于完全社交孤立状态（度中心度为0）。建议辅导员/班主任主动介入，引导其进行兴趣登记或推荐加入活动社群，提供社交关怀。'
-  } else if (studentRank <= 15) {
-    socialRole = '校园领袖型社交达人 (Opinion Leader)'
-    socialRoleIcon = '👑'
-    diagnosisNote = '诊断：该生在网络中具有极高的度中心性，属于校园社交活跃分子。建议可推荐其担任班组织管理职位，发挥其社交影响力带动周边同学。'
-  } else if (isBridge) {
-    socialRole = '跨社群社交中介桥梁 (Network Broker)'
-    socialRoleIcon = '🌉'
-    diagnosisNote = `诊断：该生介数中心性突出（桥梁指数: ${bridgeScore}），处于不同社交群体/兴趣圈子的枢纽位置，起着沟通和桥梁作用。可利用其传播特质，进行跨社群信息分发或活动推广。`
-  } else if (studentDegree >= 6) {
-    socialRole = '积极社交参与者 (Social Explorer)'
-    socialRoleIcon = '🟢'
-    diagnosisNote = '诊断：该生积极参与多项活动，兴趣广泛，社交连接度良好。建议保持目前社交习惯，继续深入探索。'
-  }
-
-  // Find connected component size using BFS
-  const visited = new Set<string>()
-  const queue = [`student:${name}`]
-  let head = 0
-  visited.add(`student:${name}`)
-  while (head < queue.length) {
-    const curr = queue[head++]
-    for (const neighbor of graph.get(curr) ?? []) {
-      if (!visited.has(neighbor)) {
-        visited.add(neighbor)
-        queue.push(neighbor)
-      }
-    }
-  }
-  const componentSize = Array.from(visited).filter(k => k.startsWith('student:')).length
-  const totalStudents = studentsList.length
-  const compPct = totalStudents > 0 ? ((componentSize / totalStudents) * 100).toFixed(1) : '0.0'
-
-  let communityDiagnosis = ''
-  if (componentSize === 1) {
-    communityDiagnosis = `🚨 **连通状态警告**：该生属于网络中的完全孤立点，社交覆盖率为 0.0%（1/${totalStudents}）。其未被包含在校园任何社交活动与圈子中，建议提供定向活动引流。`
-  } else if (Number(compPct) >= 80) {
-    communityDiagnosis = `✅ **连通状态良好**：该生已融入全校的核心主社交网络，该网络共覆盖 ${componentSize} 名学生，占全校人数的 **${compPct}%**。在全局拓扑网络中，该生具备优秀的人脉通达性和社交覆盖面。`
-  } else {
-    communityDiagnosis = `⚠️ **局部社群隔离**：该生当前被局限在一个包含 ${componentSize} 人（全校占比 **${compPct}%**）的局部兴趣小团体中。该圈子与全校主连通社交网络不连通，可能存在信息壁垒或局部社交闭环。`
-  }
-
-  // Path to Social Hub Student
-  const hubStudent = studentsList[0]?.name
-  let hubPathStr = ''
-  if (hubStudent && hubStudent !== name) {
-    const pathResult = GraphAlgorithms.findPath(graph, name, hubStudent, privateStudents)
-    if (pathResult) {
-      const elements = pathResult.path.map(k => {
-        const colonIdx = k.indexOf(':')
-        const kind = k.substring(0, colonIdx)
-        const label = k.substring(colonIdx + 1)
-        const icon = kind === 'student' ? '👤' : (kind === 'interest' ? '🎯' : '🎉')
-        return `${icon}${label}`
-      })
-      hubPathStr = elements.join(' ➔ ')
-    } else {
-      hubPathStr = '❌ 无法建立联系：该生与学校核心达人处于两个互不连通的社交孤立分支中。'
-    }
-  } else {
-    hubPathStr = '👑 该生本身即为全校社交活跃度最高的 Opinion Leader。'
-  }
+  const d = computeAdminDiagnosticData(name, false)
 
   // Start assembling markdown
   let md: string[] = []
@@ -630,17 +694,17 @@ export function generateAdminMarkdownReport(
   md.push(`\n---\n`)
   
   md.push(`## 🏥 一、网络位置与中心度诊断`)
-  md.push(`* **网络定位**: ${socialRoleIcon} **${socialRole}**`)
-  md.push(`* **直连度数 (Degree)**: \`${studentDegree}\``)
-  md.push(`* **全校排名**: 第 **${studentRank}** 名 (超越全校 \`${studentPercentile}%\` 的学生)`)
-  md.push(`* **社群连通覆盖率**: \`${compPct}%\` (共 ${componentSize} 名学生与该生连通)`)
-  md.push(`\n**诊断意见**：\n> ${diagnosisNote}`)
-  md.push(`\n**连通状态**：\n> ${communityDiagnosis}`)
+  md.push(`* **网络定位**: ${d.socialRoleIcon} **${d.socialRole}**`)
+  md.push(`* **直连度数 (Degree)**: \`${d.studentDegree}\``)
+  md.push(`* **全校排名**: 第 **${d.studentRank}** 名 (超越全校 \`${d.studentPercentile}%\` 的学生)`)
+  md.push(`* **社群连通覆盖率**: \`${d.compPct}%\` (共 ${d.componentSize} 名学生与该生连通)`)
+  md.push(`\n**诊断意见**：\n> ${d.diagnosisNote}`)
+  md.push(`\n**连通状态**：\n> ${d.communityDiagnosis}`)
   md.push(`\n---\n`)
 
   md.push(`## 🔗 二、与校园核心社交达人的连接路径`)
-  md.push(`与学校最活跃 Opinion Leader (**${hubStudent}**) 的最短路径：\n`)
-  md.push(`\`${hubPathStr}\``)
+  md.push(`与学校最活跃 Opinion Leader (**${d.hubStudent}**) 的最短路径：\n`)
+  md.push(`\`${d.hubPathStr}\``)
   md.push(`\n*注：该路径基于 BFS 最短路径算法生成，已自动屏蔽途中开启了隐私模式的同学节点。*`)
   md.push(`\n---\n`)
 
@@ -693,164 +757,10 @@ export function generateAdminHtmlReport(
   buddiesList: RecommendedBuddy[],
   getSharedInterest: (name: string, actName: string, type: 'activity' | 'student') => string
 ): string {
-  let graph: Map<string, Set<string>> = new Map()
-  let privateStudents: Set<string> = new Set()
-  let bridgeStudents: any[] = []
-  
-  try {
-    const graphStore = useGraphStore()
-    graph = graphStore.graph
-    privateStudents = graphStore.privateStudents
-    bridgeStudents = graphAnalyticsService.bridgeStudents.value
-  } catch (e) {
-    // Fallback
-  }
-
-  // 1. Gather all student degree stats to compute rank/percentile
-  const studentsList = Array.from(graph.keys())
-    .filter(k => k.startsWith('student:'))
-    .map(k => {
-      const studentName = k.substring(8)
-      return { name: studentName, degree: graph.get(k)?.size || 0 }
-    })
-    .sort((a, b) => b.degree - a.degree)
-
-  const studentRank = studentsList.findIndex(s => s.name === name) + 1
-  const studentDegree = graph.get(`student:${name}`)?.size || 0
-  const studentPercentile = studentsList.length > 0 
-    ? ((studentsList.length - studentRank) / studentsList.length * 100).toFixed(1)
-    : '0.0'
-
-  const isBridge = bridgeStudents.some(b => b.name === name)
-  const bridgeScore = bridgeStudents.find(b => b.name === name)?.score || 0
-
-  let socialRole = '普通社交参与者'
-  let socialRoleIcon = '🟡'
-  let diagnosisNote = '该生社交连接度一般，建议鼓励其参与更多跨学科活动，拓展人脉边界。'
-
-  if (studentDegree === 0) {
-    socialRole = '社交孤立个体 (重点帮扶对象)'
-    socialRoleIcon = '🚨'
-    diagnosisNote = '警告：该生目前在校园社交图谱中处于完全社交孤立状态（度中心度为0）。建议辅导员/班主任主动介入，引导其进行兴趣登记或推荐加入活动社群，提供社交关怀。'
-  } else if (studentRank <= 15) {
-    socialRole = '校园领袖型社交达人 (Opinion Leader)'
-    socialRoleIcon = '👑'
-    diagnosisNote = '诊断：该生在网络中具有极高的度中心性，属于校园社交活跃分子。建议可推荐其担任班组织管理职位，发挥其社交影响力带动周边同学。'
-  } else if (isBridge) {
-    socialRole = '跨社群社交中介桥梁 (Network Broker)'
-    socialRoleIcon = '🌉'
-    diagnosisNote = `诊断：该生介数中心性突出（桥梁指数: ${bridgeScore}），处于不同社交群体/兴趣圈子的枢纽位置，起着沟通和桥梁作用。可利用其传播特质，进行跨社群信息分发或活动推广。`
-  } else if (studentDegree >= 6) {
-    socialRole = '积极社交参与者 (Social Explorer)'
-    socialRoleIcon = '🟢'
-    diagnosisNote = '诊断：该生积极参与多项活动，兴趣广泛，社交连接度良好。建议保持目前社交习惯，继续深入探索。'
-  }
-
-  // Find connected component size using BFS
-  const visited = new Set<string>()
-  const queue = [`student:${name}`]
-  let head = 0
-  visited.add(`student:${name}`)
-  while (head < queue.length) {
-    const curr = queue[head++]
-    for (const neighbor of graph.get(curr) ?? []) {
-      if (!visited.has(neighbor)) {
-        visited.add(neighbor)
-        queue.push(neighbor)
-      }
-    }
-  }
-  const componentSize = Array.from(visited).filter(k => k.startsWith('student:')).length
-  const totalStudents = studentsList.length
-  const compPct = totalStudents > 0 ? ((componentSize / totalStudents) * 100).toFixed(1) : '0.0'
-
-  let communityDiagnosis = ''
-  if (componentSize === 1) {
-    communityDiagnosis = `🚨 <strong>连通状态警告</strong>：该生属于网络中的完全孤立点，社交覆盖率为 0.0%（1/${totalStudents}）。其未被包含在校园任何社交活动与圈子中，建议提供心理关注和定向活动引流。`
-  } else if (Number(compPct) >= 80) {
-    communityDiagnosis = `✅ <strong>连通状态良好</strong>：该生已融入全校的核心主社交网络，该网络共覆盖 ${componentSize} 名学生，占全校人数的 <strong>${compPct}%</strong>。在全局拓扑网络中，该生具备优秀的人脉通达性和社交覆盖面。`
-  } else {
-    communityDiagnosis = `⚠️ <strong>局部社群隔离</strong>：该生当前被局限在一个包含 ${componentSize} 人（全校占比 <strong>${compPct}%</strong>）的局部兴趣小团体中。该圈子与全校主连通社交网络不连通，可能存在信息壁垒或局部社交闭环。`
-  }
-
-  // Path to Social Hub Student
-  const hubStudent = studentsList[0]?.name
-  let hubPathStr = ''
-  if (hubStudent && hubStudent !== name) {
-    const pathResult = GraphAlgorithms.findPath(graph, name, hubStudent, privateStudents)
-    if (pathResult) {
-      const elements = pathResult.path.map(k => {
-        const colonIdx = k.indexOf(':')
-        const kind = k.substring(0, colonIdx)
-        const label = k.substring(colonIdx + 1)
-        const icon = kind === 'student' ? '👤' : (kind === 'interest' ? '🎯' : '🎉')
-        return `${icon}${label}`
-      })
-      hubPathStr = elements.join(' ➔ ')
-    } else {
-      hubPathStr = '❌ 无法建立联系：该生与学校核心达人处于两个互不连通的社交孤立分支中。'
-    }
-  } else {
-    hubPathStr = '👑 该生本身即为全校社交活跃度最高的 Opinion Leader。'
-  }
-
-  let interestsHtml = ''
-  if (userInterests.length > 0) {
-    interestsHtml = userInterests.map(interest => `<span class="tag tag-primary">${interest}</span>`).join('')
-  } else {
-    interestsHtml = '<p class="empty-state">目前尚未登记任何兴趣倾向。</p>'
-  }
-
-  let actsHtml = ''
-  if (acts.length > 0) {
-    acts.forEach((actName, idx) => {
-      const shared = getSharedInterest(name, actName, 'activity')
-      const pathStr = `student:${name} --(🎯${shared})--> activity:${actName}`
-      actsHtml += `
-        <div class="activity-item">
-          <div class="activity-name">${idx + 1}. ${actName}</div>
-          <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">所属兴趣圈: 🎯 <strong>${shared}</strong></div>
-          <div class="activity-path">推荐纽带: ${pathStr}</div>
-        </div>
-      `
-    })
-  } else {
-    actsHtml = '<p class="empty-state">暂时没有基于该生兴趣推荐的活动。</p>'
-  }
-
-  let buddiesHtml = ''
-  if (buddiesList.length > 0) {
-    let rows = ''
-    buddiesList.forEach((buddy, rank) => {
-      const pct = `${(buddy.jaccard * 100).toFixed(1)}%`
-      const sharedStr = buddy.sharedInterests.join('、')
-      rows += `
-        <tr>
-          <td>#${rank + 1}</td>
-          <td><strong>${buddy.name}</strong></td>
-          <td><span class="badge-percent">${pct}</span></td>
-          <td>${sharedStr}</td>
-        </tr>
-      `
-    })
-    buddiesHtml = `
-      <table>
-        <thead>
-          <tr>
-            <th>排名</th>
-            <th>推荐搭子</th>
-            <th>匹配契合度</th>
-            <th>共同兴趣</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
-    `
-  } else {
-    buddiesHtml = '<p class="empty-state">暂时没有找到具有共同兴趣的搭子。</p>'
-  }
+  const d = computeAdminDiagnosticData(name, true)
+  const interestsHtml = buildInterestsHtml(userInterests, '目前尚未登记任何兴趣倾向。')
+  const actsHtml = buildActivitiesHtml(name, acts, getSharedInterest, '暂时没有基于该生兴趣推荐的活动。')
+  const buddiesHtml = buildBuddiesHtml(buddiesList, '暂时没有找到具有共同兴趣的搭子。')
 
   const displayInterests = userInterests.slice(0, 4)
   const nodesData: any[] = [
@@ -893,7 +803,7 @@ export function generateAdminHtmlReport(
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>Campus Buddy 专业级社交诊断报告 — ${name}</title>
+  <title>Campus Buddy 专业级社交诊断报告 — ${escapeHtml(name)}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1068,7 +978,7 @@ export function generateAdminHtmlReport(
   <div class="container">
     <div class="header">
       <h1>📊 Campus Buddy 专业级社交诊断报告</h1>
-      <p>报告学生: <strong>${name}</strong> &nbsp;|&nbsp; 生成时间: ${new Date().toLocaleDateString('zh-CN')} &nbsp;|&nbsp; 级别: 全局管理员</p>
+      <p>报告学生: <strong>${escapeHtml(name)}</strong> &nbsp;|&nbsp; 生成时间: ${new Date().toLocaleDateString('zh-CN')} &nbsp;|&nbsp; 级别: 全局管理员</p>
     </div>
 
     <!-- Diagnostic Panel -->
@@ -1077,26 +987,26 @@ export function generateAdminHtmlReport(
       <div class="diag-grid">
         <div class="diag-item-cell">
           <strong>网络位置定位</strong>
-          <span style="color: #ffb74d;">${socialRoleIcon} ${socialRole}</span>
+          <span style="color: #ffb74d;">${d.socialRoleIcon} ${escapeHtml(d.socialRole)}</span>
         </div>
         <div class="diag-item-cell">
           <strong>直连度数 (Degree)</strong>
-          <span class="badge-percent" style="background: rgba(34, 211, 238, 0.1); color: #22d3ee; border: 1px solid rgba(34, 211, 238, 0.2); font-size: 11px; padding: 2px 6px;">${studentDegree}</span>
+          <span class="badge-percent" style="background: rgba(34, 211, 238, 0.1); color: #22d3ee; border: 1px solid rgba(34, 211, 238, 0.2); font-size: 11px; padding: 2px 6px;">${d.studentDegree}</span>
         </div>
         <div class="diag-item-cell">
           <strong>全校度数排名</strong>
-          <span>第 ${studentRank} 名 (超越全校 ${studentPercentile}% 的学生)</span>
+          <span>第 ${d.studentRank} 名 (超越全校 ${d.studentPercentile}% 的学生)</span>
         </div>
         <div class="diag-item-cell">
           <strong>社群连通覆盖率</strong>
-          <span>${compPct}% (共 ${componentSize} 人)</span>
+          <span>${d.compPct}% (共 ${d.componentSize} 人)</span>
         </div>
       </div>
       <div style="margin-top: 18px; padding: 12px; background: rgba(15, 23, 42, 0.5); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; line-height: 1.5; color: #cbd5e1;">
-        <strong>诊断意见：</strong>${diagnosisNote}
+        <strong>诊断意见：</strong>${d.diagnosisNote}
       </div>
       <div style="margin-top: 12px; padding: 12px; background: rgba(15, 23, 42, 0.5); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; line-height: 1.5; color: #cbd5e1;">
-        <strong>连通状态：</strong>${communityDiagnosis}
+        <strong>连通状态：</strong>${d.communityDiagnosis}
       </div>
     </div>
 
@@ -1104,7 +1014,7 @@ export function generateAdminHtmlReport(
     <div class="card">
       <h2>🔗 与全校核心社交人物的关联路径</h2>
       <div style="padding: 12px; background: rgba(0,0,0,0.25); border-left: 3px solid #ffb74d; border-radius: 6px; font-size: 13px; color: #e2e8f0; font-family: monospace; overflow-x: auto; line-height: 1.4;">
-        ${hubPathStr}
+        ${d.hubPathStr}
       </div>
       <p style="font-size: 11px; color: #64748b; margin-top: 6px; margin-bottom: 0;">* 注：路径通过广度优先搜索 (BFS) 遍历，已自动避开途中开启了隐私保护模式的同学节点。</p>
     </div>
