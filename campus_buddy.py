@@ -146,7 +146,7 @@ class CampusBuddyGraph:
             
         return sorted(recommendations, key=get_sort_key)
 
-    def export_recommendation_report(self, student, file_path=None):
+    def export_recommendation_report(self, student, file_path=None, private_students=None, social_students=None):
         """
         Generates a markdown recommendation report for a student and optionally exports to file.
         Returns the markdown string.
@@ -169,7 +169,7 @@ class CampusBuddyGraph:
         act_recs = self.get_activity_recommendations_with_paths(student)
 
         # 3. Get buddy recommendations (ranked by Jaccard similarity)
-        buddies = self.recommend_buddies_ranked(student)
+        buddies = self.recommend_buddies_ranked(student, private_students, social_students)
 
         # Build Markdown content
         md = []
@@ -249,7 +249,7 @@ class CampusBuddyGraph:
 
         return sorted(list(buddies))
 
-    def recommend_buddies_ranked(self, student):
+    def recommend_buddies_ranked(self, student, private_students=None, social_students=None):
         """
         Recommends buddies ranked by Jaccard similarity score.
         Jaccard(A, B) = |interests_A & interests_B| / |interests_A | interests_B|
@@ -259,6 +259,11 @@ class CampusBuddyGraph:
 
         Example return: [("小红", 0.67, ["篮球", "Python"]), ...]
         """
+        if private_students is None:
+            private_students = set()
+        if social_students is None:
+            social_students = set()
+
         start = self.node("student", student)
         s_interests = {
             n for n in self.graph[start] if n.startswith("interest:")
@@ -271,6 +276,8 @@ class CampusBuddyGraph:
                 if not neighbor.startswith("student:") or neighbor == start:
                     continue
                 buddy_name = neighbor.removeprefix("student:")
+                if buddy_name in private_students:
+                    continue
                 if buddy_name in buddy_scores:
                     continue  # Already computed for this buddy
 
@@ -284,6 +291,9 @@ class CampusBuddyGraph:
                     jaccard = 0.0
                 else:
                     jaccard = len(intersection) / len(union)
+
+                if buddy_name in social_students:
+                    jaccard = min(1.0, jaccard * 1.3)
 
                 shared_names = sorted(
                     i.removeprefix("interest:") for i in intersection

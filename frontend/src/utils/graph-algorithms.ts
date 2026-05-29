@@ -69,7 +69,7 @@ export class GraphAlgorithms {
           }
           path.reverse()
           const hops = path.filter(n => n.startsWith('student:')).length - 1
-          return { path, hops, readable: path.map(n => n.split(':')[1]) }
+          return { path, hops, readable: path.map(n => n.substring(n.indexOf(':') + 1)) }
         }
         queue.push(neighbor)
       }
