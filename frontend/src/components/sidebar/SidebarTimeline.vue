@@ -45,7 +45,7 @@ const handleCancel = (activity: string) => {
 </script>
 
 <style scoped>
-.activities-timeline-panel { margin: 10px 10px 0; background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; flex: 1; min-height: 0; overflow-y: auto; }
+.activities-timeline-panel { margin: 10px 10px 0; background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; flex-shrink: 0; }
 .timeline-title { font-size: 11.5px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #34d399; margin-bottom: 10px; }
 .timeline-list { display: flex; flex-direction: column; gap: 0; }
 .timeline-item { display: flex; align-items: center; gap: 8px; position: relative; padding-bottom: 8px; }
