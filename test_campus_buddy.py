@@ -321,3 +321,47 @@ def test_recommendations_with_paths_and_report(tmp_path):
     assert "深夜街球赛" in file_content
     assert "周一晚" in file_content
     assert "15 人" in file_content
+
+def test_jaccard_similarity_private_and_social():
+    g = CampusBuddyGraph()
+    # A has interests: 篮球, 摄影
+    g.add_student_interest("学生A", "篮球")
+    g.add_student_interest("学生A", "摄影")
+
+    # B has interests: 篮球, 摄影 (Jaccard = 1.0)
+    g.add_student_interest("学生B", "篮球")
+    g.add_student_interest("学生B", "摄影")
+
+    # C has interests: 篮球 (Jaccard = 0.5)
+    g.add_student_interest("学生C", "篮球")
+
+    # D has interests: 篮球 (Jaccard = 0.5)
+    g.add_student_interest("学生D", "篮球")
+
+    # 1. Base case: no private, no social
+    res = g.recommend_buddies_ranked("学生A")
+    # Expected: B (1.0), C (0.5), D (0.5)
+    names = [x[0] for x in res]
+    assert names == ["学生B", "学生C", "学生D"]
+    assert abs(res[0][1] - 1.0) < 1e-5
+    assert abs(res[1][1] - 0.5) < 1e-5
+
+    # 2. Private student filtering: exclude B
+    res_private = g.recommend_buddies_ranked("学生A", private_students={"学生B"})
+    names_private = [x[0] for x in res_private]
+    assert "学生B" not in names_private
+    assert names_private == ["学生C", "学生D"]
+
+    # 3. Social boost: C is social, Jaccard gets multiplied by 1.3 -> 0.5 * 1.3 = 0.65
+    res_social = g.recommend_buddies_ranked("学生A", social_students={"学生C"})
+    # Expected ranking order: B (1.0), C (0.65), D (0.5)
+    assert res_social[0][0] == "学生B"
+    assert res_social[1][0] == "学生C"
+    assert abs(res_social[1][1] - 0.65) < 1e-5
+    assert res_social[2][0] == "学生D"
+
+    # 4. Social boost with perfect score capping: B is social, 1.0 * 1.3 = 1.3, capped to 1.0
+    res_social_b = g.recommend_buddies_ranked("学生A", social_students={"学生B"})
+    assert res_social_b[0][0] == "学生B"
+    assert abs(res_social_b[0][1] - 1.0) < 1e-5
+
