@@ -189,24 +189,24 @@ class CampusBuddyGraph:
         md.append("\n---\n")
 
         # Section 2: Recommended Activities
-        md.append("## 🎉 智能活动推荐（两跳推荐路径）")
+        md.append("## 🎉 智能活动推荐")
         if act_recs:
-            md.append("系统根据您的兴趣，为您推荐了以下尚未报名的活动，并附带了关系链推荐路径：\n")
+            md.append("系统根据您的兴趣标签，为您匹配了以下尚未报名的活动：\n")
             for idx, item in enumerate(act_recs, 1):
                 md.append(f"### {idx}. {item['activity']}")
                 md.append(f"* **所属兴趣圈**: 🎯 `{item['interest']}`")
                 md.append(f"* **活动容量**: 👥 `{item['capacity']} 人` | **时间段**: ⏰ `{item['time_slot']}`")
-                md.append(f"* **推荐路径解释**:")
+                md.append(f"* **推荐纽带**:")
                 md.append(f"  `{item['path']}`\n")
         else:
             md.append("暂时没有基于您的兴趣推荐的活动。您可以尝试添加更多兴趣标签！")
         md.append("\n---\n")
 
         # Section 3: Recommended Buddies (Limit to top 10)
-        md.append("## 🤝 志同道合的活动搭子（按 Jaccard 相似度排序，至多推荐 10 位）")
+        md.append("## 🤝 志同道合的活动搭子")
         if buddies:
-            md.append("系统为您匹配了拥有共同兴趣圈子的同学，最匹配的排在最前：\n")
-            md.append("| 排名 | 搭子姓名 | 兴趣重合度 | 共同的兴趣 |")
+            md.append("系统为您匹配了拥有共同兴趣圈子的同学：\n")
+            md.append("| 排名 | 推荐搭子 | 匹配契合度 | 共同的兴趣 |")
             md.append("| --- | --- | --- | --- |")
             for rank, (buddy_name, score, shared) in enumerate(buddies[:10], 1):
                 pct = f"{score * 100:.1f}%"
