@@ -85,6 +85,22 @@ def main():
         print(f"    - Interests: {sorted(interests)}")
         print(f"    - Activities: {sorted(activities)}")
 
+    # 5. Export Markdown Report for 小明
+    print("\n" + "-" * 60)
+    print("  4. Export Personalized Markdown Report for '小明'")
+    print("-" * 60)
+    import os
+    os.makedirs("data/reports", exist_ok=True)
+    report_file = "data/reports/小明_demo_report.md"
+    report_content = g.export_recommendation_report("小明", report_file)
+    print(f"  Markdown report successfully generated and saved to: {report_file}")
+    print("  Report preview (first 15 lines):")
+    import sys
+    safe_preview = "\n".join(report_content.splitlines()[:15])
+    encoding = sys.stdout.encoding or "utf-8"
+    print(safe_preview.encode(encoding, errors="replace").decode(encoding))
+    print("  ...")
+
     print("\n" + "=" * 60)
     print("              DEMONSTRATION COMPLETE")
     print("=" * 60)

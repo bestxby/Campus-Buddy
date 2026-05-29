@@ -119,11 +119,17 @@
   3. BFS 遍历时，将遍历到的所有节点放入当前 Component 列表，并标记为已访问。
   4. 重复上述步骤直至所有节点访问完毕，返回所有 Component 列表。
 
+### 5. 带解释路径的活动推荐与 Markdown 报告导出 (扩展功能)
+* **带解释路径的推荐 (get_activity_recommendations_with_paths)**：
+  除了返回活动名称外，算法通过追溯 `student -> interest -> activity` 的桥梁，构造一条详细的可视化关系链字符串（如 `student:小明 --(兴趣强度: 5)--> interest:Python ----> activity:Python入门工作坊`）。并获取活动的时间和容量，最终按照学生的兴趣强度降序排列推荐活动。
+* **报告导出 (export_recommendation_report)**：
+  将学生画像、解释路径活动推荐、Jaccard 相似度搭子列表以及其在社交图谱中的社区指标汇总，编译为格式化 Markdown 文档，写入磁盘中。
+
 ---
 
 ## 📈 五、核心操作复杂度分析
 
-设 $V$ 为图的节点总数，$E$ 为图的边总数，$d_{\text{avg}}$ 为图顶点的平均度数，$B$ 为与当前学生有共同兴趣的搭子数量。
+设 $V$ 为图 of 节点总数，$E$ 为图 of 边总数，$d_{\text{avg}}$ 为图顶点的平均度数，$B$ 为与当前学生有共同兴趣的搭子数量。
 
 | 核心操作 | 时间复杂度 | 空间复杂度 | 算法描述 / 备注 |
 | :--- | :--- | :--- | :--- |
@@ -134,6 +140,7 @@
 | **连通分量 (connected_components)**| $O(V + E)$ | $O(V)$ | 标准的 BFS 全图遍历，每个顶点和边均只入队/被处理一次。 |
 | **Jaccard 搭子排序 (Ranked Buddies)**| $O(B \cdot d_{\text{avg}})$ | $O(B)$ | 对 $B$ 个搭子，分别计算其与当前学生兴趣的交集和并集（集合大小 $\le d_{\text{avg}}$）。 |
 | **BFS 最短寻路 (find_path)** | $O(V + E)$ | $O(V)$ | 使用哈希 Map 记录前驱节点，寻路终止时反向回溯。空间复杂度比存储整条路径 of BFS 更优。 |
+| **Markdown 报告导出 (export_report)**| $O(d_{\text{avg}}^2 + B \cdot d_{\text{avg}} + V + E)$| $O(V + B)$ | 整合画像、推荐路径计算、搭子排序以及连通图探测。输出文件写入磁盘。 |
 
 ---
 

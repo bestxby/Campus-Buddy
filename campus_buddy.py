@@ -88,6 +88,163 @@ class CampusBuddyGraph:
 
         return sorted(list(activities))
 
+    def get_activity_recommendations_with_paths(self, student):
+        """
+        Recommends activities with their explanation path and metadata.
+        Returns a list of dicts: [
+            {
+                "activity": "周三篮球赛",
+                "interest": "篮球",
+                "level": 5,
+                "capacity": 10,
+                "time_slot": "周三晚",
+                "path": "student:小明 --(兴趣强度: 5)--> interest:篮球 ----> activity:周三篮球赛"
+            },
+            ...
+        ]
+        """
+        start = self.node("student", student)
+        if start not in self.graph:
+            return []
+
+        registered = {
+            n.removeprefix("activity:")
+            for n in self.graph[start]
+            if n.startswith("activity:")
+        }
+        
+        recommendations = []
+        for interest_node in self.graph[start]:
+            if not interest_node.startswith("interest:"):
+                continue
+            interest_name = interest_node.removeprefix("interest:")
+            # Retrieve the student's interest level if it exists, default to "未设"
+            level = self.student_interest_levels.get((student, interest_name), "未设")
+            
+            for neighbor in self.graph[interest_node]:
+                if neighbor.startswith("activity:"):
+                    act_name = neighbor.removeprefix("activity:")
+                    if act_name not in registered:
+                        capacity = self.activity_capacities.get(act_name, "未设")
+                        time_slot = self.activity_time_slots.get(act_name, "未设")
+                        
+                        path_str = f"student:{student} --(兴趣强度: {level})--> interest:{interest_name} ----> activity:{act_name}"
+                        recommendations.append({
+                            "activity": act_name,
+                            "interest": interest_name,
+                            "level": level,
+                            "capacity": capacity,
+                            "time_slot": time_slot,
+                            "path": path_str
+                        })
+                        
+        # Sort by level descending (if level is int, otherwise treat as 0), then by activity name
+        def get_sort_key(item):
+            lvl = item["level"]
+            lvl_val = lvl if isinstance(lvl, int) else 0
+            return (-lvl_val, item["activity"])
+            
+        return sorted(recommendations, key=get_sort_key)
+
+    def export_recommendation_report(self, student, file_path=None):
+        """
+        Generates a markdown recommendation report for a student and optionally exports to file.
+        Returns the markdown string.
+        """
+        import os
+        start = self.node("student", student)
+        if start not in self.graph:
+            raise ValueError(f"Student '{student}' not found in the graph.")
+
+        # 1. Gather student interests
+        interests = []
+        for n in self.graph[start]:
+            if n.startswith("interest:"):
+                name = n.removeprefix("interest:")
+                lvl = self.student_interest_levels.get((student, name), "未设")
+                interests.append((name, lvl))
+        interests.sort(key=lambda x: (-x[1] if isinstance(x[1], int) else 0, x[0]))
+
+        # 2. Get activity recommendations with paths
+        act_recs = self.get_activity_recommendations_with_paths(student)
+
+        # 3. Get buddy recommendations (ranked by Jaccard similarity)
+        buddies = self.recommend_buddies_ranked(student)
+
+        # 4. Find community stats (connected component)
+        student_component = None
+        for comp in self.connected_components():
+            if start in comp:
+                student_component = comp
+                break
+        comp_size = len(student_component) if student_component else 0
+        comp_students = len([n for n in student_component if n.startswith("student:")]) if student_component else 0
+
+        # Build Markdown content
+        md = []
+        md.append(f"# 🧭 Campus Buddy 个性化校园推荐报告 — {student}")
+        md.append(f"\n> **报告生成时间**: 2026-05-29")
+        md.append(f"\n---\n")
+
+        # Section 1: User Profile
+        md.append("## 👤 个人画像与标签")
+        if interests:
+            md.append("您目前在系统登记的兴趣倾向及强度（1-5）：\n")
+            for name, lvl in interests:
+                stars = "★" * lvl if isinstance(lvl, int) else "未设定"
+                md.append(f"* **{name}** (兴趣等级: `{lvl}` {stars})")
+        else:
+            md.append("您目前尚未在系统中登记任何兴趣。")
+        md.append("\n---\n")
+
+        # Section 2: Recommended Activities
+        md.append("## 🎉 智能活动推荐（两跳推荐路径）")
+        if act_recs:
+            md.append("系统根据您的兴趣，为您推荐了以下尚未报名的活动，并附带了关系链推荐路径：\n")
+            for idx, item in enumerate(act_recs, 1):
+                md.append(f"### {idx}. {item['activity']}")
+                md.append(f"* **所属兴趣圈**: 🎯 `{item['interest']}`")
+                md.append(f"* **活动容量**: 👥 `{item['capacity']} 人` | **时间段**: ⏰ `{item['time_slot']}`")
+                md.append(f"* **推荐路径解释**:")
+                md.append(f"  `{item['path']}`\n")
+        else:
+            md.append("暂时没有基于您的兴趣推荐的活动。您可以尝试添加更多兴趣标签！")
+        md.append("\n---\n")
+
+        # Section 3: Recommended Buddies
+        md.append("## 🤝 志同道合的活动搭子（按 Jaccard 相似度排序）")
+        if buddies:
+            md.append("系统为您匹配了拥有共同兴趣圈子的同学，最匹配的排在最前：\n")
+            md.append("| 排名 | 搭子姓名 | 兴趣重合度 | 共同的兴趣 |")
+            md.append("| --- | --- | --- | --- |")
+            for rank, (buddy_name, score, shared) in enumerate(buddies, 1):
+                pct = f"{score * 100:.1f}%"
+                shared_str = "、".join(shared)
+                md.append(f"| #{rank} | **{buddy_name}** | {pct} | {shared_str} |")
+        else:
+            md.append("暂时没有找到与您拥有共同兴趣的学生。")
+        md.append("\n---\n")
+
+        # Section 4: Community Metrics
+        md.append("## 🌐 社交网络社区洞察")
+        md.append(f"根据社交网络拓扑分析，您当前所属的**连通社区**包含：")
+        md.append(f"* 该独立社群节点总数: `{comp_size}` 个")
+        md.append(f"* 该社区内活跃学生数: `{comp_students}` 位")
+        md.append("\n*快叫上新匹配的搭子，一起报名参加推荐的活动吧！*")
+
+        report_content = "\n".join(md)
+
+        # Write to file if file_path is specified
+        if file_path:
+            # Create directory if it doesn't exist
+            dir_name = os.path.dirname(file_path)
+            if dir_name:
+                os.makedirs(dir_name, exist_ok=True)
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(report_content)
+
+        return report_content
+
     def recommend_buddies(self, student):
         """
         Recommends activity buddies (other students) for a student.

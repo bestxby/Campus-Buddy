@@ -286,3 +286,38 @@ def test_multiple_connected_components():
     g.add_student_interest("学生B", "绘画")
     components = g.connected_components()
     assert len(components) == 2
+
+def test_recommendations_with_paths_and_report(tmp_path):
+    g = CampusBuddyGraph()
+    # Add student interest with levels
+    g.add_student_interest("测试学生", "Python", level=5)
+    g.add_student_interest("测试学生", "篮球", level=2)
+    # Add activities with capacity and time_slots
+    g.add_activity_interest("Python基础班", "Python", capacity=15, time_slot="周一晚")
+    g.add_activity_interest("深夜街球赛", "篮球", capacity=10, time_slot="周五晚")
+    
+    # 1. Test recommendations with paths
+    recs = g.get_activity_recommendations_with_paths("测试学生")
+    assert len(recs) == 2
+    # Verify sorting: Python (level 5) comes first
+    assert recs[0]["activity"] == "Python基础班"
+    assert recs[0]["level"] == 5
+    assert recs[0]["capacity"] == 15
+    assert recs[0]["time_slot"] == "周一晚"
+    assert "Python基础班" in recs[0]["path"]
+    
+    assert recs[1]["activity"] == "深夜街球赛"
+    assert recs[1]["level"] == 2
+    
+    # 2. Test markdown report generation
+    report_file = tmp_path / "report.md"
+    report = g.export_recommendation_report("测试学生", str(report_file))
+    
+    # Verify file is created and has valid markdown
+    assert report_file.exists()
+    file_content = report_file.read_text(encoding="utf-8")
+    assert "# 🧭 Campus Buddy 个性化校园推荐报告 — 测试学生" in file_content
+    assert "Python基础班" in file_content
+    assert "深夜街球赛" in file_content
+    assert "周一晚" in file_content
+    assert "15 人" in file_content
