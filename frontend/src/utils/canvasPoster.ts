@@ -36,6 +36,8 @@ export function drawAndDownloadPng(
   const ctx = canvas.getContext('2d')
   if (!ctx) return
   ctx.scale(2, 2)
+  ctx.imageSmoothingEnabled = true
+  ctx.imageSmoothingQuality = 'high'
 
   // 1. Dark Neon Background Gradient
   const bgGrad = ctx.createLinearGradient(0, 0, 0, 1800)
@@ -72,7 +74,7 @@ export function drawAndDownloadPng(
   const displayInterests = userInterests.slice(0, 3)
   displayInterests.forEach((interest, idx) => {
     const angle = (idx * Math.PI * 2) / Math.max(displayInterests.length, 1)
-    const dist = 140
+    const dist = 120
     nodes.push({
       x: 600 + Math.cos(angle) * dist,
       y: 625 + Math.sin(angle) * dist,
@@ -86,7 +88,7 @@ export function drawAndDownloadPng(
   const displayBuddies = buddiesList.slice(0, 3)
   displayBuddies.forEach((buddy, idx) => {
     const angle = ((idx + 0.5) * Math.PI * 2) / Math.max(displayBuddies.length, 1)
-    const dist = 245
+    const dist = 210
     nodes.push({
       x: 600 + Math.cos(angle) * dist,
       y: 625 + Math.sin(angle) * dist,
@@ -190,25 +192,27 @@ export function drawAndDownloadPng(
   ctx.stroke()
 
   ctx.textAlign = 'left'
+  ctx.textBaseline = 'middle'
   ctx.fillStyle = '#ffb74d'
   ctx.font = 'bold 30px "Outfit", "Inter", "Fira Sans", sans-serif'
-  ctx.fillText(name, 160, 246)
+  ctx.fillText(name, 160, 235)
 
   // Persona Badge
   ctx.fillStyle = '#a855f7'
   const nameWidth = ctx.measureText(name).width
-  drawRoundRect(ctx, 160 + nameWidth + 20, 212, 120, 36, 18)
+  drawRoundRect(ctx, 160 + nameWidth + 20, 217, 120, 36, 18)
   ctx.fill()
   ctx.fillStyle = '#ffffff'
   ctx.font = 'bold 16px "Outfit", "Inter", "Fira Sans", sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText(persona, 160 + nameWidth + 20 + 60, 236)
+  ctx.fillText(persona, 160 + nameWidth + 20 + 60, 235)
 
   // Report Time info
   ctx.textAlign = 'right'
   ctx.fillStyle = '#64748b'
   ctx.font = '16px "Outfit", "Inter", "Fira Sans", sans-serif'
-  ctx.fillText(`匹配报告生成时间: ${new Date().toLocaleDateString('zh-CN')}`, 1040, 236)
+  ctx.fillText(`匹配报告生成时间: ${new Date().toLocaleDateString('zh-CN')}`, 1040, 235)
+  ctx.textBaseline = 'alphabetic'
 
   // 6. Visual Network Title
   ctx.textAlign = 'left'
@@ -274,9 +278,11 @@ export function drawAndDownloadPng(
       ctx.fill()
       
       ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
       ctx.fillStyle = '#22d3ee'
       ctx.font = 'bold 18px "Outfit", "Inter", "Fira Sans", sans-serif'
-      ctx.fillText((idx + 1).toString(), 165, aY + 31)
+      ctx.fillText((idx + 1).toString(), 165, aY + 25)
+      ctx.textBaseline = 'alphabetic'
       
       // Activity Title
       ctx.textAlign = 'left'
