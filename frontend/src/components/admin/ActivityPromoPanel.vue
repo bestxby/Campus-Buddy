@@ -1,14 +1,28 @@
 <template>
   <div class="promo-box card glow-cyan fade-in">
-    <div class="promo-header">
-      <span>🎯 活动【{{ activityName }}】定向宣传与关怀推送助手</span>
+    <div class="promo-header" style="display: flex; align-items: center;">
+      <span style="display: inline-flex; align-items: center;">
+        <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; color: #67e8f9;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="3"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+        </svg>
+        活动【{{ activityName }}】定向宣传与关怀推送助手
+      </span>
       <button @click="emit('close')" class="close-promo-btn">×</button>
     </div>
     <div class="promo-body">
       <p class="promo-intro">寻找对 <b>{{ interestName }}</b> 有共同兴趣但<b>尚未知晓或未报名</b>的同学：</p>
       <div v-if="promoTargetsForSelectedActivity.length > 0" class="promo-targets-list">
-        <span v-for="target in promoTargetsForSelectedActivity" :key="target" class="target-student-chip">
-          👤 {{ target }}
+        <span v-for="target in promoTargetsForSelectedActivity" :key="target" class="target-student-chip" style="display: inline-flex; align-items: center; gap: 4px;">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.8;">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          {{ target }}
         </span>
       </div>
       <div v-else class="promo-empty">
@@ -20,8 +34,21 @@
           @click="sendTargetedPromotion"
           class="btn btn-xs btn-primary glow-orange send-promo-btn"
           :disabled="promoSuccess"
+          style="display: inline-flex; align-items: center; justify-content: center; gap: 4px;"
         >
-          {{ promoSuccess ? '✓ 邀请消息已推送' : `📢 发送定向活动邀请` }}
+          <template v-if="promoSuccess">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            邀请消息已推送
+          </template>
+          <template v-else>
+            <svg class="icon-svg" viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            发送定向活动邀请
+          </template>
         </button>
       </div>
     </div>

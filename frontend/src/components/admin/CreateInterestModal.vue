@@ -4,7 +4,13 @@
       <!-- Header -->
       <div class="modal-header">
         <div class="modal-title-group">
-          <h3>➕ 新增校园兴趣标签 (Publish New Interest Tag)</h3>
+          <h3 style="display: inline-flex; align-items: center;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            新增校园兴趣标签 (Publish New Interest Tag)
+          </h3>
           <span class="modal-subtitle">创建新的兴趣圈子标签，该标签可用于发布活动以及作为学生的个人兴趣选项</span>
         </div>
         <button @click="handleClose" class="close-btn" title="关闭 modal">×</button>
@@ -22,7 +28,14 @@
             class="form-input"
             @input="clearError"
           />
-          <span v-if="errorMsg" class="error-text">{{ errorMsg }}</span>
+          <span v-if="errorMsg" class="error-text" style="display: inline-flex; align-items: center; gap: 2.5px;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink: 0;">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            {{ errorMsg }}
+          </span>
         </div>
 
         <!-- Interest Category Domain -->
@@ -43,7 +56,28 @@
               }"
               @click="form.domain = d.key"
             >
-              <span class="domain-icon">{{ d.icon }}</span>
+              <span class="domain-icon" style="display: inline-flex; align-items: center;">
+                <svg v-if="d.key === 'sports'" class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M6 12a6 6 0 0 1 12 0"></path>
+                  <path d="M12 6a6 6 0 0 1 0 12"></path>
+                </svg>
+                <svg v-else-if="d.key === 'arts'" class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"></path>
+                </svg>
+                <svg v-else-if="d.key === 'tech'" class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                <svg v-else-if="d.key === 'social'" class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </span>
               <span class="domain-text">{{ d.label }}</span>
             </button>
           </div>
@@ -57,8 +91,12 @@
           @click="handleSubmit" 
           :disabled="!isValid" 
           class="btn btn-primary glow-orange submit-btn"
+          style="display: inline-flex; align-items: center; justify-content: center; gap: 4px;"
         >
-          🚀 确认发布标签 (Publish Tag)
+          <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          确认发布标签 (Publish Tag)
         </button>
       </div>
     </div>
@@ -112,7 +150,7 @@ const handleSubmit = () => {
 
   // Check for duplicate in graph
   if (graphStore.graph.has(interestNode)) {
-    errorMsg.value = '⚠️ 该兴趣标签已存在，请输入其他名称 (Interest tag already exists)'
+    errorMsg.value = '该兴趣标签已存在，请输入其他名称 (Interest tag already exists)'
     return
   }
 

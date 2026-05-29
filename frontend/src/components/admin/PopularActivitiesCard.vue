@@ -2,9 +2,20 @@
   <div class="dashboard-grid-card card">
     <div class="col-header">
       <div class="title-with-info">
-        <h3>🔥 热门校园活动排行</h3>
+        <h3 style="display: inline-flex; align-items: center;">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;">
+            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"></path>
+          </svg>
+          热门校园活动排行
+        </h3>
         <div class="info-tooltip-wrapper">
-          <span class="info-icon">ℹ️</span>
+          <span class="info-icon" style="display: inline-flex; align-items: center; justify-content: center;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </span>
           <div class="tooltip-content">
             <h4>热门活动排行说明</h4>
             <p>展示全校学生参与度最高、最受欢迎的校园社交活动。您可以一键“置顶推荐”这些活动，使其在学生端推荐列表中优先置顶展示，以吸引更多同学报名参与。</p>
@@ -37,8 +48,20 @@
               @click="togglePromotion(item.name)" 
               class="btn btn-xs action-btn"
               :class="isPromoted(item.name) ? 'btn-promoted glow-orange' : 'btn-secondary glow-cyan'"
+              style="display: inline-flex; align-items: center; justify-content: center; gap: 2px;"
             >
-              {{ isPromoted(item.name) ? '✓ 已置顶推荐' : '⚡ 置顶推荐' }}
+              <template v-if="isPromoted(item.name)">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                已置顶推荐
+              </template>
+              <template v-else>
+                <svg class="icon-svg" viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="3">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                置顶推荐
+              </template>
             </button>
           </div>
         </div>
@@ -86,7 +109,7 @@ const togglePromotion = (name: string) => {
   overflow: visible;
   height: 100%;
   background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
-  padding: 10px 14px !important;
+  padding: 12px 16px !important;
 }
 .col-header {
   display: flex;

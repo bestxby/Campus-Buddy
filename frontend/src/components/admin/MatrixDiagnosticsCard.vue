@@ -2,9 +2,24 @@
   <div class="dashboard-grid-card card">
     <div class="col-header">
       <div class="title-with-info">
-        <h3>🧮 社交邻接矩阵分析</h3>
+        <h3 style="display: inline-flex; align-items: center;">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+            <line x1="15" y1="3" x2="15" y2="21"></line>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="3" y1="15" x2="21" y2="15"></line>
+          </svg>
+          社交邻接矩阵分析
+        </h3>
         <div class="info-tooltip-wrapper">
-          <span class="info-icon">ℹ️</span>
+          <span class="info-icon" style="display: inline-flex; align-items: center; justify-content: center;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </span>
           <div class="tooltip-content left-align">
             <h4>邻接关联矩阵分析</h4>
             <p>通过多维网格分析，展现全校的兴趣重合度和活动参与分布。点击下方对应的分析按钮，即可在全局全屏视图下展开并深入探索数据关系。</p>
@@ -19,7 +34,13 @@
         @click="emit('open-graph', true, 'matrix', 'student-interest')"
         class="matrix-btn neon-cyan-btn"
       >
-        <span class="btn-left">👤 学生个人兴趣倾向分析</span>
+        <span class="btn-left" style="display: inline-flex; align-items: center;">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; opacity: 0.85;">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          学生个人兴趣倾向分析
+        </span>
         <span class="btn-arrow">➔</span>
       </button>
 
@@ -28,7 +49,17 @@
         @click="emit('open-graph', true, 'matrix', 'interest-cooccurrence')"
         class="matrix-btn neon-orange-btn"
       >
-        <span class="btn-left">🎯 兴趣社群交叉共现分析</span>
+        <span class="btn-left" style="display: inline-flex; align-items: center;">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; opacity: 0.85;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="3"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+          </svg>
+          兴趣社群交叉共现分析
+        </span>
         <span class="btn-arrow">➔</span>
       </button>
 
@@ -37,7 +68,13 @@
         @click="emit('open-graph', true, 'matrix', 'student-activity')"
         class="matrix-btn neon-green-btn"
       >
-        <span class="btn-left">🎉 校园活动参与分布分析</span>
+        <span class="btn-left" style="display: inline-flex; align-items: center;">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; opacity: 0.85;">
+            <circle cx="12" cy="8" r="7"></circle>
+            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+          </svg>
+          校园活动参与分布分析
+        </span>
         <span class="btn-arrow">➔</span>
       </button>
     </div>
@@ -57,7 +94,7 @@ const emit = defineEmits<{
   overflow: visible;
   height: 100%;
   background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
-  padding: 10px 14px !important;
+  padding: 12px 16px !important;
 }
 .col-header {
   border-bottom: 1px solid var(--border-color);

@@ -5,11 +5,11 @@
       <div class="logo-main-group">
         <div class="sidebar-logo-icon">
           <svg class="icon-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10" stroke="var(--accent-neon-cyan)" stroke-width="1.5"></circle>
+            <circle cx="12" cy="12" r="10" stroke="var(--accent-cyan)" stroke-width="1.5"></circle>
             <!-- Needle split into two halves for a premium 3D neon compass effect -->
-            <polygon points="12,12 16.24,7.76 14.12,14.12" fill="var(--accent-neon-pink)" stroke="var(--accent-neon-pink)" stroke-width="0.5"></polygon>
-            <polygon points="12,12 16.24,7.76 9.88,9.88" fill="#b30059" stroke="#b30059" stroke-width="0.5"></polygon>
-            <polygon points="12,12 7.76,16.24 9.88,9.88" fill="var(--accent-neon-cyan)" stroke="var(--accent-neon-cyan)" stroke-width="0.5"></polygon>
+            <polygon points="12,12 16.24,7.76 14.12,14.12" fill="var(--accent-orange)" stroke="var(--accent-orange)" stroke-width="0.5"></polygon>
+            <polygon points="12,12 16.24,7.76 9.88,9.88" fill="#b35a00" stroke="#b35a00" stroke-width="0.5"></polygon>
+            <polygon points="12,12 7.76,16.24 9.88,9.88" fill="var(--accent-cyan)" stroke="var(--accent-cyan)" stroke-width="0.5"></polygon>
             <polygon points="12,12 7.76,16.24 14.12,14.12" fill="#0099ab" stroke="#0099ab" stroke-width="0.5"></polygon>
             <circle cx="12" cy="12" r="1.5" fill="#ffffff" stroke="none"></circle>
           </svg>

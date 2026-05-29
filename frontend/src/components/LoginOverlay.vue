@@ -1,5 +1,9 @@
 <template>
   <div class="login-overlay fade-in">
+    <!-- Glowing background blobs for premium aurora effect -->
+    <div class="login-bg-glow blob-1"></div>
+    <div class="login-bg-glow blob-2"></div>
+
     <!-- Loading animation (shown after submit, before dashboard) -->
     <LoginLoadingScreen
       v-if="loadingPayload"
@@ -21,11 +25,11 @@
         <div class="logo-main-group">
           <div class="login-logo-icon">
             <svg class="icon-svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10" stroke="var(--accent-neon-cyan)" stroke-width="1.5"></circle>
+              <circle cx="12" cy="12" r="10" stroke="var(--accent-cyan)" stroke-width="1.5"></circle>
               <!-- Needle split into two halves for a premium 3D neon compass effect -->
-              <polygon points="12,12 16.24,7.76 14.12,14.12" fill="var(--accent-neon-pink)" stroke="var(--accent-neon-pink)" stroke-width="0.5"></polygon>
-              <polygon points="12,12 16.24,7.76 9.88,9.88" fill="#b30059" stroke="#b30059" stroke-width="0.5"></polygon>
-              <polygon points="12,12 7.76,16.24 9.88,9.88" fill="var(--accent-neon-cyan)" stroke="var(--accent-neon-cyan)" stroke-width="0.5"></polygon>
+              <polygon points="12,12 16.24,7.76 14.12,14.12" fill="var(--accent-orange)" stroke="var(--accent-orange)" stroke-width="0.5"></polygon>
+              <polygon points="12,12 16.24,7.76 9.88,9.88" fill="#b35a00" stroke="#b35a00" stroke-width="0.5"></polygon>
+              <polygon points="12,12 7.76,16.24 9.88,9.88" fill="var(--accent-cyan)" stroke="var(--accent-cyan)" stroke-width="0.5"></polygon>
               <polygon points="12,12 7.76,16.24 14.12,14.12" fill="#0099ab" stroke="#0099ab" stroke-width="0.5"></polygon>
               <circle cx="12" cy="12" r="1.5" fill="#ffffff" stroke="none"></circle>
             </svg>
@@ -47,7 +51,11 @@
           :class="{ 'tab-active': activeTab === 'student' }"
           @click="activeTab = 'student'"
         >
-          👤 学生登录入口
+          <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1.5px;">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          学生登录入口
         </button>
         <button
           type="button"
@@ -57,7 +65,11 @@
           :class="{ 'tab-active-admin': activeTab === 'admin' }"
           @click="activeTab = 'admin'"
         >
-          🔐 管理员控制台
+          <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1.5px;">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          管理员控制台
         </button>
       </div>
 
@@ -142,16 +154,55 @@ const handleSubmitted = () => {
   justify-content: center;
   align-items: center;
   padding: 20px;
+  overflow: hidden; /* Prevent scrolls from background blobs */
+}
+.login-bg-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+.blob-1 {
+  width: 400px;
+  height: 400px;
+  background: var(--accent-orange);
+  top: -100px;
+  left: -100px;
+  animation: float-blob-1 20s infinite alternate ease-in-out;
+}
+.blob-2 {
+  width: 500px;
+  height: 500px;
+  background: var(--accent-cyan);
+  bottom: -150px;
+  right: -100px;
+  animation: float-blob-2 25s infinite alternate ease-in-out;
+}
+@keyframes float-blob-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(100px, 80px) scale(1.1); }
+  100% { transform: translate(-50px, 120px) scale(0.95); }
+}
+@keyframes float-blob-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-120px, -50px) scale(0.9); }
+  100% { transform: translate(80px, -100px) scale(1.15); }
 }
 .login-card {
   max-width: 100%;
-  padding: 16px 24px;
-  background-color: var(--panel-bg);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  padding: 24px 32px;
+  background: rgba(9, 14, 26, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.05);
   max-height: 95vh;
   overflow-y: auto;
   transition: width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.35s ease, border-color 0.35s ease;
-  border-radius: 8px;
+  border-radius: 12px;
+  z-index: 1;
 }
 .student-card-width {
   width: 750px;
@@ -199,12 +250,12 @@ const handleSubmitted = () => {
 .login-logo-banner {
   margin-bottom: 20px;
   padding: 12px 16px;
-  background: linear-gradient(145deg, #09090e 0%, #110e20 50%, #030712 100%);
-  border: 1px solid rgba(0, 240, 255, 0.2);
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 .login-logo-banner::before {
   content: '';
@@ -213,7 +264,7 @@ const handleSubmitted = () => {
   right: -15px;
   width: 80px;
   height: 80px;
-  background: radial-gradient(circle, rgba(0, 240, 255, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(253, 151, 31, 0.06) 0%, transparent 70%);
   pointer-events: none;
 }
 .logo-main-group {
@@ -223,15 +274,9 @@ const handleSubmitted = () => {
 }
 .login-logo-icon {
   font-size: 32px;
-  filter: drop-shadow(0 0 8px #00f0ff) drop-shadow(0 0 15px rgba(255, 0, 127, 0.2));
-  animation: floatIcon 3s ease-in-out infinite;
   display: flex;
   align-items: center;
   flex-shrink: 0;
-}
-@keyframes floatIcon {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
 }
 .login-logo-text-wrap {
   display: flex;
@@ -242,20 +287,15 @@ const handleSubmitted = () => {
   font-size: 16px;
   font-weight: 950;
   letter-spacing: -0.3px;
-  background: linear-gradient(90deg, #ff007f 0%, #ff7f00 45%, #00f0ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 6px rgba(0, 240, 255, 0.2);
+  color: var(--text-primary);
   line-height: 1.2;
 }
 .login-logo-sub {
   font-size: 10.5px;
-  color: #93c5fd;
+  color: #94a3b8;
   margin-top: 3px;
   letter-spacing: 0.2px;
   font-weight: 600;
-  text-shadow: 0 0 4px rgba(147, 197, 253, 0.2);
   line-height: 1.2;
 }
 
@@ -268,7 +308,7 @@ const handleSubmitted = () => {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .login-github-item {
   display: flex;
@@ -280,7 +320,7 @@ const handleSubmitted = () => {
   padding: 8px 12px;
   border-radius: 8px;
   flex: 1;
-  min-width: 160px;
+  min-width: 0;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
 }
@@ -371,6 +411,12 @@ const handleSubmitted = () => {
 @media (max-width: 480px) {
   .git-divider {
     display: none;
+  }
+  .login-github-card {
+    flex-wrap: wrap;
+  }
+  .login-github-item {
+    min-width: 100%;
   }
 }
 </style>

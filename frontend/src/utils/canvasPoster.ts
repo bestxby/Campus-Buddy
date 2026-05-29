@@ -43,7 +43,7 @@ export function drawAndDownloadPng(
   ctx.imageSmoothingQuality = 'high'
 
   let socialRole = persona
-  let badgeColor = '#a855f7'
+  let badgeColor = '#f472b6'
   if (isAdminMode) {
     let graph: Map<string, Set<string>> = new Map()
     let bridgeStudents: any[] = []
@@ -145,7 +145,7 @@ export function drawAndDownloadPng(
       x: 150 + Math.random() * 900,
       y: 405 + Math.random() * 440,
       size: 2 + Math.random() * 2.5,
-      color: Math.random() > 0.55 ? 'rgba(34, 211, 238, 0.25)' : 'rgba(168, 85, 247, 0.25)'
+      color: Math.random() > 0.55 ? 'rgba(34, 211, 238, 0.25)' : 'rgba(253, 151, 31, 0.25)'
     })
   }
 

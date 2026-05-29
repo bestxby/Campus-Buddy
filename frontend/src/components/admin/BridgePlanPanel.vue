@@ -1,7 +1,12 @@
 <template>
   <div class="bridge-plan-box card glow-orange fade-in">
     <div class="bridge-header">
-      <h4>⚡ 人脉拓扑桥接方案</h4>
+      <h4 style="display: inline-flex; align-items: center;">
+        <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; color: #ffb74d;">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        人脉拓扑桥接方案
+      </h4>
       <button @click="emit('close')" class="close-promo-btn">×</button>
     </div>
     
@@ -53,8 +58,13 @@
       <button 
         @click="applyBridgePlan"
         class="btn btn-primary glow-orange apply-bridge-btn"
+        style="display: inline-flex; align-items: center; justify-content: center; gap: 4px;"
       >
-        📢 一键发送桥接建议
+        <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        一键发送桥接建议
       </button>
     </div>
   </div>
@@ -210,7 +220,7 @@ const applyBridgePlan = () => {
   flex-shrink: 0;
 }
 .option-badge.opt-interest { background-color: rgba(6, 182, 212, 0.1); color: #22d3ee; }
-.option-badge.opt-student { background-color: rgba(167, 139, 250, 0.1); color: #c084fc; }
+.option-badge.opt-student { background-color: rgba(244, 114, 182, 0.1); color: #f472b6; }
 .option-badge.opt-activity { background-color: rgba(253, 151, 31, 0.12); color: #ffb74d; }
 .option-title {
   font-size: 10px;

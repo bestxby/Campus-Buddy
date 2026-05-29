@@ -52,7 +52,7 @@
   bottom: -4px;
   right: -4px;
   font-size: 12px;
-  filter: drop-shadow(0 0 4px rgba(168,85,247,0.8));
+  filter: drop-shadow(0 0 4px rgba(244,114,182,0.8));
   animation: privPulse 2s ease-in-out infinite;
 }
 @keyframes privPulse {
@@ -91,7 +91,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 90px;
+  max-width: 140px;
 }
 .profile-persona-badge {
   display: inline-block;
@@ -160,14 +160,14 @@
   color: rgba(255,255,255,0.7);
 }
 .mode-btn-active-private {
-  background: rgba(168,85,247,0.12);
-  border-color: rgba(168,85,247,0.3);
-  color: #c084fc;
-  box-shadow: 0 0 8px rgba(168,85,247,0.15);
+  background: rgba(244,114,182,0.12);
+  border-color: rgba(244,114,182,0.3);
+  color: #f472b6;
+  box-shadow: 0 0 8px rgba(244,114,182,0.15);
 }
 .mode-btn-active-private:hover {
-  background: rgba(168,85,247,0.2);
-  border-color: rgba(168,85,247,0.5);
+  background: rgba(244,114,182,0.2);
+  border-color: rgba(244,114,182,0.5);
 }
 .mode-btn-active-social {
   background: rgba(253,151,31,0.12);
@@ -188,26 +188,26 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(168,85,247,0.06);
-  border: 1px solid rgba(168,85,247,0.18);
+  background: rgba(244,114,182,0.06);
+  border: 1px solid rgba(244,114,182,0.18);
   border-radius: 6px;
   padding: 5px 9px;
   font-size: 10px;
-  color: rgba(192,132,252,0.9);
+  color: rgba(244,114,182,0.9);
   letter-spacing: 0.2px;
 }
 .privacy-status-dot {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #a855f7;
-  box-shadow: 0 0 5px rgba(168,85,247,0.7);
+  background: #f472b6;
+  box-shadow: 0 0 5px rgba(244,114,182,0.7);
   flex-shrink: 0;
   animation: privDotPulse 2s ease-in-out infinite;
 }
 @keyframes privDotPulse {
-  0%,100% { opacity: 0.6; box-shadow: 0 0 4px rgba(168,85,247,0.5); }
-  50% { opacity: 1; box-shadow: 0 0 8px rgba(168,85,247,0.9); }
+  0%,100% { opacity: 0.6; box-shadow: 0 0 4px rgba(244,114,182,0.5); }
+  50% { opacity: 1; box-shadow: 0 0 8px rgba(244,114,182,0.9); }
 }
 
 /* ── SOCIAL STATUS BAR ────────────────────────── */

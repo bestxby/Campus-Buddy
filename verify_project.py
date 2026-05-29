@@ -49,7 +49,7 @@ def main():
     # Compile the verification report
     reports = [
         os.path.join(root_dir, "system_verification_report.md"),
-        r"C:\Users\24740\.gemini\antigravity-ide\brain\5d8f71e5-1122-47be-abdb-0f9e63f61de4\system_verification_report.md"
+        r"C:\Users\24740\.gemini\antigravity-ide\brain\0aa6c2f6-5066-4980-9111-fdad82b33925\system_verification_report.md"
     ]
     
     for report_path in reports:

@@ -2,9 +2,21 @@
   <div class="dashboard-grid-card card">
     <div class="col-header">
       <div class="title-with-info">
-        <h3>📟 实时图算法与沙盒操作日志</h3>
+        <h3 style="display: inline-flex; align-items: center;">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
+          </svg>
+          实时图算法与沙盒操作日志
+        </h3>
         <div class="info-tooltip-wrapper">
-          <span class="info-icon">ℹ️</span>
+          <span class="info-icon" style="display: inline-flex; align-items: center; justify-content: center;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </span>
           <div class="tooltip-content">
             <h4>操作日志说明</h4>
             <p>实时滚动记录系统后台图算法的执行与沙盒环境操作进程。包含：图谱加载统计、BFS/介数中心性等图论指标的运算耗时、定向帮扶消息发送、推荐引擎计算请求，以及网络重置动作。</p>
@@ -37,7 +49,7 @@ import { logs } from '@/composables/useLogs'
   overflow: visible;
   height: 100%;
   background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
-  padding: 14px 18px !important;
+  padding: 12px 16px !important;
 }
 .col-header {
   display: flex;

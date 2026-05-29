@@ -1,15 +1,26 @@
 <template>
   <div class="card result-card">
     <div class="result-card-header">
-      <h3>🌐 全校所有活动</h3>
+      <h3>
+        <svg class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1px;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        全校所有活动
+      </h3>
     </div>
 
     <div class="all-activities-container">
       <!-- Search Box -->
       <div class="activity-search-wrapper">
+        <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 6px; opacity: 0.5;">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
         <input 
           v-model="allActivitiesSearchQuery" 
-          placeholder="🔍 搜索活动名称或关联兴趣标签..." 
+          placeholder="搜索活动名称或关联兴趣标签..." 
           class="activity-search-input"
         />
       </div>
@@ -25,7 +36,14 @@
           >
             <div class="activity-card-header-row">
               <div class="header-left">
-                <span class="activity-card-icon">🎉</span>
+                <span class="activity-card-icon" style="display: inline-flex; align-items: center; color: var(--accent-cyan);">
+                  <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </span>
                 <h4 class="activity-card-title" :title="act.name">{{ act.name }}</h4>
               </div>
               <div class="activity-card-tags-right">
@@ -40,7 +58,12 @@
 
             <div class="activity-card-footer">
               <div class="activity-card-members">
-                <span class="members-icon">👥</span>
+                <span class="members-icon" style="display: inline-flex; align-items: center; margin-right: 4px; vertical-align: -1px; color: var(--text-secondary);">
+                  <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                  </svg>
+                </span>
                 <span class="members-text">{{ act.studentCount }} 人已报名</span>
               </div>
 

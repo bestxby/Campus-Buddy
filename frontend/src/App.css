@@ -18,15 +18,17 @@
 .select-self-btn {
   padding: 10px 24px;
   font-size: 13px;
-  background: linear-gradient(135deg, #fd971f 0%, #ec4899 100%) !important;
-  color: #ffffff !important;
-  border: none !important;
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
   font-weight: 700;
-  box-shadow: 0 4px 15px rgba(253, 151, 31, 0.35);
+  box-shadow: none;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .select-self-btn:hover {
-  box-shadow: 0 6px 20px rgba(253, 151, 31, 0.5);
+  background-color: rgba(245, 158, 11, 0.25) !important;
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
   transform: translateY(-1px);
 }
 .tip-box { margin-top: 20px; padding: 14px 18px; background: rgba(6,182,212,0.05); border: 1px solid rgba(6,182,212,0.15); border-radius: 8px; font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
@@ -39,28 +41,22 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  overflow: hidden;
+  overflow: visible;
   height: 100%;
-  padding: 10px 10px 0;
-  margin: -10px -10px 0;
 }
 .recommendations-row {
   display: flex;
   gap: 16px;
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
   min-height: 0;
-  padding: 10px 10px 0;
-  margin: -10px -10px 0;
 }
 .rec-split-col {
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: 10px 10px 0;
-  margin: -10px -10px 0;
 }
 .rec-split-col.buddy-col {
   flex: 1.35;
@@ -76,48 +72,16 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   background: linear-gradient(135deg, rgba(18, 24, 38, 0.98) 0%, rgba(30, 41, 59, 0.92) 100%) !important;
-  border: none !important;
+  border: 1px solid rgba(253, 151, 31, 0.2) !important;
   border-radius: 8px;
   flex-shrink: 0;
   user-select: none;
   position: relative;
 }
-.student-graph-btn-card::before {
-  content: '';
-  position: absolute;
-  inset: -1.5px;
-  z-index: -1;
-  border-radius: 9.5px;
-  padding: 1.5px;
-  background: linear-gradient(
-    90deg,
-    #fd971f,
-    #ec4899,
-    #8b5cf6,
-    #06b6d4,
-    #34d399,
-    #fd971f,
-    #ec4899,
-    #8b5cf6
-  );
-  background-size: 300% 100%;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: gradientFlow 6s linear infinite;
-  transition: all 0.3s ease;
-}
 .student-graph-btn-card:hover {
   transform: translateY(-2px);
-}
-.student-graph-btn-card:hover::before {
-  inset: -2.5px;
-  padding: 2.5px;
-  border-radius: 10.5px;
-}
-@keyframes gradientFlow {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 300% 50%; }
+  border-color: rgba(253, 151, 31, 0.5) !important;
+  box-shadow: 0 4px 16px rgba(253, 151, 31, 0.1);
 }
 .student-card-content {
   display: flex;
@@ -216,10 +180,7 @@
   .mobile-title {
     font-size: 16px;
     font-weight: 800;
-    background: linear-gradient(90deg, #ff007f 0%, #00f0ff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text-primary);
   }
   .mobile-avatar {
     font-size: 18px;

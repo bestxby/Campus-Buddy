@@ -100,7 +100,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.node-student { color: #c084fc; flex-shrink: 0; }
+.node-student { color: #ffb74d; flex-shrink: 0; }
 .node-interest { color: #60a5fa; flex-shrink: 0; }
 .node-activity { color: #22d3ee; flex-shrink: 1; min-width: 0; }
 .flow-arrow { font-size: 10px; color: #ffb74d; font-weight: 900; margin: 0 3px; text-shadow: 0 0 4px rgba(253, 151, 31, 0.3); flex-shrink: 0; }

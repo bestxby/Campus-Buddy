@@ -2,9 +2,22 @@
   <div class="dashboard-grid-card card">
     <div class="col-header">
       <div class="title-with-info">
-        <h3>📊 全局社交网络特征指标</h3>
+        <h3>
+          <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1px;">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          全局社交网络特征指标
+        </h3>
         <div class="info-tooltip-wrapper">
-          <span class="info-icon">ℹ️</span>
+          <span class="info-icon" style="display: inline-flex; align-items: center; justify-content: center;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </span>
           <div class="tooltip-content left-align">
             <h4>图论特征指标说明</h4>
             <p>基于当前全校学生、兴趣标签与活动参与构成的社交关系图谱，实时计算出的高阶网络拓扑指标。</p>
@@ -17,7 +30,14 @@
       <div class="metric-row">
         <div class="metric-info">
           <div class="metric-meta">
-            <span class="metric-label">🌐 全校人脉连通率</span>
+            <span class="metric-label" style="display: inline-flex; align-items: center;">
+              <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              全校人脉连通率
+            </span>
             <div class="info-tooltip-wrapper sub-tooltip">
               <span class="info-icon mini-icon">?</span>
               <div class="tooltip-content left-align">
@@ -34,7 +54,15 @@
       <div class="metric-row">
         <div class="metric-info">
           <div class="metric-meta">
-            <span class="metric-label">👥 平均社交距离</span>
+            <span class="metric-label" style="display: inline-flex; align-items: center;">
+              <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              平均社交距离
+            </span>
             <div class="info-tooltip-wrapper sub-tooltip">
               <span class="info-icon mini-icon">?</span>
               <div class="tooltip-content left-align">
@@ -51,7 +79,16 @@
       <div class="metric-row">
         <div class="metric-info">
           <div class="metric-meta">
-            <span class="metric-label">🔮 圈子聚集系数</span>
+            <span class="metric-label" style="display: inline-flex; align-items: center;">
+              <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+              圈子聚集系数
+            </span>
             <div class="info-tooltip-wrapper sub-tooltip">
               <span class="info-icon mini-icon">?</span>
               <div class="tooltip-content left-align">
@@ -61,14 +98,20 @@
           </div>
           <span class="metric-desc">社群内部凝聚力指数</span>
         </div>
-        <span class="metric-value text-purple">{{ clusteringCoefficient }}</span>
+        <span class="metric-value text-pink">{{ clusteringCoefficient }}</span>
       </div>
 
       <!-- Metric 4: Network Density -->
       <div class="metric-row">
         <div class="metric-info">
           <div class="metric-meta">
-            <span class="metric-label">📈 人脉网络密度</span>
+            <span class="metric-label" style="display: inline-flex; align-items: center;">
+              <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+              人脉网络密度
+            </span>
             <div class="info-tooltip-wrapper sub-tooltip">
               <span class="info-icon mini-icon">?</span>
               <div class="tooltip-content left-align">
@@ -99,7 +142,7 @@ import {
   flex-direction: column;
   height: 100%;
   background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
-  padding: 10px 14px !important;
+  padding: 12px 16px !important;
   box-sizing: border-box;
 }
 
@@ -210,9 +253,9 @@ import {
   text-shadow: 0 0 6px rgba(255, 167, 38, 0.2);
 }
 
-.text-purple {
-  color: #b388ff;
-  text-shadow: 0 0 6px rgba(179, 136, 255, 0.2);
+.text-pink {
+  color: #f472b6;
+  text-shadow: 0 0 6px rgba(244, 114, 182, 0.2);
 }
 
 .text-green {

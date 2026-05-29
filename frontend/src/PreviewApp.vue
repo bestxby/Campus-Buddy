@@ -62,8 +62,8 @@ const resetPreview = () => {
 }
 .sandbox-card {
   background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(168, 85, 247, 0.25);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(6, 182, 212, 0.15);
   border-radius: 16px;
   padding: 24px 36px;
   text-align: center;
@@ -82,21 +82,23 @@ const resetPreview = () => {
   line-height: 1.6;
 }
 .sandbox-reset-btn {
-  background: linear-gradient(135deg, #a855f7, #6366f1);
-  border: none;
-  color: white;
+  background: rgba(253, 151, 31, 0.12);
+  border: 1px solid rgba(253, 151, 31, 0.4);
+  color: #ffb74d;
   padding: 10px 20px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 4px 12px rgba(253, 151, 31, 0.1);
   outline: none;
 }
 .sandbox-reset-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(168, 85, 247, 0.5);
+  background-color: rgba(253, 151, 31, 0.2);
+  border-color: rgba(253, 151, 31, 0.55);
+  box-shadow: 0 6px 18px rgba(253, 151, 31, 0.2);
 }
 
 /* fade transition */

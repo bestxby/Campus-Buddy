@@ -2,9 +2,22 @@
   <div class="dashboard-grid-card card">
     <div class="col-header">
       <div class="title-with-info">
-        <h3>📊 热门兴趣标签排行</h3>
+        <h3 style="display: inline-flex; align-items: center;">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          热门兴趣标签排行
+        </h3>
         <div class="info-tooltip-wrapper">
-          <span class="info-icon">ℹ️</span>
+          <span class="info-icon" style="display: inline-flex; align-items: center; justify-content: center;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </span>
           <div class="tooltip-content left-align">
             <h4>热门兴趣分布说明</h4>
             <p>统计全校 1,500+ 学生中各个兴趣标签的关联频次。高频次的标签反映出校园中规模最大的主要兴趣社群，在图结构中表现为密集连接的“网络枢纽中心”；低频标签则表示冷门小众的亚文化兴趣圈。</p>
@@ -46,7 +59,7 @@ const maxInterestCount = computed(() => {
   overflow: visible;
   height: 100%;
   background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
-  padding: 10px 14px !important;
+  padding: 12px 16px !important;
 }
 .col-header {
   display: flex;

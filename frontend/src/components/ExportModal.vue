@@ -11,7 +11,17 @@
       <!-- Header -->
       <div class="export-modal-header">
         <h3>
-          <span class="export-header-glow">{{ isAdminMode ? '📊' : '🧭' }}</span>
+          <span class="export-header-glow" style="display: inline-flex; align-items: center; vertical-align: middle; margin-right: 4px;">
+            <svg v-if="isAdminMode" class="icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <svg v-else class="icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+          </span>
           {{ isAdminMode ? '导出社交匹配与社交圈分析报告' : '导出个性化匹配与方向推荐报告' }}
         </h3>
         <p>{{ isAdminMode ? '包含全局网络中心度分析、社群归属占比、搭子推荐及连通分量指标分析' : '支持将您的专属画像、活动匹配路径、相似搭子及社区拓扑指标一键保存至本地' }}</p>

@@ -2,9 +2,22 @@
   <div class="dashboard-grid-card card">
     <div class="col-header">
       <div class="title-with-info">
-        <h3>🔮 主题社群划分与活跃度分析</h3>
+        <h3 style="display: inline-flex; align-items: center;">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+          主题社群划分与活跃度分析
+        </h3>
         <div class="info-tooltip-wrapper">
-          <span class="info-icon">ℹ️</span>
+          <span class="info-icon" style="display: inline-flex; align-items: center; justify-content: center;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </span>
           <div class="tooltip-content left-align">
             <h4>主题社群分析说明</h4>
             <p>基于运动、艺术、科技、社交四大领域类别，划分兴趣关联关系。环状图展示了各大兴趣领域学生参与人次的分布比重，指点悬停至不同区块可实时获取各社群的具体覆盖率与社交活跃度数。</p>
@@ -50,8 +63,8 @@
             <!-- Center Text Group -->
             <g class="donut-center-text">
               <text x="50" y="42" class="center-title">{{ hoveredSlice ? hoveredSlice.label + '社群' : '主题社群' }}</text>
-              <text x="50" y="55" class="center-value">{{ hoveredSlice ? `👥 ${hoveredSlice.size}人` : `共 ${totalSize}人次` }}</text>
-              <text x="50" y="66" class="center-sub">{{ hoveredSlice ? `⚡ 均度: ${hoveredSlice.avgDegree}` : '悬停查看' }}</text>
+              <text x="50" y="55" class="center-value">{{ hoveredSlice ? `成员: ${hoveredSlice.size}人` : `共 ${totalSize}人次` }}</text>
+              <text x="50" y="66" class="center-sub">{{ hoveredSlice ? `均度: ${hoveredSlice.avgDegree}` : '悬停查看' }}</text>
             </g>
           </svg>
         </div>
@@ -73,8 +86,8 @@
               <span class="legend-percentage">{{ slice.percentage }}%</span>
             </div>
             <div class="legend-details">
-              <span>👥 {{ slice.size }}人</span>
-              <span class="legend-deg">⚡ 均度: {{ slice.avgDegree }}</span>
+              <span>成员: {{ slice.size }}人</span>
+              <span class="legend-deg">均度: {{ slice.avgDegree }}</span>
             </div>
           </div>
         </div>
@@ -122,7 +135,7 @@ const slices = computed(() => {
   overflow: visible;
   height: 100%;
   background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
-  padding: 10px 14px !important;
+  padding: 12px 16px !important;
 }
 .col-header {
   display: flex;

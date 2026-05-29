@@ -4,7 +4,14 @@
       <!-- Header -->
       <div class="modal-header">
         <div class="modal-title-group">
-          <h3>📢 发布校园新活动 (Publish New Activity)</h3>
+          <h3 style="display: inline-flex; align-items: center;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;">
+              <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            </svg>
+            发布校园新活动 (Publish New Activity)
+          </h3>
           <span class="modal-subtitle">创建新活动并分配关联的兴趣标签，学生可依据兴趣匹配和报名</span>
         </div>
         <button @click="handleClose" class="close-btn" title="关闭 modal">×</button>
@@ -22,7 +29,14 @@
             class="form-input"
             @input="clearError"
           />
-          <span v-if="errorMsg" class="error-text">{{ errorMsg }}</span>
+          <span v-if="errorMsg" class="error-text" style="display: inline-flex; align-items: center; gap: 2.5px;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink: 0;">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            {{ errorMsg }}
+          </span>
         </div>
 
         <!-- Interest Tags Pickers -->
@@ -36,8 +50,28 @@
               :key="domain.key" 
               class="domain-group"
             >
-              <div class="domain-title" :style="{ color: domain.color }">
-                {{ domain.icon }} {{ domain.label }}
+              <div class="domain-title" :style="{ color: domain.color }" style="display: inline-flex; align-items: center; gap: 4px;">
+                <svg v-if="domain.key === 'sports'" class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M6 12a6 6 0 0 1 12 0"></path>
+                  <path d="M12 6a6 6 0 0 1 0 12"></path>
+                </svg>
+                <svg v-else-if="domain.key === 'arts'" class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"></path>
+                </svg>
+                <svg v-else-if="domain.key === 'tech'" class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                <svg v-else-if="domain.key === 'social'" class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                {{ domain.label }}
               </div>
               <div class="tags-grid">
                 <button
@@ -66,8 +100,12 @@
           @click="handleSubmit" 
           :disabled="!isValid" 
           class="btn btn-primary glow-orange submit-btn"
+          style="display: inline-flex; align-items: center; justify-content: center; gap: 4px;"
         >
-          🚀 确认发布活动 (Publish)
+          <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          确认发布活动 (Publish)
         </button>
       </div>
     </div>
@@ -131,7 +169,7 @@ const handleSubmit = () => {
 
   // Check for duplicates
   if (graphStore.graph.has(actKey)) {
-    errorMsg.value = '⚠️ 该活动名称已存在，请输入其他名称 (Activity already exists)'
+    errorMsg.value = '该活动名称已存在，请输入其他名称 (Activity already exists)'
     return
   }
 

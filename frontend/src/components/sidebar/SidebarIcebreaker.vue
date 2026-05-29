@@ -14,18 +14,20 @@
         <path d="M10 22h4"></path>
         <path d="M15.09 14c.18-.33.3-.68.37-1.04A5 5 0 0 0 16 9a5 5 0 0 0-10 0 5 5 0 0 0 .54 2.96c.07.36.19.7.37 1.04l1.59 2h7l1.59-2z"></path>
       </svg>
-      <div style="flex: 1;">
-        <template v-if="tipData.hasBuddy">
-          建议与
-          <span class="highlight-buddy">{{ tipData.buddyName }}</span>
-          交流
-          <span class="highlight-interest"># {{ tipData.interest }}</span>
-          话题，你们有共同的兴趣契合点！
-        </template>
-        <template v-else>
-          {{ tipData.text }}
-        </template>
-      </div>
+      <Transition name="fade" mode="out-in">
+        <div :key="tipData.buddyName || tipData.text" style="flex: 1;">
+          <template v-if="tipData.hasBuddy">
+            建议与
+            <span class="highlight-buddy">{{ tipData.buddyName }}</span>
+            交流
+            <span class="highlight-interest"># {{ tipData.interest }}</span>
+            话题，你们有共同的兴趣契合点！
+          </template>
+          <template v-else>
+            {{ tipData.text }}
+          </template>
+        </div>
+      </Transition>
     </div>
   </div>
 </template>
@@ -63,6 +65,13 @@ const tipData = computed(() => {
   padding: 12px;
   flex-shrink: 0;
   box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sidebar-icebreaker-panel:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(253, 151, 31, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 8px rgba(253, 151, 31, 0.04);
 }
 .panel-title {
   font-size: 11.5px;
@@ -79,11 +88,19 @@ const tipData = computed(() => {
   text-align: left;
 }
 .highlight-buddy {
-  color: #c084fc;
+  color: var(--accent-orange);
   font-weight: bold;
 }
 .highlight-interest {
   color: #22d3ee;
   font-weight: bold;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

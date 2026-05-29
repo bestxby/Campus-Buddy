@@ -10,11 +10,11 @@
         <span class="profile-avatar-big">
           <template v-if="currentUserAvatar">{{ currentUserAvatar }}</template>
           <svg v-else class="icon-svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10" stroke="var(--accent-neon-cyan)" stroke-width="1.5"></circle>
+            <circle cx="12" cy="12" r="10" stroke="var(--accent-cyan)" stroke-width="1.5"></circle>
             <!-- Needle split into two halves for a premium 3D neon compass effect -->
-            <polygon points="12,12 16.24,7.76 14.12,14.12" fill="var(--accent-neon-pink)" stroke="var(--accent-neon-pink)" stroke-width="0.5"></polygon>
-            <polygon points="12,12 16.24,7.76 9.88,9.88" fill="#b30059" stroke="#b30059" stroke-width="0.5"></polygon>
-            <polygon points="12,12 7.76,16.24 9.88,9.88" fill="var(--accent-neon-cyan)" stroke="var(--accent-neon-cyan)" stroke-width="0.5"></polygon>
+            <polygon points="12,12 16.24,7.76 14.12,14.12" fill="var(--accent-orange)" stroke="var(--accent-orange)" stroke-width="0.5"></polygon>
+            <polygon points="12,12 16.24,7.76 9.88,9.88" fill="#b35a00" stroke="#b35a00" stroke-width="0.5"></polygon>
+            <polygon points="12,12 7.76,16.24 9.88,9.88" fill="var(--accent-cyan)" stroke="var(--accent-cyan)" stroke-width="0.5"></polygon>
             <polygon points="12,12 7.76,16.24 14.12,14.12" fill="#0099ab" stroke="#0099ab" stroke-width="0.5"></polygon>
             <circle cx="12" cy="12" r="1.5" fill="#ffffff" stroke="none"></circle>
           </svg>
@@ -42,8 +42,12 @@
       </div>
 
       <!-- Logout button (icon-only, top-right) -->
-      <button @click="handleLogout" class="logout-btn" title="退出登录">
-        <span class="logout-icon">⏻</span>
+      <button @click="handleLogout" class="logout-btn" title="退出登录" style="display: inline-flex; align-items: center; justify-content: center;">
+        <svg class="icon-svg logout-icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
       </button>
     </div>
 
@@ -114,7 +118,13 @@
     <template v-if="currentUserRole !== 'admin'">
       <div class="export-report-row">
         <button class="export-report-btn" @click="isExportModalVisible = true" title="导出我的个性化匹配与方向推荐报告">
-          <span class="export-icon">📥</span>
+          <span class="export-icon" style="display: inline-flex; align-items: center;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </span>
           <span class="export-label">导出我的个性化匹配报告</span>
         </button>
       </div>

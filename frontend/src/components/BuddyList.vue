@@ -1,6 +1,16 @@
 <template>
   <div class="card result-card">
-    <h3>🤝 兴趣契合的活动搭子</h3>
+    <div class="result-card-header">
+      <h3>
+        <svg class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1px;">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        兴趣契合的活动搭子
+      </h3>
+    </div>
 
     <!-- Shortest Path Finder (人脉搭桥) -->
     <PathFinder v-if="currentUserRole === 'admin'" @open-graph-highlight="emit('open-graph-highlight')" />
@@ -12,19 +22,32 @@
           <div class="path-flow">
             <span class="node student" :class="{ 'social-buddy-node': isSocialBuddy(activeStudent!) }" :title="activeStudent || ''">
               {{ activeStudent }}
-              <span v-if="isSocialBuddy(activeStudent!)" class="social-star" title="社交达人">🌟</span>
+              <span v-if="isSocialBuddy(activeStudent!)" class="social-star" title="社交达人" style="display: inline-flex; align-items: center; margin-left: 2px;">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="9" height="9" fill="currentColor" stroke="none">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </span>
             </span>
             <span class="arrow">➔</span>
             <span class="node interest" :title="getSharedInterest(activeStudent!, buddy.name, 'student')">{{ getSharedInterest(activeStudent!, buddy.name, 'student') }}</span>
             <span class="arrow">➔</span>
             <span class="node student" :class="{ 'social-buddy-node': isSocialBuddy(buddy.name) }" :title="buddy.name">
               {{ buddy.name }}
-              <span v-if="isSocialBuddy(buddy.name)" class="social-star" title="社交达人">🌟</span>
+              <span v-if="isSocialBuddy(buddy.name)" class="social-star" title="社交达人" style="display: inline-flex; align-items: center; margin-left: 2px;">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="9" height="9" fill="currentColor" stroke="none">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </span>
             </span>
           </div>
           <!-- Jaccard badge -->
           <div class="jaccard-badge" :title="`Jaccard 相似度: ${(buddy.jaccard * 100).toFixed(0)}%`">
-            <span class="jaccard-icon">🎯</span>
+            <span class="jaccard-icon" style="display: inline-flex; align-items: center; color: var(--accent-orange);">
+              <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="4"></circle>
+              </svg>
+            </span>
             <span class="jaccard-count">{{ buddy.sharedCount }}个共同</span>
             <span class="jaccard-score">{{ (buddy.jaccard * 100).toFixed(0) }}%</span>
           </div>
@@ -52,7 +75,8 @@ const maxVisibleBuddies = computed(() => currentUserRole.value === 'admin' ? 30 
 
 <style scoped>
 .result-card { height: 100%; display: flex; flex-direction: column; }
-.result-card h3 { font-size: 13px; margin: 0 0 16px 0; color: var(--text-secondary); }
+.result-card-header { margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+.result-card h3 { font-size: 13px; margin: 0; color: var(--accent-pink, #f472b6); font-weight: 800; letter-spacing: 0.3px; }
 .buddy-list {
   list-style: none;
   padding: 8px 8px 8px 6px;
@@ -63,7 +87,19 @@ const maxVisibleBuddies = computed(() => currentUserRole.value === 'admin' ? 30 
   overflow-y: auto;
   flex: 1;
 }
-.path-item { background-color: rgba(255,255,255,0.01); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 12px; }
+.path-item {
+  background-color: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.path-item:hover {
+  border-color: rgba(6, 182, 212, 0.35) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
 .buddy-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: nowrap; min-width: 0; }
 .path-flow { display: flex; align-items: center; gap: 6px; font-size: 10px; flex: 1; min-width: 0; }
 .node { padding: 4px 8px; border-radius: 4px; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: min(120px, 30%); }
@@ -80,6 +116,13 @@ const maxVisibleBuddies = computed(() => currentUserRole.value === 'admin' ? 30 
   background: linear-gradient(135deg, rgba(253,151,31,0.02) 0%, rgba(255,255,255,0.01) 100%) !important;
   border-color: rgba(253, 151, 31, 0.22) !important;
   box-shadow: 0 0 6px rgba(253, 151, 31, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.social-buddy-item:hover {
+  border-color: rgba(253, 151, 31, 0.5) !important;
+  background: linear-gradient(135deg, rgba(253,151,31,0.05) 0%, rgba(255,255,255,0.02) 100%) !important;
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 16px rgba(253, 151, 31, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 .social-buddy-node {
   background-color: rgba(253, 151, 31, 0.12) !important;
