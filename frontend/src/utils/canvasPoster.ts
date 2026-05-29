@@ -1,4 +1,6 @@
 import { RecommendedBuddy } from './reportGenerator';
+import { useGraphStore } from '@/stores/graph'
+import { graphAnalyticsService } from '@/services/GraphAnalyticsService'
 
 const drawRoundRect = (
   ctx: CanvasRenderingContext2D,
@@ -27,7 +29,8 @@ export function drawAndDownloadPng(
   acts: string[],
   buddiesList: RecommendedBuddy[],
   persona: string,
-  getSharedInterest: (name: string, actName: string, type: 'activity' | 'student') => string
+  getSharedInterest: (name: string, actName: string, type: 'activity' | 'student') => string,
+  isAdminMode?: boolean
 ): void {
   // Poster Size (4K Ultra-HD 3600x5400)
   const canvas = document.createElement('canvas')
@@ -38,6 +41,44 @@ export function drawAndDownloadPng(
   ctx.scale(3, 3)
   ctx.imageSmoothingEnabled = true
   ctx.imageSmoothingQuality = 'high'
+
+  let socialRole = persona
+  let badgeColor = '#a855f7'
+  if (isAdminMode) {
+    let graph: Map<string, Set<string>> = new Map()
+    let bridgeStudents: any[] = []
+    try {
+      const graphStore = useGraphStore()
+      graph = graphStore.graph
+      bridgeStudents = graphAnalyticsService.bridgeStudents.value
+    } catch (e) {}
+
+    const studentsList = Array.from(graph.keys())
+      .filter(k => k.startsWith('student:'))
+      .map(k => ({ name: k.substring(8), degree: graph.get(k)?.size || 0 }))
+      .sort((a, b) => b.degree - a.degree)
+
+    const rank = studentsList.findIndex(s => s.name === name) + 1
+    const degree = graph.get(`student:${name}`)?.size || 0
+    const isBridge = bridgeStudents.some(b => b.name === name)
+
+    if (degree === 0) {
+      socialRole = '🚨 社交孤立'
+      badgeColor = '#ef4444'
+    } else if (rank <= 15) {
+      socialRole = '👑 意见领袖'
+      badgeColor = '#ffb74d'
+    } else if (isBridge) {
+      socialRole = '🌉 社交枢纽'
+      badgeColor = '#3b82f6'
+    } else if (degree >= 6) {
+      socialRole = '积极探索'
+      badgeColor = '#10b981'
+    } else {
+      socialRole = '参与学生'
+      badgeColor = '#6b7280'
+    }
+  }
 
   // 1. Dark Neon Background Gradient
   const bgGrad = ctx.createLinearGradient(0, 0, 0, 1800)
@@ -175,17 +216,17 @@ export function drawAndDownloadPng(
 
   // 4. Header Section
   ctx.textAlign = 'center'
-  ctx.fillStyle = '#22d3ee'
+  ctx.fillStyle = isAdminMode ? '#ffb74d' : '#22d3ee'
   ctx.font = 'bold 32px "Outfit", "Inter", "Fira Sans", sans-serif'
-  ctx.fillText('🧭 CAMPUS BUDDY', 600, 100)
+  ctx.fillText(isAdminMode ? '📊 CAMPUS DIAGNOSTIC' : '🧭 CAMPUS BUDDY', 600, 100)
 
   ctx.fillStyle = '#94a3b8'
   ctx.font = '16px "Outfit", "Inter", "Fira Sans", sans-serif'
-  ctx.fillText('— 校园智能活动与社交匹配网络图谱 —', 600, 140)
+  ctx.fillText(isAdminMode ? '— 专业级社交定位与诊断图谱 —' : '— 校园智能活动与社交匹配网络图谱 —', 600, 140)
 
   // 5. Profile card at the top
   ctx.fillStyle = 'rgba(255, 255, 255, 0.02)'
-  ctx.strokeStyle = 'rgba(6, 182, 212, 0.25)'
+  ctx.strokeStyle = isAdminMode ? 'rgba(255, 183, 77, 0.25)' : 'rgba(6, 182, 212, 0.25)'
   ctx.lineWidth = 1
   drawRoundRect(ctx, 120, 180, 960, 110, 18)
   ctx.fill()
@@ -198,14 +239,14 @@ export function drawAndDownloadPng(
   ctx.fillText(name, 160, 235)
 
   // Persona Badge
-  ctx.fillStyle = '#a855f7'
+  ctx.fillStyle = badgeColor
   const nameWidth = ctx.measureText(name).width
   drawRoundRect(ctx, 160 + nameWidth + 20, 217, 120, 36, 18)
   ctx.fill()
   ctx.fillStyle = '#ffffff'
   ctx.font = 'bold 16px "Outfit", "Inter", "Fira Sans", sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText(persona, 160 + nameWidth + 20 + 60, 235)
+  ctx.fillText(socialRole, 160 + nameWidth + 20 + 60, 235)
 
   // Report Time info
   ctx.textAlign = 'right'
@@ -365,7 +406,7 @@ export function drawAndDownloadPng(
 
   // Download logic
   const link = document.createElement('a')
-  link.download = `${name}_校园活动搭子匹配海报.png`
+  link.download = `${name}_${isAdminMode ? '校园社交诊断海报' : '校园活动搭子匹配海报'}.png`
   link.href = canvas.toDataURL('image/png')
   document.body.appendChild(link)
   link.click()
