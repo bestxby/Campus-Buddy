@@ -1,14 +1,14 @@
 # 系统自动化集成验证报告 (E2E Validation)
 
-验证时间: 2026-05-29 10:00:24
+验证时间: 2026-05-29 10:05:01
 
 ## 1. 验证结果概览
 
 | 模块 | 验证项目 | 耗时 (ms) | 状态 | 备注 |
 | --- | --- | --- | --- | --- |
-| 后端 | Python 算法测试 (pytest) | 733.6 | ✅ PASSED | - |
-| 前端 | Vitest 组件与状态测试 | 893.6 | ✅ PASSED | - |
-| 前端 | Vite 生产环境构建打包 | 859.6 | ✅ SUCCESS | - |
+| 后端 | Python 算法测试 (pytest) | 655.7 | ✅ PASSED | - |
+| 前端 | Vitest 组件与状态测试 | 843.1 | ✅ PASSED | - |
+| 前端 | Vite 生产环境构建打包 | 810.9 | ✅ SUCCESS | - |
 
 ## 2. 后端算法测试细节
 
@@ -23,9 +23,9 @@ plugins: anyio-4.13.0
 collected 21 items
 
 test_campus_buddy.py ............
-[Performance] 2-hop buddy recommendation for '严丽' took 0.3157 ms.
-[Performance] Jaccard-ranked buddy recommendation for '严丽' took 1.9983 ms.
-[Performance] BFS find_path from '严丽' to '严刚' took 1.7377 ms. Path length: 5
+[Performance] 2-hop buddy recommendation for '严丽' took 0.1744 ms.
+[Performance] Jaccard-ranked buddy recommendation for '严丽' took 1.5883 ms.
+[Performance] BFS find_path from '严丽' to '严刚' took 1.6854 ms. Path length: 5
 .......
 test_python_scripts.py Mock Data Generation Complete:
   - Generated 1499 unique students and 4553 student-interest edges.
@@ -35,7 +35,7 @@ test_python_scripts.py Mock Data Generation Complete:
 .Exported 2 student-interests, 1 activity-interests, and 1 registrations to 'frontend/public\graph_data.json'.
 .
 
-============================= 21 passed in 0.13s ==============================
+============================= 21 passed in 0.12s ==============================
 
 ```
 
@@ -80,8 +80,8 @@ dist/assets/preview-DUCrF57E.js       0.90 kB │ gzip:  0.70 kB
 dist/assets/style-CUL1M7Kc.js         9.65 kB │ gzip:  4.20 kB
 dist/assets/d3-vendor-7qNyeggi.js    61.04 kB │ gzip: 20.90 kB
 dist/assets/vue-vendor-CKem-9up.js   77.84 kB │ gzip: 30.61 kB
-dist/assets/main-DoeJyhUv.js        139.14 kB │ gzip: 42.54 kB
+dist/assets/main-D3VWNIpm.js        139.27 kB │ gzip: 42.54 kB
 
-[32m✓ built in 350ms[39m
+[32m✓ built in 332ms[39m
 
 ```
