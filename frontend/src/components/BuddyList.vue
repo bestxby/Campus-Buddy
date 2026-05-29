@@ -3,7 +3,7 @@
     <h3>🤝 兴趣契合的活动搭子</h3>
 
     <!-- Shortest Path Finder (人脉搭桥) -->
-    <PathFinder @open-graph-highlight="emit('open-graph-highlight')" />
+    <PathFinder v-if="currentUserRole === 'admin'" @open-graph-highlight="emit('open-graph-highlight')" />
 
     <!-- Jaccard-ranked buddy list -->
     <ul v-if="recommendations.buddies.length" class="buddy-list">

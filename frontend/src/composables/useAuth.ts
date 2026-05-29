@@ -1,8 +1,21 @@
 import { useAuthStore } from '@/stores/auth'
-import { computed } from 'vue'
+import { computed, customRef } from 'vue'
+import { getActivePinia } from 'pinia'
 
 export const currentUser = computed(() => useAuthStore().currentUser)
-export const currentUserRole = computed(() => useAuthStore().currentUserRole)
+export const currentUserRole = customRef<'student' | 'admin' | null>((track, trigger) => ({
+  get: () => {
+    track()
+    if (!getActivePinia()) return null
+    return useAuthStore().currentUserRole
+  },
+  set: (val) => {
+    if (getActivePinia()) {
+      useAuthStore().currentUserRole = val
+      trigger()
+    }
+  }
+}))
 export const currentUserAvatar = computed(() => useAuthStore().currentUserAvatar)
 export const userPersona = computed(() => useAuthStore().userPersona)
 export const signedUpActivities = computed(() => useAuthStore().signedUpActivities)

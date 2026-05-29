@@ -92,13 +92,6 @@ export class GraphAlgorithms {
     const sInterests = Array.from(graph.get(start) ?? []).filter(n => n.startsWith('interest:'))
     const sInterestSet = new Set(sInterests)
     
-    // Find registered activities to exclude them
-    const registeredActivities = new Set(
-      Array.from(graph.get(start) ?? [])
-        .filter(n => n.startsWith('activity:'))
-        .map(n => n.replace('activity:', ''))
-    )
-
     const matchedActivities = new Set<string>()
     const seenBuddies = new Set<string>()
     const rankedBuddies: BuddyResult[] = []
@@ -107,9 +100,7 @@ export class GraphAlgorithms {
       for (const neighbor of graph.get(interest) ?? []) {
         if (neighbor.startsWith('activity:')) {
           const actName = neighbor.replace('activity:', '')
-          if (!registeredActivities.has(actName)) {
-            matchedActivities.add(actName)
-          }
+          matchedActivities.add(actName)
         } else if (neighbor.startsWith('student:') && neighbor !== start) {
           const buddyName = neighbor.replace('student:', '')
           if (privateStudents.has(buddyName)) continue
