@@ -27,7 +27,7 @@ export class MatrixLayoutCalculator {
     const isMobile = canvasWidth < 768
     const rowHeaderWidth = isCooccurrence 
       ? (isMobile ? 65 : 85) 
-      : (isMobile ? 45 : 65)
+      : (isMobile ? 65 : 85)
     const rightMargin = isCooccurrence ? 0 : (isMobile ? 5 : 15)
 
     const gridX = rowHeaderWidth

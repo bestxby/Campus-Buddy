@@ -180,19 +180,21 @@ export class AdjacencyMatrixPainter {
 
       // Draw Row Serial Number on the far left of the row header area
       if (matrixMode !== 'interest-cooccurrence') {
+        const isMobile = ctx.canvas.width < 768
+        const serialX = isMobile ? 6 : 10
         if (isActiveStudent) {
           ctx.fillStyle = '#06b6d4'
           ctx.font = 'bold 9px "Outfit", monospace'
           ctx.textAlign = 'left'
           ctx.textBaseline = 'middle'
-          ctx.fillText(`▶`, 10, rowY + cellHeight / 2)
+          ctx.fillText(`▶`, serialX, rowY + cellHeight / 2)
         } else {
           ctx.fillStyle = isHovered ? 'rgba(253, 151, 31, 0.45)' : 'rgba(255, 255, 255, 0.18)'
           ctx.font = '9px "Outfit", monospace'
           ctx.textAlign = 'left'
           ctx.textBaseline = 'middle'
           const padIndex = String(r + 1).padStart(2, '0')
-          ctx.fillText(`#${padIndex}`, 10, rowY + cellHeight / 2)
+          ctx.fillText(`#${padIndex}`, serialX, rowY + cellHeight / 2)
         }
       }
 
