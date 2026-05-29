@@ -29,12 +29,13 @@ export function drawAndDownloadPng(
   persona: string,
   getSharedInterest: (name: string, actName: string, type: 'activity' | 'student') => string
 ): void {
-  // Poster Size (High-Res 1200x1800)
+  // Poster Size (Ultra High-Res 2400x3600)
   const canvas = document.createElement('canvas')
-  canvas.width = 1200
-  canvas.height = 1800
+  canvas.width = 2400
+  canvas.height = 3600
   const ctx = canvas.getContext('2d')
   if (!ctx) return
+  ctx.scale(2, 2)
 
   // 1. Dark Neon Background Gradient
   const bgGrad = ctx.createLinearGradient(0, 0, 0, 1800)
@@ -145,10 +146,22 @@ export function drawAndDownloadPng(
     ctx.shadowBlur = 0
     
     if (node.label) {
-      ctx.fillStyle = '#cbd5e1'
       ctx.font = 'bold 14px "Outfit", "Inter", "Fira Sans", sans-serif'
       ctx.textAlign = 'center'
-      ctx.fillText(node.label, node.x, node.y - node.size - 10)
+      const textY = node.y - node.size - 12
+      const textWidth = ctx.measureText(node.label).width
+      
+      // Draw capsule background to ensure text readability
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)'
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.3)'
+      ctx.lineWidth = 1
+      drawRoundRect(ctx, node.x - textWidth / 2 - 8, textY - 14, textWidth + 16, 20, 6)
+      ctx.fill()
+      ctx.stroke()
+      
+      // Draw text
+      ctx.fillStyle = '#cbd5e1'
+      ctx.fillText(node.label, node.x, textY)
     }
   })
 

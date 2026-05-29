@@ -134,8 +134,8 @@ export function generateHtmlReport(
 
   displayInterests.forEach((tag, idx) => {
     const angle = (idx * Math.PI * 2) / Math.max(displayInterests.length, 1)
-    const x = 350 + Math.cos(angle) * 75
-    const y = 200 + Math.sin(angle) * 75
+    const x = 350 + Math.cos(angle) * 95
+    const y = 200 + Math.sin(angle) * 95
     nodesData.push({ id: `interest:${tag}`, label: tag, type: 'interest', x, y, size: 6.5, color: '#22d3ee' })
     linksData.push({ source: `student:${name}`, target: `interest:${tag}` })
   })
@@ -152,8 +152,8 @@ export function generateHtmlReport(
 
   outerList.forEach((item, idx) => {
     const angle = ((idx + 0.5) * Math.PI * 2) / Math.max(outerList.length, 1)
-    const x = 350 + Math.cos(angle) * 155
-    const y = 200 + Math.sin(angle) * 155
+    const x = 350 + Math.cos(angle) * 170
+    const y = 200 + Math.sin(angle) * 170
     nodesData.push({ id: `${item.type}:${item.name}`, label: item.name, type: item.type, x, y, size: 5.5, color: item.color })
     if (item.interest) {
       linksData.push({ source: `interest:${item.interest}`, target: `${item.type}:${item.name}` })
@@ -336,7 +336,7 @@ export function generateHtmlReport(
     <div class="card">
       <h2>📡 我的校园社交圈 (互动图谱)</h2>
       <div class="graph-container" style="display: flex; flex-direction: column; align-items: center;">
-        <canvas id="interactive-canvas" width="700" height="400" style="background: rgba(0,0,0,0.15); border-radius: 12px; border: 1px solid var(--border-color);"></canvas>
+        <canvas id="interactive-canvas" width="1400" height="800" style="width: 700px; height: 400px; background: rgba(0,0,0,0.15); border-radius: 12px; border: 1px solid var(--border-color);"></canvas>
         <div class="graph-hint">💡 提示：将鼠标悬停在节点上，可以高亮显示并查看兴趣、搭子与活动关联的匹配细节。</div>
       </div>
     </div>
@@ -360,6 +360,7 @@ export function generateHtmlReport(
       const canvas = document.getElementById('interactive-canvas');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
+      ctx.scale(2, 2);
       let hoveredNode = null;
 
       const isPrintMode = document.body.classList.contains('print-mode');
@@ -433,11 +434,28 @@ export function generateHtmlReport(
           ctx.fill();
           ctx.shadowBlur = 0;
  
-          // Label
-          ctx.fillStyle = isPrintMode ? '#334155' : (isHovered ? '#ffffff' : '#94a3b8');
-          ctx.font = isPrintMode ? 'bold 11px "Outfit", "Inter", "Fira Sans", sans-serif' : (isHovered ? 'bold 11px "Outfit", "Inter", "Fira Sans", sans-serif' : '10px "Outfit", "Inter", "Fira Sans", sans-serif');
+          // Label text styling
+          ctx.font = isPrintMode 
+            ? 'bold 11px "Outfit", "Inter", "Fira Sans", sans-serif' 
+            : (isHovered ? 'bold 11px "Outfit", "Inter", "Fira Sans", sans-serif' : '10px "Outfit", "Inter", "Fira Sans", sans-serif');
           ctx.textAlign = 'center';
-          ctx.fillText(node.label, node.x, node.y - size - 6);
+
+          // Label text vertical offset
+          const textY = node.y - size - 8;
+
+          if (!isPrintMode) {
+            const textWidth = ctx.measureText(node.label).width;
+            ctx.fillStyle = isHovered ? 'rgba(15, 23, 42, 0.9)' : 'rgba(15, 23, 42, 0.6)';
+            ctx.strokeStyle = isHovered ? node.color : 'rgba(6, 182, 212, 0.15)';
+            ctx.lineWidth = 1;
+            drawRoundRect(ctx, node.x - textWidth / 2 - 6, textY - 11, textWidth + 12, 16, 4);
+            ctx.fill();
+            ctx.stroke();
+          }
+
+          // Label text fill
+          ctx.fillStyle = isPrintMode ? '#334155' : (isHovered ? '#ffffff' : '#cbd5e1');
+          ctx.fillText(node.label, node.x, textY);
         });
  
         // Tooltip
