@@ -218,11 +218,11 @@ export function drawAndDownloadPng(
   ctx.textAlign = 'center'
   ctx.fillStyle = isAdminMode ? '#ffb74d' : '#22d3ee'
   ctx.font = 'bold 32px "Outfit", "Inter", "Fira Sans", sans-serif'
-  ctx.fillText(isAdminMode ? '📊 CAMPUS DIAGNOSTIC' : '🧭 CAMPUS BUDDY', 600, 100)
+  ctx.fillText(isAdminMode ? '📊 CAMPUS ANALYSIS' : '🧭 CAMPUS BUDDY', 600, 100)
 
   ctx.fillStyle = '#94a3b8'
   ctx.font = '16px "Outfit", "Inter", "Fira Sans", sans-serif'
-  ctx.fillText(isAdminMode ? '— 专业级社交定位与诊断图谱 —' : '— 校园智能活动与社交匹配网络图谱 —', 600, 140)
+  ctx.fillText(isAdminMode ? '— 校园社交定位与社交圈图谱 —' : '— 校园智能活动与社交匹配网络图谱 —', 600, 140)
 
   // 5. Profile card at the top
   ctx.fillStyle = 'rgba(255, 255, 255, 0.02)'
@@ -406,7 +406,7 @@ export function drawAndDownloadPng(
 
   // Download logic
   const link = document.createElement('a')
-  link.download = `${name}_${isAdminMode ? '校园社交诊断海报' : '校园活动搭子匹配海报'}.png`
+  link.download = `${name}_${isAdminMode ? '校园社交分析海报' : '校园活动搭子匹配海报'}.png`
   link.href = canvas.toDataURL('image/png')
   document.body.appendChild(link)
   link.click()

@@ -82,24 +82,24 @@ function computeAdminDiagnosticData(name: string, useHtmlMarkup: boolean): Admin
 
   let socialRole = '普通社交参与者'
   let socialRoleIcon = '🟡'
-  let diagnosisNote = '该生社交连接度一般，建议鼓励其参与更多跨学科活动，拓展人脉边界。'
+  let diagnosisNote = '该同学社交连接度一般，建议尝试参与更多跨主题活动，拓展本校社交圈。'
 
   if (studentDegree === 0) {
-    socialRole = '社交孤立个体 (重点帮扶对象)'
+    socialRole = '暂无网络连接 (可积极建连)'
     socialRoleIcon = '🚨'
-    diagnosisNote = '警告：该生目前在校园社交图谱中处于完全社交孤立状态（度中心度为0）。建议辅导员/班主任主动介入，引导其进行兴趣登记或推荐加入活动社群，提供社交关怀。'
+    diagnosisNote = '提示：该同学目前在校园社交网络中尚未与其他同学建立边连接。建议可以补充一些兴趣标签或报名一些热门的校园活动，以便系统更好地为其推荐校园搭子。'
   } else if (studentRank <= 15) {
-    socialRole = '校园领袖型社交达人 (Opinion Leader)'
+    socialRole = '校园社交达人 (活跃核心)'
     socialRoleIcon = '👑'
-    diagnosisNote = '诊断：该生在网络中具有极高的度中心性，属于校园社交活跃分子。建议可推荐其担任班组织管理职位，发挥其社交影响力带动周边同学。'
+    diagnosisNote = '分析：该同学在校园网络中具有极高的社交连接度，属于非常活跃的社交核心。可以继续保持积极的活动参与度，带动和发起更多有趣的搭子活动。'
   } else if (isBridge) {
-    socialRole = '跨社群社交中介桥梁 (Network Broker)'
+    socialRole = '社群桥梁枢纽 (跨界联络人)'
     socialRoleIcon = '🌉'
-    diagnosisNote = `诊断：该生介数中心性突出（桥梁指数: ${bridgeScore}），处于不同社交群体/兴趣圈子的枢纽位置，起着沟通和桥梁作用。可利用其传播特质，进行跨社群信息分发或活动推广。`
+    diagnosisNote = `分析：该同学在不同兴趣社群和朋友圈子中起着纽带桥梁作用（社交桥梁指数: ${bridgeScore}）。非常适合发起跨界活动，帮助更多不同领域的同学建立社交连接。`
   } else if (studentDegree >= 6) {
-    socialRole = '积极社交参与者 (Social Explorer)'
+    socialRole = '活跃社交成员 (活动探索者)'
     socialRoleIcon = '🟢'
-    diagnosisNote = '诊断：该生积极参与多项活动，兴趣广泛，社交连接度良好。建议保持目前社交习惯，继续深入探索。'
+    diagnosisNote = '分析：该同学积极参与多项校园活动，兴趣广泛且社交连接度良好。建议保持活跃，发掘更多志趣相投的校园搭子。'
   }
 
   // Find connected component size using BFS
@@ -124,11 +124,11 @@ function computeAdminDiagnosticData(name: string, useHtmlMarkup: boolean): Admin
   const bold = (text: string) => useHtmlMarkup ? `<strong>${text}</strong>` : `**${text}**`
   let communityDiagnosis = ''
   if (componentSize === 1) {
-    communityDiagnosis = `🚨 ${bold('连通状态警告')}：该生属于网络中的完全孤立点，社交覆盖率为 0.0%（1/${totalStudents}）。其未被包含在校园任何社交活动与圈子中，建议提供心理关注和定向活动引流。`
+    communityDiagnosis = `🚨 ${bold('社交孤立状态提示')}：该同学当前暂未在校园社交网络中建立任何连接。建议可以通过添加个人兴趣标签或报名参与活动来开启第一步。`
   } else if (Number(compPct) >= 80) {
-    communityDiagnosis = `✅ ${bold('连通状态良好')}：该生已融入全校的核心主社交网络，该网络共覆盖 ${componentSize} 名学生，占全校人数的 ${bold(compPct + '%')}。在全局拓扑网络中，该生具备优秀的人脉通达性和社交覆盖面。`
+    communityDiagnosis = `✅ ${bold('社交圈连通度极佳')}：该同学已融入全校的核心主社交网络，该网络覆盖了全校 ${componentSize} 名同学（占比 ${bold(compPct + '%')}），在全局网络中具备非常广泛的社交潜在匹配空间。`
   } else {
-    communityDiagnosis = `⚠️ ${bold('局部社群隔离')}：该生当前被局限在一个包含 ${componentSize} 人（全校占比 ${bold(compPct + '%')}）的局部兴趣小团体中。该圈子与全校主连通社交网络不连通，可能存在信息壁垒或局部社交闭环。`
+    communityDiagnosis = `⚠️ ${bold('处于局部社交圈')}：该同学当前被包含在一个包含 ${componentSize} 人（全校占比 ${bold(compPct + '%')}）的局部兴趣圈子中。如果希望结识更多不同领域的伙伴，可以尝试探索和报名其他跨学科/跨主题的活动。`
   }
 
   // Path to Social Hub Student
@@ -146,10 +146,10 @@ function computeAdminDiagnosticData(name: string, useHtmlMarkup: boolean): Admin
       })
       hubPathStr = elements.join(' ➔ ')
     } else {
-      hubPathStr = '❌ 无法建立联系：该生与学校核心达人处于两个互不连通的社交孤立分支中。'
+      hubPathStr = '❌ 无法建立联系：该同学与学校社交达人处于两个互不连通的独立社交分支中。'
     }
   } else {
-    hubPathStr = '👑 该生本身即为全校社交活跃度最高的 Opinion Leader。'
+    hubPathStr = '👑 该同学本身即为全校社交活跃度最高的核心达人之一。'
   }
 
   return {
@@ -689,21 +689,21 @@ export function generateAdminMarkdownReport(
 
   // Start assembling markdown
   let md: string[] = []
-  md.push(`# 📊 Campus Buddy 专业级社交诊断与学术匹配报告 — ${name}`)
+  md.push(`# 📊 Campus Buddy 社交匹配与社交圈分析报告 — ${name}`)
   md.push(`\n> **报告生成时间**: ${new Date().toLocaleDateString('zh-CN')} | **管理权限**: 全局管理员`)
   md.push(`\n---\n`)
   
-  md.push(`## 🏥 一、网络位置与中心度诊断`)
+  md.push(`## 🧭 一、校园社交定位与中心度分析`)
   md.push(`* **网络定位**: ${d.socialRoleIcon} **${d.socialRole}**`)
   md.push(`* **直连度数 (Degree)**: \`${d.studentDegree}\``)
   md.push(`* **全校排名**: 第 **${d.studentRank}** 名 (超越全校 \`${d.studentPercentile}%\` 的学生)`)
   md.push(`* **社群连通覆盖率**: \`${d.compPct}%\` (共 ${d.componentSize} 名学生与该生连通)`)
-  md.push(`\n**诊断意见**：\n> ${d.diagnosisNote}`)
+  md.push(`\n**分析建议**：\n> ${d.diagnosisNote}`)
   md.push(`\n**连通状态**：\n> ${d.communityDiagnosis}`)
   md.push(`\n---\n`)
 
   md.push(`## 🔗 二、与校园核心社交达人的连接路径`)
-  md.push(`与学校最活跃 Opinion Leader (**${d.hubStudent}**) 的最短路径：\n`)
+  md.push(`与学校最活跃核心达人 (**${d.hubStudent}**) 的最短路径：\n`)
   md.push(`\`${d.hubPathStr}\``)
   md.push(`\n*注：该路径基于 BFS 最短路径算法生成，已自动屏蔽途中开启了隐私模式的同学节点。*`)
   md.push(`\n---\n`)
@@ -714,7 +714,7 @@ export function generateAdminMarkdownReport(
       md.push(`* **${interest}**`)
     }
   } else {
-    md.push(`该生目前在系统内尚未登记任何兴趣倾向。`)
+    md.push(`该同学目前在系统内尚未登记任何兴趣倾向。`)
   }
   md.push(`\n---\n`)
 
@@ -803,7 +803,7 @@ export function generateAdminHtmlReport(
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>Campus Buddy 专业级社交诊断报告 — ${escapeHtml(name)}</title>
+  <title>Campus Buddy 社交匹配与社交圈分析报告 — ${escapeHtml(name)}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -977,13 +977,13 @@ export function generateAdminHtmlReport(
 <body>
   <div class="container">
     <div class="header">
-      <h1>📊 Campus Buddy 专业级社交诊断报告</h1>
+      <h1>📊 Campus Buddy 社交匹配与社交圈分析报告</h1>
       <p>报告学生: <strong>${escapeHtml(name)}</strong> &nbsp;|&nbsp; 生成时间: ${new Date().toLocaleDateString('zh-CN')} &nbsp;|&nbsp; 级别: 全局管理员</p>
     </div>
 
     <!-- Diagnostic Panel -->
     <div class="card" style="border-color: #ffb74d; background: rgba(255, 183, 77, 0.04);">
-      <h2 style="color: #ffb74d; border-color: rgba(255, 183, 77, 0.15)">🏥 专业级社交定位与诊断指标</h2>
+      <h2 style="color: #ffb74d; border-color: rgba(255, 183, 77, 0.15)">🧭 校园社交定位与分析指标</h2>
       <div class="diag-grid">
         <div class="diag-item-cell">
           <strong>网络位置定位</strong>
@@ -1003,7 +1003,7 @@ export function generateAdminHtmlReport(
         </div>
       </div>
       <div style="margin-top: 18px; padding: 12px; background: rgba(15, 23, 42, 0.5); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; line-height: 1.5; color: #cbd5e1;">
-        <strong>诊断意见：</strong>${d.diagnosisNote}
+        <strong>分析建议：</strong>${d.diagnosisNote}
       </div>
       <div style="margin-top: 12px; padding: 12px; background: rgba(15, 23, 42, 0.5); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; line-height: 1.5; color: #cbd5e1;">
         <strong>连通状态：</strong>${d.communityDiagnosis}

@@ -77,7 +77,7 @@
       </div>
     </div>
 
-    <!-- 2. 个人社交诊断与检索 -->
+    <!-- 2. 个人社交匹配与检索 -->
     <div class="stats-grid-panel admin-individual-panel">
       <div class="stats-grid-title">
         <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1px;">
@@ -85,7 +85,7 @@
           <path d="M12 8v4"></path>
           <path d="M12 16h.01"></path>
         </svg>
-        个人社交诊断与检索
+        个人社交匹配与检索
       </div>
       
       <div class="control-cards-grid">
@@ -154,7 +154,7 @@
                   <polyline points="7 10 12 15 17 10"></polyline>
                   <line x1="12" y1="15" x2="12" y2="3"></line>
                 </svg>
-                导出诊断报告
+                导出分析报告
               </button>
             </div>
             <button @click="clearSearch" class="btn-text btn-xs">清除</button>

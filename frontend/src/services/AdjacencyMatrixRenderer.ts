@@ -259,7 +259,7 @@ export class AdjacencyMatrixRenderer {
           }
         }
         
-        let detailsStr = `【兴趣交叉诊断】共有 ${overlap} 位同学同时对“${rowName}”和“${colName}”感兴趣。`
+        let detailsStr = `【兴趣交叉分析】共有 ${overlap} 位同学同时对“${rowName}”和“${colName}”感兴趣。`
         if (overlap > 0) {
           detailsStr += ` 包括：${overlapNames.join('、')}${overlap > 5 ? ' 等人' : ''}。此热力表示了这两个兴趣社群的融合度。`
         } else {

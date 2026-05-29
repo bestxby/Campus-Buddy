@@ -8,14 +8,13 @@
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
-
       <!-- Header -->
       <div class="export-modal-header">
         <h3>
           <span class="export-header-glow">{{ isAdminMode ? '📊' : '🧭' }}</span>
-          {{ isAdminMode ? '导出专业级社交诊断与学术匹配报告' : '导出个性化匹配与方向推荐报告' }}
+          {{ isAdminMode ? '导出社交匹配与社交圈分析报告' : '导出个性化匹配与方向推荐报告' }}
         </h3>
-        <p>{{ isAdminMode ? '包含全局网络中心度分析、社群归属占比、搭子推荐及最密连通分量指标诊断' : '支持将您的专属画像、活动匹配路径、相似搭子及社区拓扑指标一键保存至本地' }}</p>
+        <p>{{ isAdminMode ? '包含全局网络中心度分析、社群归属占比、搭子推荐及连通分量指标分析' : '支持将您的专属画像、活动匹配路径、相似搭子及社区拓扑指标一键保存至本地' }}</p>
       </div>
 
       <!-- Options -->
@@ -34,8 +33,8 @@
             </svg>
           </div>
           <div class="export-option-info">
-            <span class="export-option-title">Markdown 诊断报告 (.md)</span>
-            <span class="export-option-desc">{{ isAdminMode ? '包含该生中心度诊断、连通社群归属以及隐私关系链路径' : '便于导入 Obsidian 或 Notion 知识库，轻量纯文本' }}</span>
+            <span class="export-option-title">Markdown 匹配报告 (.md)</span>
+            <span class="export-option-desc">{{ isAdminMode ? '包含该生网络中心度分析、连通社群归属以及隐私关系链路径' : '便于导入 Obsidian 或 Notion 知识库，轻量纯文本' }}</span>
           </div>
         </div>
 
@@ -66,8 +65,8 @@
             </svg>
           </div>
           <div class="export-option-info">
-            <span class="export-option-title">学术 PDF 报告 (.pdf)</span>
-            <span class="export-option-desc">{{ isAdminMode ? '专业级网络诊断报告排版，高对比度双栏学术样式' : '高对比度分页排版，自动调起浏览器打印，完美输出为PDF文件' }}</span>
+            <span class="export-option-title">个性化 PDF 报告 (.pdf)</span>
+            <span class="export-option-desc">{{ isAdminMode ? '高对比度双栏排版，集成社交圈定位与搭子推荐分析' : '高对比度分页排版，自动调起浏览器打印，完美输出为PDF文件' }}</span>
           </div>
         </div>
 
@@ -83,8 +82,8 @@
             </svg>
           </div>
           <div class="export-option-info">
-            <span class="export-option-title">专业级分享海报 (.png)</span>
-            <span class="export-option-desc">{{ isAdminMode ? '生成高对比度诊断海报，包含网络位置及关键路径诊断分析' : '生成极具科技感的立体点云匹配海报，适合朋友圈及群分享' }}</span>
+            <span class="export-option-title">个性化分享海报 (.png)</span>
+            <span class="export-option-desc">{{ isAdminMode ? '生成高对比度分析海报，包含社交定位及关键路径分析' : '生成极具科技感的立体点云匹配海报，适合朋友圈及群分享' }}</span>
           </div>
         </div>
       </div>
@@ -197,7 +196,7 @@ const exportMarkdown = () => {
   link.href = url
   
   const filename = props.isAdminMode 
-    ? `${getTargetStudentName()}_专业级社交诊断与学术匹配报告.md`
+    ? `${getTargetStudentName()}_社交匹配与社交圈分析报告.md`
     : `${getTargetStudentName()}_校园活动搭子匹配推荐报告.md`
     
   link.setAttribute('download', filename)
@@ -217,7 +216,7 @@ const exportHtml = () => {
   link.href = url
   
   const filename = props.isAdminMode 
-    ? `${getTargetStudentName()}_专业级社交诊断与学术匹配报告.html`
+    ? `${getTargetStudentName()}_社交匹配与社交圈分析报告.html`
     : `${getTargetStudentName()}_校园活动搭子匹配推荐报告.html`
     
   link.setAttribute('download', filename)

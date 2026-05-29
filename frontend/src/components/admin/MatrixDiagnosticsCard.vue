@@ -2,12 +2,12 @@
   <div class="dashboard-grid-card card">
     <div class="col-header">
       <div class="title-with-info">
-        <h3>🧮 社交邻接矩阵诊断</h3>
+        <h3>🧮 社交邻接矩阵分析</h3>
         <div class="info-tooltip-wrapper">
           <span class="info-icon">ℹ️</span>
           <div class="tooltip-content left-align">
-            <h4>邻接关联矩阵诊断</h4>
-            <p>通过多维网格诊断，分析全校的兴趣重合度和活动参与分布。点击下方对应的诊断按钮，即可在全局全屏视图下展开并深入探索数据关系。</p>
+            <h4>邻接关联矩阵分析</h4>
+            <p>通过多维网格分析，展现全校的兴趣重合度和活动参与分布。点击下方对应的分析按钮，即可在全局全屏视图下展开并深入探索数据关系。</p>
           </div>
         </div>
       </div>
@@ -19,7 +19,7 @@
         @click="emit('open-graph', true, 'matrix', 'student-interest')"
         class="matrix-btn neon-cyan-btn"
       >
-        <span class="btn-left">👤 学生个人兴趣倾向诊断</span>
+        <span class="btn-left">👤 学生个人兴趣倾向分析</span>
         <span class="btn-arrow">➔</span>
       </button>
 
@@ -28,7 +28,7 @@
         @click="emit('open-graph', true, 'matrix', 'interest-cooccurrence')"
         class="matrix-btn neon-orange-btn"
       >
-        <span class="btn-left">🎯 兴趣社群交叉共现诊断</span>
+        <span class="btn-left">🎯 兴趣社群交叉共现分析</span>
         <span class="btn-arrow">➔</span>
       </button>
 
@@ -37,7 +37,7 @@
         @click="emit('open-graph', true, 'matrix', 'student-activity')"
         class="matrix-btn neon-green-btn"
       >
-        <span class="btn-left">🎉 校园活动参与分布诊断</span>
+        <span class="btn-left">🎉 校园活动参与分布分析</span>
         <span class="btn-arrow">➔</span>
       </button>
     </div>

@@ -2,7 +2,7 @@
   <div class="dashboard-grid-card card">
     <div class="col-header">
       <div class="title-with-info">
-        <h3>🔮 主题社群划分与活跃度诊断</h3>
+        <h3>🔮 主题社群划分与活跃度分析</h3>
         <div class="info-tooltip-wrapper">
           <span class="info-icon">ℹ️</span>
           <div class="tooltip-content left-align">
@@ -51,7 +51,7 @@
             <g class="donut-center-text">
               <text x="50" y="42" class="center-title">{{ hoveredSlice ? hoveredSlice.label + '社群' : '主题社群' }}</text>
               <text x="50" y="55" class="center-value">{{ hoveredSlice ? `👥 ${hoveredSlice.size}人` : `共 ${totalSize}人次` }}</text>
-              <text x="50" y="66" class="center-sub">{{ hoveredSlice ? `⚡ 均度: ${hoveredSlice.avgDegree}` : '悬停诊断' }}</text>
+              <text x="50" y="66" class="center-sub">{{ hoveredSlice ? `⚡ 均度: ${hoveredSlice.avgDegree}` : '悬停查看' }}</text>
             </g>
           </svg>
         </div>

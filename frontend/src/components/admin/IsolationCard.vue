@@ -2,24 +2,24 @@
   <div class="dashboard-grid-card card">
     <div class="col-header">
       <div class="title-with-info">
-        <h3>🧭 社交孤立诊断与一键人脉桥接</h3>
+        <h3>🧭 社交孤立分析与一键人脉桥接</h3>
         <div class="info-tooltip-wrapper">
           <span class="info-icon">ℹ️</span>
           <div class="tooltip-content left-align">
-            <h4>社交孤立诊断说明</h4>
-            <p>基于图论度数（Degree）检测。当一个学生节点的度数为 0（无任何连边）时即判定为社交孤立。系统实时诊断这些“孤岛学生”，并提供关联热门兴趣、推荐社交达人或报名热门活动三种一键桥接方案，以最小的图边代价将他们织入全校社交网。</p>
+            <h4>社交孤立分析说明</h4>
+            <p>基于图论度数（Degree）检测。当一个学生节点的度数为 0（无任何连边）时即判定为社交孤立。系统实时分析这些“孤岛学生”，并提供关联热门兴趣、推荐社交达人或报名热门活动三种一键桥接方案，以最小的图边代价将他们织入全校社交网。</p>
           </div>
         </div>
       </div>
     </div>
     
     <div class="flex-1-scroll">
-      <!-- Compact diagnostic banner -->
+      <!-- Compact analysis banner -->
       <div class="isolation-diagnostic-summary" :class="{ 'has-isolated-alert': isolatedStudents.length > 0 }">
         <span class="alert-icon">{{ isolatedStudents.length > 0 ? '⚠️' : '🎉' }}</span>
         <span class="alert-text">
           <template v-if="isolatedStudents.length > 0">
-            检测到 <strong>{{ isolatedStudents.length }}</strong> 名处于隔离状态的孤立学生
+            检测到 <strong>{{ isolatedStudents.length }}</strong> 名暂无社交连接的孤立学生
           </template>
           <template v-else>
             全校社交网络连通率 100%，无孤立个体！

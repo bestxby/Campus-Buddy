@@ -21,7 +21,7 @@
             {{ viewMode === 'matrix' ? '校园人脉邻接关联矩阵' : (isGlobalMode ? '校园全局人脉拓扑网络' : '局域关联拓扑网络') }}
           </h3>
           <span class="vis-subtitle">
-            {{ viewMode === 'matrix' ? '通过二维网格交叉诊断兴趣重合与活动参与' : (isGlobalMode ? '全校兴趣社群与活动分布骨干网络图谱' : (currentUserRole === 'admin' ? `${activeStudent} 的双跳聚焦关系网络` : '您的双跳聚焦关系网络')) }}
+            {{ viewMode === 'matrix' ? '通过二维网格交叉分析兴趣重合与活动参与' : (isGlobalMode ? '全校兴趣社群与活动分布骨干网络图谱' : (currentUserRole === 'admin' ? `${activeStudent} 的双跳聚焦关系网络` : '您的双跳聚焦关系网络')) }}
           </span>
         </div>
         <div class="modal-controls-row">
