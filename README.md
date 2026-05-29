@@ -16,7 +16,7 @@
 
 ```mermaid
 graph TD
-    subgraph 节点类型
+    subgraph node_types ["节点类型"]
         S[学生节点 student:姓名]
         I[兴趣节点 interest:名称]
         A[活动节点 activity:名称]
@@ -53,7 +53,7 @@ graph TD
 ```mermaid
 graph TD
     %% Python Backend Data Processing
-    subgraph Python Backend (Data Layer)
+    subgraph python_backend ["Python Backend (Data Layer)"]
         GMD[generate_mock_data.py] -->|1. 生成 CSV| CSV[data/*.csv]
         CSV -->|2. 加载与分析| CBP[campus_buddy.py]
         CSV -->|3. 导出图结构| EGJ[export_graph_to_json.py]
@@ -65,17 +65,17 @@ graph TD
     end
 
     %% Frontend Layered Architecture
-    subgraph Frontend Client (Vue 3 Client App)
+    subgraph frontend_client ["Frontend Client (Vue 3 Client App)"]
         GJSON -->|1. Fetch 加载| GStore[stores/graph.ts]
         
-        subgraph Stores (Pinia 状态存储层)
+        subgraph stores ["Stores (Pinia 状态存储层)"]
             GStore
             AStore[stores/auth.ts]
             RStore[stores/recommendation.ts]
             LStore[stores/log.ts]
         end
         
-        subgraph Composables (Facade 外观适配层)
+        subgraph composables ["Composables (Facade 外观适配层)"]
             UC[useGraph.ts]
             UA[useAuth.ts]
             UR[useRecommendations.ts]
@@ -87,32 +87,32 @@ graph TD
         RStore <--> UR
         LStore <--> UL
         
-        subgraph Domain Services (领域服务 & Painter 渲染器)
+        subgraph domain_services ["Domain Services (领域服务 & Painter 渲染器)"]
             FGR[ForceGraphRenderer.ts] -->|物理仿真 & 拖动交互| FGCP[ForceGraphCanvasPainter.ts]
             AMR[AdjacencyMatrixRenderer.ts] -->|手势处理| AMP[AdjacencyMatrixPainter.ts]
             GAS[GraphAnalyticsService.ts] -->|后台诊断计算| GStore
             LPE[LoadingParticleEngine.ts] -->|离子流动| LoginOverlay
         end
         
-        subgraph Pure Utilities (无状态图论算法纯函数)
+        subgraph pure_utilities ["Pure Utilities (无状态图论算法纯函数)"]
             GA[graph-algorithms.ts] -->|Jaccard & BFS 寻路| UR
             GM[graph-metrics*.ts] -->|中心性 & 密度系数| GAS
         end
         
-        subgraph UI Components (Vue 组件层)
+        subgraph ui_components ["UI Components (Vue 组件层)"]
             LoginOverlay[components/LoginOverlay.vue]
             AppSidebar[components/AppSidebar.vue]
             GraphModal[components/GraphModal.vue]
             AdminDashboard[components/AdminDashboard.vue]
         end
         
-        UC --> UI Components
-        UA --> UI Components
-        UR --> UI Components
-        UL --> UI Components
+        UC --> ui_components
+        UA --> ui_components
+        UR --> ui_components
+        UL --> ui_components
         
-        UI Components --> FGR
-        UI Components --> AMR
+        ui_components --> FGR
+        ui_components --> AMR
     end
 ```
 
