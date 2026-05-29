@@ -1,14 +1,14 @@
 # 系统自动化集成验证报告 (E2E Validation)
 
-验证时间: 2026-05-29 10:05:01
+验证时间: 2026-05-29 11:15:14
 
 ## 1. 验证结果概览
 
 | 模块 | 验证项目 | 耗时 (ms) | 状态 | 备注 |
 | --- | --- | --- | --- | --- |
-| 后端 | Python 算法测试 (pytest) | 655.7 | ✅ PASSED | - |
-| 前端 | Vitest 组件与状态测试 | 843.1 | ✅ PASSED | - |
-| 前端 | Vite 生产环境构建打包 | 810.9 | ✅ SUCCESS | - |
+| 后端 | Python 算法测试 (pytest) | 1439.0 | ✅ PASSED | - |
+| 前端 | Vitest 组件与状态测试 | 1692.4 | ✅ PASSED | - |
+| 前端 | Vite 生产环境构建打包 | 1680.8 | ✅ SUCCESS | - |
 
 ## 2. 后端算法测试细节
 
@@ -23,19 +23,19 @@ plugins: anyio-4.13.0
 collected 21 items
 
 test_campus_buddy.py ............
-[Performance] 2-hop buddy recommendation for '严丽' took 0.1744 ms.
-[Performance] Jaccard-ranked buddy recommendation for '严丽' took 1.5883 ms.
-[Performance] BFS find_path from '严丽' to '严刚' took 1.6854 ms. Path length: 5
+[Performance] 2-hop buddy recommendation for '严丽' took 0.4128 ms.
+[Performance] Jaccard-ranked buddy recommendation for '严丽' took 2.1083 ms.
+[Performance] BFS find_path from '严丽' to '严华杰' took 0.4828 ms. Path length: 3
 .......
 test_python_scripts.py Mock Data Generation Complete:
-  - Generated 1499 unique students and 4553 student-interest edges.
+  - Generated 1499 unique students and 4452 student-interest edges.
   - Generated 100 unique activities (Total 30 interest types).
-  - Generated 1490 student-activity registration edges.
+  - Generated 1468 student-activity registration edges.
   - Saved files to 'data/student_interests.csv', 'data/activity_interests.csv', and 'data/student_registrations.csv'.
 .Exported 2 student-interests, 1 activity-interests, and 1 registrations to 'frontend/public\graph_data.json'.
 .
 
-============================= 21 passed in 0.12s ==============================
+============================= 21 passed in 0.23s ==============================
 
 ```
 
@@ -64,7 +64,7 @@ No test files found, exiting with code 0
 
 ```text
 
-> campus-buddy-web@1.1.1 build
+> campus-buddy-web@1.1.2 build
 > vite build
 
 [36mvite v8.0.14 [32mbuilding client environment for production...[36m[39m
@@ -75,13 +75,13 @@ dist/loader-preview.html              1.06 kB │ gzip:  0.52 kB
 dist/index.html                       2.20 kB │ gzip:  1.10 kB
 dist/assets/preview-Do-ytrWU.css      1.04 kB │ gzip:  0.55 kB
 dist/assets/style-CSMlZpfA.css       13.18 kB │ gzip:  3.47 kB
-dist/assets/main-BoQ8mGKK.css        87.17 kB │ gzip: 14.24 kB
+dist/assets/main-xmhi7NSN.css        87.17 kB │ gzip: 14.24 kB
 dist/assets/preview-DUCrF57E.js       0.90 kB │ gzip:  0.70 kB
 dist/assets/style-CUL1M7Kc.js         9.65 kB │ gzip:  4.20 kB
 dist/assets/d3-vendor-7qNyeggi.js    61.04 kB │ gzip: 20.90 kB
 dist/assets/vue-vendor-CKem-9up.js   77.84 kB │ gzip: 30.61 kB
-dist/assets/main-D3VWNIpm.js        139.27 kB │ gzip: 42.54 kB
+dist/assets/main-DxH46scQ.js        139.26 kB │ gzip: 42.54 kB
 
-[32m✓ built in 332ms[39m
+[32m✓ built in 607ms[39m
 
 ```

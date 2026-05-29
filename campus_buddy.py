@@ -5,6 +5,10 @@ class CampusBuddyGraph:
     def __init__(self):
         # Initialize the adjacency list using a defaultdict of sets
         self.graph = defaultdict(set)
+        # Store metadata fields from expanded tables
+        self.student_interest_levels = {}
+        self.activity_capacities = {}
+        self.activity_time_slots = {}
 
     def node(self, kind, name):
         """
@@ -22,21 +26,41 @@ class CampusBuddyGraph:
         self.graph[u].add(v)
         self.graph[v].add(u)
 
-    def add_student_interest(self, student, interest):
+    def add_student_interest(self, student, interest, level=None):
         """
-        Adds an edge representing student's interest.
+        Adds an edge representing student's interest, storing interest level if provided.
         """
         s = self.node("student", student)
         i = self.node("interest", interest)
         self.add_edge(s, i)
+        if level is not None:
+            self.student_interest_levels[(student, interest)] = level
 
-    def add_activity_interest(self, activity, interest):
+    def add_activity_interest(self, activity, interest, capacity=None, time_slot=None):
         """
-        Adds an edge representing activity's interest type.
+        Adds an edge representing activity's interest type, storing capacity and time slot if provided.
         """
         a = self.node("activity", activity)
         i = self.node("interest", interest)
         self.add_edge(a, i)
+        if capacity is not None:
+            self.activity_capacities[activity] = capacity
+        if time_slot is not None:
+            self.activity_time_slots[activity] = time_slot
+
+    def get_adjacency_list(self):
+        """
+        Returns the raw adjacency list (defaultdict of sets) representing the graph.
+        """
+        return self.graph
+
+    def print_adjacency_list(self):
+        """
+        Prints the adjacency list of the graph in a readable format.
+        """
+        for node in sorted(self.graph.keys()):
+            neighbors = ", ".join(sorted(self.graph[node]))
+            print(f"  {node} -> {{{neighbors}}}")
 
     def recommend_activities(self, student):
         """
@@ -221,7 +245,7 @@ class CampusBuddyGraph:
     def load_students_from_csv(self, file_path):
         """
         Loads student interests from a CSV file.
-        CSV format: student,interest
+        CSV format: student,interest[,level]
         """
         with open(file_path, mode='r', encoding='utf-8') as f:
             reader = csv.reader(f)
@@ -230,12 +254,15 @@ class CampusBuddyGraph:
             for row in reader:
                 if not row or len(row) < 2:
                     continue
-                self.add_student_interest(row[0].strip(), row[1].strip())
+                student = row[0].strip()
+                interest = row[1].strip()
+                level = int(row[2].strip()) if len(row) >= 3 and row[2].strip().isdigit() else None
+                self.add_student_interest(student, interest, level)
 
     def load_activities_from_csv(self, file_path):
         """
         Loads activity interests from a CSV file.
-        CSV format: activity,interest
+        CSV format: activity,interest[,capacity,time_slot]
         """
         with open(file_path, mode='r', encoding='utf-8') as f:
             reader = csv.reader(f)
@@ -244,7 +271,11 @@ class CampusBuddyGraph:
             for row in reader:
                 if not row or len(row) < 2:
                     continue
-                self.add_activity_interest(row[0].strip(), row[1].strip())
+                activity = row[0].strip()
+                interest = row[1].strip()
+                capacity = int(row[2].strip()) if len(row) >= 3 and row[2].strip().isdigit() else None
+                time_slot = row[3].strip() if len(row) >= 4 else None
+                self.add_activity_interest(activity, interest, capacity, time_slot)
 
     def load_registrations_from_csv(self, file_path):
         """

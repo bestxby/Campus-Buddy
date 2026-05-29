@@ -48,6 +48,9 @@ def generate_data():
     # Ensure output directory exists
     os.makedirs("data", exist_ok=True)
 
+    # Time slot options for activities
+    time_slots = ["周一晚", "周二晚", "周三晚", "周四晚", "周五晚", "周六上午", "周六下午", "周六晚", "周日上午", "周日下午", "周日晚"]
+
     # 1. Generate student interests (each student gets 2 to 4 random interests)
     student_interest_rows = []
     student_to_interests = {}
@@ -56,11 +59,13 @@ def generate_data():
         selected_interests = random.sample(interests, num_interests)
         student_to_interests[student] = selected_interests
         for interest in selected_interests:
-            student_interest_rows.append([student, interest])
+            # Generate random interest level between 1 and 5
+            level = random.randint(1, 5)
+            student_interest_rows.append([student, interest, level])
 
     with open("data/student_interests.csv", mode="w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["student", "interest"])
+        writer.writerow(["student", "interest", "level"])
         writer.writerows(student_interest_rows)
 
     # 2. Generate activity interests
@@ -72,12 +77,14 @@ def generate_data():
         templates = templates_4 if idx < 10 else templates_3
         for template in templates:
             activity_name = template.format(interest)
-            activity_interest_rows.append([activity_name, interest])
+            capacity = random.choice([10, 15, 20, 30, 50])
+            time_slot = random.choice(time_slots)
+            activity_interest_rows.append([activity_name, interest, capacity, time_slot])
             interest_to_activities[interest].append(activity_name)
 
     with open("data/activity_interests.csv", mode="w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["activity", "interest"])
+        writer.writerow(["activity", "interest", "capacity", "time_slot"])
         writer.writerows(activity_interest_rows)
 
     # 3. Generate student-activity registrations (social connections)
