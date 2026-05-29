@@ -962,6 +962,10 @@ export function generateAdminHtmlReport(
       margin-top: 15px;
     }
     .diag-item-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
       padding: 10px 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
@@ -970,8 +974,8 @@ export function generateAdminHtmlReport(
       font-size: 13px;
     }
     .diag-item-cell span {
-      float: right;
       font-weight: 600;
+      font-size: 13px;
     }
     .diag-card {
       border-color: #ffb74d !important;
@@ -1024,7 +1028,7 @@ export function generateAdminHtmlReport(
         </div>
         <div class="diag-item-cell">
           <strong>直连度数 (Degree)</strong>
-          <span class="badge-percent" style="background: rgba(34, 211, 238, 0.1); color: #22d3ee; border: 1px solid rgba(34, 211, 238, 0.2); font-size: 11px; padding: 2px 6px;">${d.studentDegree}</span>
+          <span class="badge-percent" style="background: rgba(34, 211, 238, 0.1); color: #22d3ee; border: 1px solid rgba(34, 211, 238, 0.2); font-size: 13px; padding: 2px 6px;">${d.studentDegree}</span>
         </div>
         <div class="diag-item-cell">
           <strong>全校度数排名</strong>

@@ -350,7 +350,7 @@ const exportPdf = () => {
           padding: 2px 8px !important;
           border-radius: 6px !important;
           font-weight: 700 !important;
-          font-size: 12px !important;
+          font-size: 13px !important;
         }
         .graph-hint {
           display: none !important;
@@ -373,13 +373,21 @@ const exportPdf = () => {
           border-bottom: 1px solid #fde68a !important;
         }
         .diag-item-cell {
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          gap: 5px !important;
           border-bottom: 1px solid #f3f4f6 !important;
+          padding: 10px 0 !important;
         }
         .diag-item-cell strong {
           color: #4b5563 !important;
+          font-size: 13px !important;
         }
         .diag-item-cell span {
           color: #111827 !important;
+          font-size: 13px !important;
+          font-weight: 600 !important;
         }
         .diag-note-box, .diag-status-box {
           background-color: #fffdf5 !important;
