@@ -5,7 +5,7 @@
         <h3>👑 校园社交达人</h3>
         <div class="info-tooltip-wrapper">
           <span class="info-icon">ℹ️</span>
-          <div class="tooltip-content right-align">
+          <div class="tooltip-content left-align">
             <h4>社交活跃达人说明</h4>
             <p>展示校园中最为活跃、参与活动及兴趣非常丰富的同学。他们在多个社群都有所涉及，建立的校园人际连接较多，在日常活动和社交生活中扮演着积极开朗的纽带与先锋角色。</p>
           </div>

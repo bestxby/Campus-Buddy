@@ -5,7 +5,7 @@
         <h3>🧮 社交邻接矩阵诊断</h3>
         <div class="info-tooltip-wrapper">
           <span class="info-icon">ℹ️</span>
-          <div class="tooltip-content right-align">
+          <div class="tooltip-content left-align">
             <h4>邻接关联矩阵诊断</h4>
             <p>通过多维网格诊断，分析全校的兴趣重合度和活动参与分布。点击下方对应的诊断按钮，即可在全局全屏视图下展开并深入探索数据关系。</p>
           </div>

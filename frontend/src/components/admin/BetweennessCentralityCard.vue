@@ -5,7 +5,7 @@
         <h3>🌉 跨界人脉桥梁</h3>
         <div class="info-tooltip-wrapper">
           <span class="info-icon">ℹ️</span>
-          <div class="tooltip-content right-align">
+          <div class="tooltip-content left-align">
             <h4>跨界沟通桥梁说明</h4>
             <p>识别能够帮助跨界沟通、“连接不同圈子”的关键同学。这些同学虽然直接认识的人不一定是最多的，但由于他们跨越了不同的学科或兴趣圈子，在促进校园多元社群融合、打破人际隔阂中起着关键的纽带作用。</p>
           </div>

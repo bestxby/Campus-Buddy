@@ -5,7 +5,7 @@
         <h3>📊 全局社交网络特征指标</h3>
         <div class="info-tooltip-wrapper">
           <span class="info-icon">ℹ️</span>
-          <div class="tooltip-content right-align">
+          <div class="tooltip-content left-align">
             <h4>图论特征指标说明</h4>
             <p>基于当前全校学生、兴趣标签与活动参与构成的社交关系图谱，实时计算出的高阶网络拓扑指标。</p>
           </div>
@@ -20,7 +20,7 @@
             <span class="metric-label">🌐 全校人脉连通率</span>
             <div class="info-tooltip-wrapper sub-tooltip">
               <span class="info-icon mini-icon">?</span>
-              <div class="tooltip-content right-align">
+              <div class="tooltip-content left-align">
                 <p>非孤立节点学生占全校学生总数的比例，反映社交融入的整体水平。</p>
               </div>
             </div>
@@ -37,7 +37,7 @@
             <span class="metric-label">👥 平均社交距离</span>
             <div class="info-tooltip-wrapper sub-tooltip">
               <span class="info-icon mini-icon">?</span>
-              <div class="tooltip-content right-align">
+              <div class="tooltip-content left-align">
                 <p>任意两位同学在社交网中建立关联所需的平均步数（即通过兴趣/活动的间接关联跳数）。</p>
               </div>
             </div>
@@ -54,7 +54,7 @@
             <span class="metric-label">🔮 圈子聚集系数</span>
             <div class="info-tooltip-wrapper sub-tooltip">
               <span class="info-icon mini-icon">?</span>
-              <div class="tooltip-content right-align">
+              <div class="tooltip-content left-align">
                 <p>代表各个兴趣社群内部的抱团紧密程度，系数越高表明兴趣重叠与好友交集越深。</p>
               </div>
             </div>
@@ -71,7 +71,7 @@
             <span class="metric-label">📈 人脉网络密度</span>
             <div class="info-tooltip-wrapper sub-tooltip">
               <span class="info-icon mini-icon">?</span>
-              <div class="tooltip-content right-align">
+              <div class="tooltip-content left-align">
                 <p>实际连线数量与理论上最大可能连线数量的比值，体现关联的密集程度。</p>
               </div>
             </div>
