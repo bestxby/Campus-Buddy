@@ -3,6 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function() {
+        var saved = localStorage.getItem('campus-buddy-theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (saved === 'dark' || (!saved && prefersDark)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+        }
+      })();
+    </script>
     <!-- Prevent browser caching of index.html to ensure users always receive the latest JS/CSS build updates on refresh -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
@@ -13,20 +24,20 @@
     <meta property="og:description" content="通过 D3.js 力导向图可视化校园社交网络，智能推荐活动搭子" />
     <meta property="og:type" content="website" />
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>" />
-    <!-- Google Fonts: Inter -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='bgGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23D96E48'/%3E%3Cstop offset='50%25' stop-color='%237C3AED'/%3E%3Cstop offset='100%25' stop-color='%230284C7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='url(%23bgGrad)' stroke-width='2.2'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='url(%23bgGrad)' stroke-width='0.8' stroke-dasharray='2 2'/%3E%3Cg transform='rotate(30 16 16)'%3E%3Cpolygon points='16 7, 16 16, 13 16' fill='%23ffffff'/%3E%3Cpolygon points='16 7, 16 16, 19 16' fill='%230284C7'/%3E%3Cpolygon points='16 25, 16 16, 13 16' fill='%23cbd5e1'/%3E%3Cpolygon points='16 25, 16 16, 19 16' fill='%23D96E48'/%3E%3C/g%3E%3Ccircle cx='16' cy='16' r='2.2' fill='%23ffffff' stroke='url(%23bgGrad)' stroke-width='1'/%3E%3C/svg%3E" />
+    <!-- Google Fonts: Fira Code & Fira Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <title>Campus Buddy - 校园活动搭子匹配图</title>
-    <script type="module" crossorigin src="/Campus-Buddy/assets/main-mxQODrW3.js"></script>
-    <link rel="modulepreload" crossorigin href="/Campus-Buddy/assets/vue-vendor-CKem-9up.js">
-    <link rel="modulepreload" crossorigin href="/Campus-Buddy/assets/style-VP_LE33V.js">
-    <link rel="modulepreload" crossorigin href="/Campus-Buddy/assets/d3-vendor-7qNyeggi.js">
-    <link rel="stylesheet" crossorigin href="/Campus-Buddy/assets/style-B5HYt0dy.css">
-    <link rel="stylesheet" crossorigin href="/Campus-Buddy/assets/main-B_RJM1du.css">
+    <script type="module" crossorigin src="/Campus-Buddy/assets/main-JmhSDbyG.js"></script>
+    <link rel="modulepreload" crossorigin href="/Campus-Buddy/assets/vue-vendor-SI8RVhHu.js">
+    <link rel="modulepreload" crossorigin href="/Campus-Buddy/assets/style-2WoOui6e.js">
+    <link rel="modulepreload" crossorigin href="/Campus-Buddy/assets/d3-vendor-CSNoqnqE.js">
+    <link rel="stylesheet" crossorigin href="/Campus-Buddy/assets/style-DwMoQK8u.css">
+    <link rel="stylesheet" crossorigin href="/Campus-Buddy/assets/main-D_uquFRH.css">
   </head>
-  <body style="margin: 0; background-color: #020617; color: #f8fafc; font-family: 'Fira Sans', system-ui, -apple-system, sans-serif; overflow: hidden;">
-    <div id="app"></div>
+  <body style="margin: 0; overflow: hidden;">
+    <div id="app"></div>
   </body>
 </html>
