@@ -136,13 +136,13 @@ const sendTargetedPromotion = () => {
 .close-promo-btn {
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   font-size: 14px;
   cursor: pointer;
   line-height: 1;
 }
 .close-promo-btn:hover {
-  color: var(--text-primary);
+  color: var(--color-text);
 }
 .promo-body {
   display: flex;
@@ -152,7 +152,7 @@ const sendTargetedPromotion = () => {
 }
 .promo-intro {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   margin: 0;
 }
 .promo-targets-list {
@@ -163,15 +163,15 @@ const sendTargetedPromotion = () => {
 }
 .target-student-chip {
   background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
   font-size: 10px;
   padding: 2px 6px;
   border-radius: 4px;
 }
 .promo-empty {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   font-style: italic;
 }
 .promo-action-row {

@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useGraphStore } from '../stores/graph'
+import { graphDb } from '../utils/indexedDb'
 
 describe('Graph Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.restoreAllMocks()
+    graphDb.clearFallback()
   })
 
   it('should add edges correctly', () => {
@@ -50,7 +52,6 @@ describe('Graph Store', () => {
   })
 
   it('should support admin adding custom activities and interests with persistence', async () => {
-    localStorage.clear()
     const mockData = {
       students: [],
       activities: []
@@ -66,15 +67,17 @@ describe('Graph Store', () => {
     await store.loadGraphData()
 
     // Add custom interest
-    store.addInterestNode('TypeScript', 'tech')
+    await store.addInterestNode('TypeScript', 'tech')
     expect(store.graph.has('interest:TypeScript')).toBe(true)
-    expect(JSON.parse(localStorage.getItem('campus_buddy_custom_interests') || '[]')).toContainEqual({ name: 'TypeScript', domain: 'tech' })
+    const interests = await graphDb.get<any[]>('campus_buddy_custom_interests')
+    expect(interests).toContainEqual({ name: 'TypeScript', domain: 'tech' })
 
     // Add custom activity linked to interest
-    store.addActivity('TypeScript Workshop', ['TypeScript'])
+    await store.addActivity('TypeScript Workshop', ['TypeScript'])
     expect(store.graph.has('activity:TypeScript Workshop')).toBe(true)
     expect(store.graph.get('activity:TypeScript Workshop')?.has('interest:TypeScript')).toBe(true)
-    expect(JSON.parse(localStorage.getItem('campus_buddy_custom_activities') || '[]')).toContainEqual({ name: 'TypeScript Workshop', interests: ['TypeScript'] })
+    const activities = await graphDb.get<any[]>('campus_buddy_custom_activities')
+    expect(activities).toContainEqual({ name: 'TypeScript Workshop', interests: ['TypeScript'] })
 
     // Refresh graph and check custom elements are re-loaded
     store.graph.clear()
@@ -85,7 +88,6 @@ describe('Graph Store', () => {
   })
 
   it('should support admin deleting activities with persistence', async () => {
-    localStorage.clear()
     const mockData = {
       students: [],
       activities: [
@@ -105,9 +107,10 @@ describe('Graph Store', () => {
     expect(store.graph.has('activity:DefaultActivity')).toBe(true)
 
     // Admin deletes the default activity
-    store.deleteActivity('DefaultActivity')
+    await store.deleteActivity('DefaultActivity')
     expect(store.graph.has('activity:DefaultActivity')).toBe(false)
-    expect(JSON.parse(localStorage.getItem('campus_buddy_deleted_activities') || '[]')).toContain('DefaultActivity')
+    const deleted = await graphDb.get<string[]>('campus_buddy_deleted_activities')
+    expect(deleted).toContain('DefaultActivity')
 
     // Reload graph data, verify DefaultActivity is not re-loaded
     await store.loadGraphData()

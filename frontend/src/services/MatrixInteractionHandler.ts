@@ -15,6 +15,10 @@ export interface InteractionCallbacks {
   setScrollLeft: (val: number) => void
   isDraggingScrollbar: () => boolean
   setDraggingScrollbar: (val: boolean) => void
+  isDraggingHScrollbar: () => boolean
+  setDraggingHScrollbar: (val: boolean) => void
+  setHoveredVScrollbar: (val: boolean) => void
+  setHoveredHScrollbar: (val: boolean) => void
   getHoveredState: () => { rowIdx: number | null; colIdx: number | null }
   setHoveredState: (rowIdx: number | null, colIdx: number | null) => void
 }
@@ -24,9 +28,24 @@ export class MatrixInteractionHandler {
   private callbacks: InteractionCallbacks
   private scrollbarWidth: number
 
-  // Temp drag state
+  // Temp drag state (scrollbar thumb)
   private dragStartMouseY = 0
   private dragStartScrollTop = 0
+
+  // Temp drag state (horizontal scrollbar thumb)
+  private hDragStartMouseX = 0
+  private hDragStartScrollLeft = 0
+
+  // Temp drag state (content pan)
+  private isDraggingContent = false
+  private panStartMouseX = 0
+  private panStartMouseY = 0
+  private panStartScrollLeft = 0
+  private panStartScrollTop = 0
+  private hasPanned = false // distinguish pan from click
+
+  // Height reserved for the horizontal scrollbar (must match AdjacencyMatrixPainter)
+  private readonly hScrollbarHeight = 14
 
   // Touch state
   private touchStartClientX = 0
@@ -90,33 +109,147 @@ export class MatrixInteractionHandler {
 
       const specs = this.callbacks.getLayoutSpecs()
       const { totalRows, totalCols, gridY, gridX, gridH, gridW, cellWidth, cellHeight } = specs
+      const effectiveGridH = gridH - (specs.needsHorizontalScroll ? this.hScrollbarHeight : 0)
 
-      // Handle scrollbar dragging
+      const maxScrollTop = this.callbacks.getMaxScrollTop()
+      const maxScrollLeft = this.callbacks.getMaxScrollLeft()
+
+      // Handle scrollbar thumb dragging (vertical)
       if (this.callbacks.isDraggingScrollbar()) {
         const dy = e.clientY - this.dragStartMouseY
         const scrollRange = totalRows * cellHeight - gridH
         const scrollbarRange = gridH - MatrixLayoutCalculator.getScrollbarThumbHeight(gridH, totalRows, cellHeight)
         if (scrollbarRange > 0) {
           const deltaScroll = (dy / scrollbarRange) * scrollRange
-          const maxScroll = this.callbacks.getMaxScrollTop()
-          const newScroll = Math.max(0, Math.min(maxScroll, this.dragStartScrollTop + deltaScroll))
+          const newScroll = Math.max(0, Math.min(maxScrollTop, this.dragStartScrollTop + deltaScroll))
           this.callbacks.setScrollTop(newScroll)
           this.callbacks.onRedraw()
         }
+        if (canvas.style.cursor !== 'ns-resize') {
+          canvas.style.cursor = 'ns-resize'
+        }
         return
+      }
+
+      // Handle horizontal scrollbar thumb dragging
+      if (this.callbacks.isDraggingHScrollbar()) {
+        const dx = e.clientX - this.hDragStartMouseX
+        if (specs.needsHorizontalScroll && maxScrollLeft > 0) {
+          const hThumbRatio = specs.gridW / specs.totalContentWidth
+          const hThumbW = Math.max(30, hThumbRatio * specs.gridW)
+          const scrollbarRange = specs.gridW - hThumbW
+          if (scrollbarRange > 0) {
+            const deltaScroll = (dx / scrollbarRange) * maxScrollLeft
+            const newScroll = Math.max(0, Math.min(maxScrollLeft, this.hDragStartScrollLeft + deltaScroll))
+            this.callbacks.setScrollLeft(newScroll)
+            this.callbacks.onRedraw()
+          }
+        }
+        if (canvas.style.cursor !== 'ew-resize') {
+          canvas.style.cursor = 'ew-resize'
+        }
+        return
+      }
+
+      // Handle content pan dragging (both axes)
+      if (this.isDraggingContent) {
+        const dx = e.clientX - this.panStartMouseX
+        const dy = e.clientY - this.panStartMouseY
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+          this.hasPanned = true
+        }
+        if (maxScrollLeft > 0) {
+          const newScrollLeft = Math.max(0, Math.min(maxScrollLeft, this.panStartScrollLeft - dx))
+          this.callbacks.setScrollLeft(newScrollLeft)
+        }
+        if (maxScrollTop > 0) {
+          const newScrollTop = Math.max(0, Math.min(maxScrollTop, this.panStartScrollTop - dy))
+          this.callbacks.setScrollTop(newScrollTop)
+        }
+        if (canvas.style.cursor !== 'grabbing') {
+          canvas.style.cursor = 'grabbing'
+        }
+        this.callbacks.onRedraw()
+        return
+      }
+
+      // Set cursor and update scrollbar hovers when not dragging
+      let targetCursor = 'default'
+      let overVThumb = false
+      let overHThumb = false
+
+      // 1. Check Vertical Scrollbar Hover
+      const scrollbarX = gridX + gridW
+      const isOverVScrollbar = maxScrollTop > 0 &&
+        mx >= scrollbarX && mx <= scrollbarX + this.scrollbarWidth &&
+        my >= gridY && my <= gridY + effectiveGridH
+
+      if (isOverVScrollbar) {
+        const thumbH = MatrixLayoutCalculator.getScrollbarThumbHeight(effectiveGridH, totalRows, cellHeight)
+        const scrollRatio = maxScrollTop > 0 ? (this.callbacks.getScrollTop() / maxScrollTop) : 0
+        const thumbY = gridY + scrollRatio * (effectiveGridH - thumbH)
+        if (my >= thumbY && my <= thumbY + thumbH) {
+          overVThumb = true
+          targetCursor = 'pointer'
+        } else {
+          targetCursor = 'default'
+        }
+      }
+
+      // 2. Check Horizontal Scrollbar Hover
+      const hBarY = gridY + effectiveGridH
+      const isOverHScrollbar = specs.needsHorizontalScroll && maxScrollLeft > 0 &&
+        mx >= gridX && mx <= gridX + gridW &&
+        my >= hBarY && my <= hBarY + this.hScrollbarHeight
+
+      if (isOverHScrollbar) {
+        const hThumbRatio = gridW / specs.totalContentWidth
+        const hThumbW = Math.max(30, hThumbRatio * gridW)
+        const hThumbX = gridX + (this.callbacks.getScrollLeft() / maxScrollLeft) * (gridW - hThumbW)
+        if (mx >= hThumbX && mx <= hThumbX + hThumbW) {
+          overHThumb = true
+          targetCursor = 'pointer'
+        } else {
+          targetCursor = 'default'
+        }
+      }
+
+      this.callbacks.setHoveredVScrollbar(overVThumb)
+      this.callbacks.setHoveredHScrollbar(overHThumb)
+
+      // 3. Check Headers and Grid Cells if not hovering scrollbars
+      if (!isOverVScrollbar && !isOverHScrollbar) {
+        const isOverColHeaders = mx >= gridX && mx < gridX + gridW && my >= 0 && my < gridY
+        const isOverContent = mx >= 0 && mx < gridX + gridW && my >= gridY && my < gridY + effectiveGridH
+
+        if (isOverColHeaders) {
+          targetCursor = 'pointer'
+        } else if (isOverContent) {
+          if (maxScrollTop > 0 || maxScrollLeft > 0) {
+            targetCursor = 'grab'
+          } else {
+            targetCursor = 'pointer'
+          }
+        }
+      }
+
+      if (canvas.style.cursor !== targetCursor) {
+        canvas.style.cursor = targetCursor
       }
 
       // Identify hovered cell (accounting for horizontal scroll)
       let newHoveredRowIdx: number | null = null
       let newHoveredColIdx: number | null = null
 
-      const scrollLeft = this.callbacks.getScrollLeft()
-      if (mx >= gridX && mx < gridX + gridW && my >= gridY && my < gridY + gridH) {
-        newHoveredRowIdx = Math.floor((my - gridY + this.callbacks.getScrollTop()) / cellHeight)
-        newHoveredColIdx = Math.floor((mx - gridX + scrollLeft) / cellWidth)
+      if (!isOverVScrollbar && !isOverHScrollbar) {
+        const scrollLeft = this.callbacks.getScrollLeft()
+        if (mx >= gridX && mx < gridX + gridW && my >= gridY && my < gridY + effectiveGridH) {
+          newHoveredRowIdx = Math.floor((my - gridY + this.callbacks.getScrollTop()) / cellHeight)
+          newHoveredColIdx = Math.floor((mx - gridX + scrollLeft) / cellWidth)
 
-        if (newHoveredRowIdx >= totalRows) newHoveredRowIdx = null
-        if (newHoveredColIdx >= totalCols) newHoveredColIdx = null
+          if (newHoveredRowIdx >= totalRows) newHoveredRowIdx = null
+          if (newHoveredColIdx >= totalCols) newHoveredColIdx = null
+        }
       }
 
       const currentHover = this.callbacks.getHoveredState()
@@ -133,14 +266,16 @@ export class MatrixInteractionHandler {
       const my = e.clientY - rect.top
 
       const specs = this.callbacks.getLayoutSpecs()
-      const { totalRows, gridY, gridH, cellHeight, gridX, gridW } = specs
+      const { totalRows, gridY, gridH, cellHeight, gridX, gridW, needsHorizontalScroll } = specs
       const scrollbarX = gridX + gridW
+      const effectiveGridH = gridH - (needsHorizontalScroll ? this.hScrollbarHeight : 0)
 
-      if (mx >= scrollbarX && mx <= scrollbarX + this.scrollbarWidth && my >= gridY && my <= gridY + gridH) {
-        const thumbH = MatrixLayoutCalculator.getScrollbarThumbHeight(gridH, totalRows, cellHeight)
+      // Priority 1: Vertical scrollbar thumb
+      if (mx >= scrollbarX && mx <= scrollbarX + this.scrollbarWidth && my >= gridY && my <= gridY + effectiveGridH) {
+        const thumbH = MatrixLayoutCalculator.getScrollbarThumbHeight(effectiveGridH, totalRows, cellHeight)
         const maxScroll = this.callbacks.getMaxScrollTop()
         const scrollRatio = maxScroll > 0 ? (this.callbacks.getScrollTop() / maxScroll) : 0
-        const thumbY = gridY + scrollRatio * (gridH - thumbH)
+        const thumbY = gridY + scrollRatio * (effectiveGridH - thumbH)
 
         if (my >= thumbY && my <= thumbY + thumbH) {
           this.callbacks.setDraggingScrollbar(true)
@@ -148,15 +283,74 @@ export class MatrixInteractionHandler {
           this.dragStartScrollTop = this.callbacks.getScrollTop()
           e.preventDefault()
         }
+        return
+      }
+
+      // Priority 2: Horizontal scrollbar strip (bottom of grid)
+      const hBarY = gridY + effectiveGridH
+      const maxScrollH = this.callbacks.getMaxScrollLeft()
+      if (needsHorizontalScroll && maxScrollH > 0 &&
+          mx >= gridX && mx <= gridX + gridW &&
+          my >= hBarY && my <= hBarY + this.hScrollbarHeight) {
+        // Compute thumb position to check if click is on thumb
+        const hThumbRatio = gridW / specs.totalContentWidth
+        const hThumbW = Math.max(30, hThumbRatio * gridW)
+        const hThumbX = gridX + (this.callbacks.getScrollLeft() / maxScrollH) * (gridW - hThumbW)
+
+        if (mx >= hThumbX && mx <= hThumbX + hThumbW) {
+          // Dragging the thumb
+          this.callbacks.setDraggingHScrollbar(true)
+          this.hDragStartMouseX = e.clientX
+          this.hDragStartScrollLeft = this.callbacks.getScrollLeft()
+          canvas.style.cursor = 'ew-resize'
+        } else {
+          // Click on track — jump to position
+          const clickRatio = (mx - gridX - hThumbW / 2) / (gridW - hThumbW)
+          const newScroll = Math.max(0, Math.min(maxScrollH, clickRatio * maxScrollH))
+          this.callbacks.setScrollLeft(newScroll)
+          this.callbacks.onRedraw()
+        }
+        e.preventDefault()
+        return
+      }
+
+      // Priority 3: Content pan inside matrix grid (excluding h-scrollbar strip)
+      const maxScrollV = this.callbacks.getMaxScrollTop()
+      if ((maxScrollH > 0 || maxScrollV > 0) && mx >= 0 && mx <= gridX + gridW && my >= gridY && my <= gridY + effectiveGridH) {
+        this.isDraggingContent = true
+        this.hasPanned = false
+        this.panStartMouseX = e.clientX
+        this.panStartMouseY = e.clientY
+        this.panStartScrollLeft = this.callbacks.getScrollLeft()
+        this.panStartScrollTop = this.callbacks.getScrollTop()
+        canvas.style.cursor = 'grab'
+        e.preventDefault()
       }
     }
 
     this.handleMouseUpFn = () => {
       this.callbacks.setDraggingScrollbar(false)
+      if (this.callbacks.isDraggingHScrollbar()) {
+        this.callbacks.setDraggingHScrollbar(false)
+      }
+      if (this.isDraggingContent) {
+        this.isDraggingContent = false
+      }
+      canvas.style.cursor = 'default'
     }
 
     this.handleMouseOutFn = () => {
       this.callbacks.setDraggingScrollbar(false)
+      if (this.callbacks.isDraggingHScrollbar()) {
+        this.callbacks.setDraggingHScrollbar(false)
+      }
+      if (this.isDraggingContent) {
+        this.isDraggingContent = false
+      }
+      this.callbacks.setHoveredVScrollbar(false)
+      this.callbacks.setHoveredHScrollbar(false)
+      canvas.style.cursor = 'default'
+
       const currentHover = this.callbacks.getHoveredState()
       if (currentHover.rowIdx !== null || currentHover.colIdx !== null) {
         this.callbacks.setHoveredState(null, null)
@@ -166,17 +360,24 @@ export class MatrixInteractionHandler {
     }
 
     this.handleClickFn = (e: MouseEvent) => {
+      // Suppress click if the user was dragging/panning
       if (this.callbacks.isDraggingScrollbar()) return
+      if (this.callbacks.isDraggingHScrollbar()) return
+      if (this.hasPanned) {
+        this.hasPanned = false
+        return
+      }
       const rect = canvas.getBoundingClientRect()
       const mx = e.clientX - rect.left
       const my = e.clientY - rect.top
 
       const specs = this.callbacks.getLayoutSpecs()
       const { totalRows, totalCols, gridY, gridX, gridH, gridW, rows, cols, cellWidth, cellHeight } = specs
+      const effectiveGridH = gridH - (specs.needsHorizontalScroll ? this.hScrollbarHeight : 0)
       const scrollLeft = this.callbacks.getScrollLeft()
 
       // 1. Click on grid cells or row headers -> Row click
-      if (mx >= 0 && mx < gridX + gridW && my >= gridY && my < gridY + gridH) {
+      if (mx >= 0 && mx < gridX + gridW && my >= gridY && my < gridY + effectiveGridH) {
         const clickedRow = Math.floor((my - gridY + this.callbacks.getScrollTop()) / cellHeight)
         if (clickedRow >= 0 && clickedRow < totalRows) {
           const rowName = rows[clickedRow]

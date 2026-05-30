@@ -2,7 +2,7 @@
   <div class="card result-card">
     <div class="result-card-header">
       <h3>
-        <svg class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1px;">
+        <svg class="icon-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="2" y1="12" x2="22" y2="12"></line>
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
@@ -58,7 +58,7 @@
 
             <div class="activity-card-footer">
               <div class="activity-card-members">
-                <span class="members-icon" style="display: inline-flex; align-items: center; margin-right: 4px; vertical-align: -1px; color: var(--text-secondary);">
+                <span class="members-icon" style="display: inline-flex; align-items: center; margin-right: 4px; vertical-align: -1px; color: var(--color-subtext);">
                   <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>

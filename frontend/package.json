@@ -1,7 +1,7 @@
 {
   "name": "campus-buddy-web",
   "private": true,
-  "version": "2.1.0",
+  "version": "3.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
+    "@types/node": "^20.19.41",
     "@vitejs/plugin-vue": "^6.0.7",
     "@vitest/coverage-v8": "^4.1.7",
     "@vue/test-utils": "^2.4.10",

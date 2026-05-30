@@ -2,7 +2,7 @@
   <div class="card result-card">
     <div class="result-card-header">
       <h3>
-        <svg class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1px;">
+        <svg class="icon-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
           <circle cx="12" cy="12" r="10"></circle>
           <circle cx="12" cy="12" r="6"></circle>
           <circle cx="12" cy="12" r="2"></circle>
@@ -41,7 +41,7 @@
           <!-- Activity Title & Header -->
           <div class="activity-card-header-row">
             <div class="header-left">
-              <span class="activity-card-icon" style="display: inline-flex; align-items: center; color: var(--accent-orange);">
+              <span class="activity-card-icon" style="display: inline-flex; align-items: center; color: var(--color-accent);">
                 <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
                   <circle cx="12" cy="12" r="10"></circle>
                   <circle cx="12" cy="12" r="4"></circle>
@@ -71,7 +71,7 @@
           <!-- Buddy match reason (compact) -->
           <div class="match-reason-line">
             <span v-if="act.buddiesSigned.length > 0" class="buddy-signup-text" style="display: inline-flex; align-items: center; gap: 4px;">
-              <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: -1px; color: var(--text-secondary);">
+              <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: -1px; color: var(--color-subtext);">
                 <path d="M17 21v-2a4 4 0 0 0-3-3.87"></path>
                 <path d="M9 21v-2a4 4 0 0 0-3-3.87"></path>
                 <circle cx="9" cy="7" r="4"></circle>
@@ -79,7 +79,7 @@
               {{ act.buddiesSigned.slice(0, 2).join('、') }}<span v-if="act.buddiesSigned.length > 2">等{{ act.buddiesSigned.length }}人</span>也报名了
             </span>
             <span v-else class="recommend-reason-text" style="display: inline-flex; align-items: center; gap: 4px;">
-              <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: -1px; color: var(--accent-orange);">
+              <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: -1px; color: var(--color-accent);">
                 <path d="M9 18h6"></path>
                 <path d="M10 22h4"></path>
                 <path d="M15.09 14c.18-.33.3-.68.37-1.04A5 5 0 0 0 16 9a5 5 0 0 0-10 0 5 5 0 0 0 .54 2.96c.07.36.19.7.37 1.04l1.59 2h7l1.59-2z"></path>
@@ -91,7 +91,7 @@
           <!-- Footer & Actions -->
           <div class="activity-card-footer">
             <div class="activity-card-members">
-              <span class="members-icon" style="display: inline-flex; align-items: center; margin-right: 4px; vertical-align: -1px; color: var(--text-secondary);">
+              <span class="members-icon" style="display: inline-flex; align-items: center; margin-right: 4px; vertical-align: -1px; color: var(--color-subtext);">
                 <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                   <circle cx="9" cy="7" r="4"></circle>

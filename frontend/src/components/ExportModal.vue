@@ -262,7 +262,7 @@ const exportPdf = () => {
           width: 100% !important;
         }
         .header {
-          background: #ffffff !important;
+          background: var(--color-surface) !important;
           border: 1px solid #e2e8f0 !important;
           border-top: 4px solid ${primaryThemeColor} !important;
           border-radius: 12px !important;
@@ -282,7 +282,7 @@ const exportPdf = () => {
           font-size: 13px !important;
         }
         .card {
-          background: #ffffff !important;
+          background: var(--color-surface) !important;
           border: 1px solid #e2e8f0 !important;
           border-radius: 12px !important;
           padding: 24px 30px !important;

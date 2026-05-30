@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
       alias: {
         '@': resolve(__dirname, 'src'),
       },
+      dedupe: ['vue', 'pinia'],
     },
     test: {
       globals: true,

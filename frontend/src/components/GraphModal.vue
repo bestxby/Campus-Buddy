@@ -63,56 +63,20 @@
             </button>
           </div>
 
-          <div class="canvas-toggles" v-if="viewMode === 'network'">
-            <div class="toggle-group">
-              <label class="neon-checkbox" style="display: inline-flex; align-items: center;">
-                <input type="checkbox" v-model="hideBuddies" />
-                <span class="checkbox-box"></span>
-                <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -1px;">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-                隐藏同学
-              </label>
-              <label class="neon-checkbox" style="display: inline-flex; align-items: center;">
-                <input type="checkbox" v-model="hideActivities" />
-                <span class="checkbox-box"></span>
-                <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -1px;">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-                隐藏活动
-              </label>
-            </div>
-            <div class="limit-slider-group" v-if="!isGlobalMode">
-              <span class="slider-label" style="display: inline-flex; align-items: center; gap: 4px;">
-                <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                </svg>
-                推荐搭子限额: {{ buddyLimit }}人
-              </span>
-              <input type="range" min="0" :max="maxLimit" step="1" v-model.number="buddyLimit" class="neon-slider" />
-            </div>
-          </div>
-          <div class="zoom-controls-modal" v-if="viewMode === 'network'">
-            <button @click="zoomIn" class="zoom-btn" title="放大" aria-label="放大" style="display: inline-flex; align-items: center; justify-content: center;">
-              <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-            </button>
-            <button @click="zoomOut" class="zoom-btn" title="缩小" aria-label="缩小" style="display: inline-flex; align-items: center; justify-content: center;">
-              <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-            </button>
-            <button @click="resetZoom" class="zoom-btn" title="重置" aria-label="重置" style="display: inline-flex; align-items: center; justify-content: center;">
-              <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
-              </svg>
-            </button>
-          </div>
+          <GraphFilterControls
+            v-if="viewMode === 'network'"
+            v-model:hideBuddies="hideBuddies"
+            v-model:hideActivities="hideActivities"
+            v-model:buddyLimit="buddyLimit"
+            :maxLimit="maxLimit"
+            :isGlobalMode="isGlobalMode"
+          />
+          <GraphZoomControls
+            v-if="viewMode === 'network'"
+            @zoomIn="zoomIn"
+            @zoomOut="zoomOut"
+            @resetZoom="resetZoom"
+          />
         </div>
       </div>
 
@@ -143,6 +107,8 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { graph } from '@/composables/useGraph'
+import GraphZoomControls from './graph/GraphZoomControls.vue'
+import GraphFilterControls from './graph/GraphFilterControls.vue'
 import { activeStudent, recommendations, selectStudent, pathResult } from '@/composables/useRecommendations'
 import { currentUser, currentUserRole, signedUpActivities } from '@/composables/useAuth'
 import { useGraphStore } from '@/stores/graph'

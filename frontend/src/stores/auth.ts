@@ -4,6 +4,7 @@ import { useGraphStore } from './graph'
 import { AVATAR_OPTIONS, INTEREST_CATEGORIES, DOMAIN_META, ADMIN_NAME } from '@/constants/interests'
 import type { DomainBar, RegForm } from '@/types'
 import { computePersona, hashPassword, NAME_VALIDATION_REGEX } from '@/utils/auth-helpers'
+import { graphDb } from '@/utils/indexedDb'
 
 const safeStorage = {
   getItem(key: string): string | null {
@@ -51,7 +52,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isSocialMode = ref<boolean>(safeStorage.getItem('campus_buddy_social_mode') === 'true')
 
 
-  function togglePrivacyMode(): void {
+  async function togglePrivacyMode(): Promise<void> {
     isPrivateMode.value = !isPrivateMode.value
     safeStorage.setItem('campus_buddy_private_mode', isPrivateMode.value ? 'true' : 'false')
     
@@ -72,18 +73,18 @@ export const useAuthStore = defineStore('auth', () => {
     // Sync to registered students
     if (currentUser.value) {
       try {
-        const list = JSON.parse(safeStorage.getItem('campus_buddy_registered_students') || '[]')
+        const list = await graphDb.get<any[]>('campus_buddy_registered_students') || []
         const student = list.find((s: any) => s.name === currentUser.value)
         if (student) {
           student.privateMode = isPrivateMode.value
           student.socialMode = isSocialMode.value
-          safeStorage.setItem('campus_buddy_registered_students', JSON.stringify(list))
+          await graphDb.set('campus_buddy_registered_students', list)
         }
       } catch (e) {}
     }
   }
 
-  function toggleSocialMode(): void {
+  async function toggleSocialMode(): Promise<void> {
     isSocialMode.value = !isSocialMode.value
     safeStorage.setItem('campus_buddy_social_mode', isSocialMode.value ? 'true' : 'false')
 
@@ -104,12 +105,12 @@ export const useAuthStore = defineStore('auth', () => {
     // Sync to registered students
     if (currentUser.value) {
       try {
-        const list = JSON.parse(safeStorage.getItem('campus_buddy_registered_students') || '[]')
+        const list = await graphDb.get<any[]>('campus_buddy_registered_students') || []
         const student = list.find((s: any) => s.name === currentUser.value)
         if (student) {
           student.privateMode = isPrivateMode.value
           student.socialMode = isSocialMode.value
-          safeStorage.setItem('campus_buddy_registered_students', JSON.stringify(list))
+          await graphDb.set('campus_buddy_registered_students', list)
         }
       } catch (e) {}
     }
@@ -164,7 +165,7 @@ export const useAuthStore = defineStore('auth', () => {
     else          regForm.selectedInterests.push(interest)
   }
 
-  function submitRegistration(): void {
+  async function submitRegistration(): Promise<void> {
     const name = regForm.name.trim()
     if (!name || !NAME_VALIDATION_REGEX.test(name) || regForm.selectedInterests.length === 0) return
 
@@ -185,7 +186,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Persist the student profile info in campus_buddy_registered_students
     try {
-      const list = JSON.parse(safeStorage.getItem('campus_buddy_registered_students') || '[]')
+      const list = await graphDb.get<any[]>('campus_buddy_registered_students') || []
       const existingIdx = list.findIndex((s: any) => s.name === name)
       const sInfo = {
         name,
@@ -200,7 +201,7 @@ export const useAuthStore = defineStore('auth', () => {
       } else {
         list.push(sInfo)
       }
-      safeStorage.setItem('campus_buddy_registered_students', JSON.stringify(list))
+      await graphDb.set('campus_buddy_registered_students', list)
     } catch (e) {}
 
     const graphStore = useGraphStore()
@@ -287,7 +288,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function logout(): Promise<void> {
+  async function logout(shouldReset: boolean = false): Promise<void> {
     try {
       const persistentKeys = [
         'campus_buddy_custom_activities',
@@ -296,10 +297,16 @@ export const useAuthStore = defineStore('auth', () => {
         'campus_buddy_registered_students'
       ]
       Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('campus_buddy_') && !persistentKeys.includes(key)) {
+        if (key.startsWith('campus_buddy_') && (shouldReset || !persistentKeys.includes(key))) {
           localStorage.removeItem(key)
         }
       })
+      if (shouldReset) {
+        await graphDb.remove('campus_buddy_custom_activities')
+        await graphDb.remove('campus_buddy_custom_interests')
+        await graphDb.remove('campus_buddy_deleted_activities')
+        await graphDb.remove('campus_buddy_registered_students')
+      }
     } catch (e) {}
     currentUser.value = null
     currentUserRole.value = null
@@ -317,7 +324,7 @@ export const useAuthStore = defineStore('auth', () => {
     await graphStore.loadGraphData()
   }
 
-  function signUpForActivity(activity: string): void {
+  async function signUpForActivity(activity: string): Promise<void> {
     if (!currentUser.value) return
     const graphStore = useGraphStore()
     const sNode = `student:${currentUser.value}`
@@ -328,18 +335,18 @@ export const useAuthStore = defineStore('auth', () => {
       
       // Update persistent registered student signups list
       try {
-        const list = JSON.parse(safeStorage.getItem('campus_buddy_registered_students') || '[]')
+        const list = await graphDb.get<any[]>('campus_buddy_registered_students') || []
         const student = list.find((s: any) => s.name === currentUser.value)
         if (student && !student.signups.includes(activity)) {
           student.signups.push(activity)
-          safeStorage.setItem('campus_buddy_registered_students', JSON.stringify(list))
+          await graphDb.set('campus_buddy_registered_students', list)
         }
       } catch (e) {}
     }
     graphStore.updateStats()
   }
 
-  function cancelSignUpForActivity(activity: string): void {
+  async function cancelSignUpForActivity(activity: string): Promise<void> {
     if (!currentUser.value) return
     const graphStore = useGraphStore()
     const sNode = `student:${currentUser.value}`
@@ -357,11 +364,11 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Update persistent registered student signups list
       try {
-        const list = JSON.parse(safeStorage.getItem('campus_buddy_registered_students') || '[]')
+        const list = await graphDb.get<any[]>('campus_buddy_registered_students') || []
         const student = list.find((s: any) => s.name === currentUser.value)
         if (student) {
           student.signups = student.signups.filter((a: string) => a !== activity)
-          safeStorage.setItem('campus_buddy_registered_students', JSON.stringify(list))
+          await graphDb.set('campus_buddy_registered_students', list)
         }
       } catch (e) {}
     }

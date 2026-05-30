@@ -27,7 +27,7 @@
             <svg class="icon-svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10" stroke="var(--accent-cyan)" stroke-width="1.5"></circle>
               <!-- Needle split into two halves for a premium 3D neon compass effect -->
-              <polygon points="12,12 16.24,7.76 14.12,14.12" fill="var(--accent-orange)" stroke="var(--accent-orange)" stroke-width="0.5"></polygon>
+              <polygon points="12,12 16.24,7.76 14.12,14.12" fill="var(--color-accent)" stroke="var(--color-accent)" stroke-width="0.5"></polygon>
               <polygon points="12,12 16.24,7.76 9.88,9.88" fill="#b35a00" stroke="#b35a00" stroke-width="0.5"></polygon>
               <polygon points="12,12 7.76,16.24 9.88,9.88" fill="var(--accent-cyan)" stroke="var(--accent-cyan)" stroke-width="0.5"></polygon>
               <polygon points="12,12 7.76,16.24 14.12,14.12" fill="#0099ab" stroke="#0099ab" stroke-width="0.5"></polygon>
@@ -148,7 +148,7 @@ const handleSubmitted = () => {
 .login-overlay {
   position: fixed;
   inset: 0;
-  background-color: #020617; /* Solid dark color to prevent background leak/transparency */
+  background-color: var(--color-bg); /* Use adaptive theme background */
   z-index: 100;
   display: flex;
   justify-content: center;
@@ -167,7 +167,7 @@ const handleSubmitted = () => {
 .blob-1 {
   width: 400px;
   height: 400px;
-  background: var(--accent-orange);
+  background: var(--color-accent);
   top: -100px;
   left: -100px;
   animation: float-blob-1 20s infinite alternate ease-in-out;
@@ -193,14 +193,14 @@ const handleSubmitted = () => {
 .login-card {
   max-width: 100%;
   padding: 24px 32px;
-  background: rgba(9, 14, 26, 0.75);
+  background: var(--color-surface); /* Adaptive card background */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border); /* Adaptive border */
+  box-shadow: var(--shadow-xl); /* Adaptive premium shadow */
   max-height: 95vh;
   overflow-y: auto;
-  transition: width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+  transition: width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.35s ease, border-color 0.35s ease, background-color var(--transition-slow);
   border-radius: 12px;
   z-index: 1;
 }
@@ -214,14 +214,14 @@ const handleSubmitted = () => {
   display: flex;
   gap: 12px;
   margin-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 8px;
 }
 .login-tab-btn {
   flex: 1;
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-subtext);
   border-radius: 8px;
   padding: 10px;
   font-size: 13px;
@@ -231,31 +231,31 @@ const handleSubmitted = () => {
   outline: none;
 }
 .login-tab-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
+  background-color: var(--color-muted);
+  color: var(--color-text);
 }
 .tab-active {
-  background-color: rgba(253, 151, 31, 0.1) !important;
-  border-color: rgba(253, 151, 31, 0.4) !important;
-  color: #ffb74d !important;
-  box-shadow: 0 0 10px rgba(253, 151, 31, 0.1);
+  background-color: var(--color-social-active-bg) !important;
+  border-color: var(--color-social-active-border) !important;
+  color: var(--color-social-active-text) !important;
+  box-shadow: 0 0 10px var(--color-social-active-bg);
 }
 .tab-active-admin {
-  background-color: rgba(6, 182, 212, 0.1) !important;
-  border-color: rgba(6, 182, 212, 0.4) !important;
-  color: #22d3ee !important;
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.1);
+  background-color: var(--color-admin-active-bg) !important;
+  border-color: var(--color-admin-active-border) !important;
+  color: var(--color-admin-active-text) !important;
+  box-shadow: 0 0 10px var(--color-admin-active-bg);
 }
 /* Redesigned Premium Logo Banner */
 .login-logo-banner {
   margin-bottom: 20px;
   padding: 12px 16px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-surface-2); /* Adaptive banner background */
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-sm);
 }
 .login-logo-banner::before {
   content: '';
@@ -264,7 +264,7 @@ const handleSubmitted = () => {
   right: -15px;
   width: 80px;
   height: 80px;
-  background: radial-gradient(circle, rgba(253, 151, 31, 0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--color-accent-orange-glow) 0%, transparent 70%);
   pointer-events: none;
 }
 .logo-main-group {
@@ -287,12 +287,12 @@ const handleSubmitted = () => {
   font-size: 16px;
   font-weight: 950;
   letter-spacing: -0.3px;
-  color: var(--text-primary);
+  color: var(--color-text);
   line-height: 1.2;
 }
 .login-logo-sub {
   font-size: 10.5px;
-  color: #94a3b8;
+  color: var(--color-subtext);
   margin-top: 3px;
   letter-spacing: 0.2px;
   font-weight: 600;
@@ -302,7 +302,7 @@ const handleSubmitted = () => {
 /* GitHub Card in Login Page */
 .login-github-card {
   margin-top: 20px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--color-border);
   padding-top: 16px;
   display: flex;
   justify-content: space-between;
@@ -315,8 +315,8 @@ const handleSubmitted = () => {
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   padding: 8px 12px;
   border-radius: 8px;
   flex: 1;
@@ -325,35 +325,35 @@ const handleSubmitted = () => {
   box-sizing: border-box;
 }
 .login-github-item:hover {
-  background: rgba(253, 151, 31, 0.04);
-  border-color: rgba(253, 151, 31, 0.25);
-  box-shadow: 0 4px 12px rgba(253, 151, 31, 0.06);
+  background: var(--color-social-active-bg);
+  border-color: var(--color-social-active-border);
+  box-shadow: 0 4px 12px var(--color-social-active-bg);
 }
 .login-github-item.author-link:hover {
-  background: rgba(6, 182, 212, 0.04);
-  border-color: rgba(6, 182, 212, 0.25);
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.06);
+  background: var(--color-admin-active-bg);
+  border-color: var(--color-admin-active-border);
+  box-shadow: 0 4px 12px var(--color-admin-active-bg);
 }
 .git-icon-wrap {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(253, 151, 31, 0.05);
-  border: 1px solid rgba(253, 151, 31, 0.2);
-  color: #ffb74d;
+  background: var(--color-social-active-bg);
+  border: 1px solid var(--color-social-active-border);
+  color: var(--color-social-active-text);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: all 0.25s ease;
-  box-shadow: 0 0 6px rgba(253, 151, 31, 0.15);
+  box-shadow: 0 0 6px var(--color-social-active-bg);
 }
 .git-avatar-img {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 1px solid rgba(6, 182, 212, 0.3);
-  box-shadow: 0 0 6px rgba(6, 182, 212, 0.15);
+  border: 1px solid var(--color-admin-active-border);
+  box-shadow: 0 0 6px var(--color-admin-active-border);
   flex-shrink: 0;
   transition: all 0.25s ease;
   box-sizing: border-box;
@@ -365,18 +365,18 @@ const handleSubmitted = () => {
   transition: transform 0.4s ease;
 }
 .login-github-item.repo-link:hover .git-icon-wrap {
-  background: rgba(253, 151, 31, 0.15);
-  border-color: #ffb74d;
-  color: #ffffff;
-  box-shadow: 0 0 10px rgba(253, 151, 31, 0.4);
+  background: var(--color-social-active-text);
+  border-color: var(--color-social-active-text);
+  color: var(--color-surface);
+  box-shadow: 0 0 10px var(--color-social-active-border);
   transform: scale(1.08);
 }
 .login-github-item:hover .github-icon {
   transform: rotate(360deg);
 }
 .login-github-item.author-link:hover .git-avatar-img {
-  border-color: #22d3ee;
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+  border-color: var(--color-admin-active-text);
+  box-shadow: 0 0 10px var(--color-admin-active-border);
   transform: scale(1.08);
 }
 .git-info {
@@ -387,25 +387,25 @@ const handleSubmitted = () => {
   min-width: 0;
 }
 .git-title {
-  color: var(--text-primary);
+  color: var(--color-text);
   font-size: 12px;
   font-weight: 700;
   transition: color 0.25s ease;
 }
 .login-github-item:hover .git-title {
-  color: #ffb74d;
+  color: var(--color-social-active-text);
 }
 .login-github-item.author-link:hover .git-title {
-  color: #22d3ee;
+  color: var(--color-admin-active-text);
 }
 .git-desc {
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   font-size: 10px;
 }
 .git-divider {
   width: 1px;
   height: 24px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--color-border);
   flex-shrink: 0;
 }
 @media (max-width: 480px) {

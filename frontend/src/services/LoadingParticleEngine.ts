@@ -98,7 +98,12 @@ export class LoadingParticleEngine {
   private initParticles() {
     this.particles = []
     const count = 600 // Restored to 600 as visual density is important and engine is fully optimized
-    const colors = ['#fd971f', '#06b6d4', '#ec4899', '#4ade80', '#a78bfa', '#facc15']
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+    // Dark mode: vivid neon palette that pops against deep backgrounds
+    // Light mode: warm, muted tones that look elegant on pale surfaces
+    const colors = isDark
+      ? ['#00e5ff', '#ff4fcf', '#a259ff', '#ffe033', '#00ff8c', '#ff6f3c']
+      : ['#fd971f', '#0ea5e9', '#ec4899', '#22c55e', '#8b5cf6', '#f59e0b']
     const w = this.canvasWidth || window.innerWidth
     const h = this.canvasHeight || window.innerHeight
 
@@ -156,8 +161,14 @@ export class LoadingParticleEngine {
     const exiting = this.exitingProvider()
 
     if (ctx) {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+      const colorBg = isDark ? 'rgba(2, 6, 23, 0.15)' : 'rgba(251, 249, 246, 0.18)'
+      const colorLineRgb = isDark ? '0, 229, 255' : '2, 132, 199'
+      // Dark mode: stronger trails by letting more of the previous frame show through
+      const shadowBlurAmount = isDark ? 10 : 4
+
       // Semi-transparent overlay to draw smooth motion trails
-      ctx.fillStyle = 'rgba(2, 6, 23, 0.18)'
+      ctx.fillStyle = colorBg
       ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
       const dpr = window.devicePixelRatio || 1
@@ -257,7 +268,7 @@ export class LoadingParticleEngine {
 
         ctx.fillStyle = p.color
         ctx.globalAlpha = p.alpha * fadeMultiplier * alphaFade
-        ctx.shadowBlur = 4
+        ctx.shadowBlur = shadowBlurAmount
         ctx.shadowColor = p.color
 
         ctx.beginPath()
@@ -301,9 +312,10 @@ export class LoadingParticleEngine {
             // Only run Math.sqrt of distance if the line is actually visible
             if (alphaFade > 0.01) {
               const dist = Math.sqrt(distSq)
-              const alpha = (1 - dist / maxDist) * 0.15 * Math.min(progress * 2.5, 1) * alphaFade
+              const lineAlpha = isDark ? 0.22 : 0.15
+              const alpha = (1 - dist / maxDist) * lineAlpha * Math.min(progress * 2.5, 1) * alphaFade
               if (alpha > 0.01) {
-                ctx.strokeStyle = `rgba(6, 182, 212, ${alpha})`
+                ctx.strokeStyle = `rgba(${colorLineRgb}, ${alpha})`
                 ctx.beginPath()
                 ctx.moveTo(p1.currentDrawX, p1.currentDrawY)
                 ctx.lineTo(p2.currentDrawX, p2.currentDrawY)

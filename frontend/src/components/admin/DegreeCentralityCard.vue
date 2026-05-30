@@ -55,14 +55,14 @@ import { topSocialStudents } from '@/composables/useGraphInsights'
   flex-direction: column;
   overflow: visible;
   height: 100%;
-  background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
+  background: var(--color-surface);
   padding: 12px 16px !important;
 }
 .col-header {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 6px;
   margin-bottom: 8px;
   flex-shrink: 0;
@@ -70,13 +70,13 @@ import { topSocialStudents } from '@/composables/useGraphInsights'
 .col-header h3 {
   font-size: 12px;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--color-text);
   font-weight: bold;
   text-align: left;
 }
 .col-header .header-sub {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   text-align: left;
 }
 .card-scroll-body {
@@ -87,8 +87,8 @@ import { topSocialStudents } from '@/composables/useGraphInsights'
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 8px 12px;
 }
@@ -97,12 +97,12 @@ import { topSocialStudents } from '@/composables/useGraphInsights'
   align-items: center;
   justify-content: space-between;
   font-size: 11px;
-  color: var(--text-primary);
+  color: var(--color-text);
   line-height: 1.4;
 }
 .centrality-rank {
   font-weight: 800;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   font-family: monospace;
   width: 25px;
 }

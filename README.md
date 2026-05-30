@@ -2,7 +2,7 @@
 
 > 🌐 **在线演示**: [https://bestxby.github.io/Campus-Buddy/](https://bestxby.github.io/Campus-Buddy/)
 > 
-> 🧪 **测试覆盖率**: 26/26 前端 Vitest 通过, 21/21 后端 Pytest 通过, Vue-tsc 编译 0 报错
+> 🧪 **测试覆盖率**: 70/70 前端 Vitest 通过, 23/23 后端 Pytest 通过, Vue-tsc 编译 0 报错
 
 `Campus Buddy` 是一个基于图数据结构（Graph Data Structure）的高性能校园社交与活动匹配推荐系统。本项目支持 **1,500+ 学生、30 种兴趣标签、100 个校园活动**的大规模数据关联，提供命令行 MVP 工具与基于 **Vue 3 + D3.js + TypeScript** 开发的极客霓虹感（Sleek Slate & Neon）现代化可视化 Web 交互面板。
 
@@ -128,7 +128,10 @@ graph TD
 ## ⚡ 性能优化与技术亮点
 
 * **无刷新 SPA 路由跳转 (Zero-Flicker SPA Router Migration)**：全面重构页面跳转机制，使用 Vue Router `router.push` 和 `<router-link>` 替代原生 `<a>` 标签与 `window.location`，彻底解决页面切换时的“白屏闪烁”和“页面硬刷新”问题，维持 Vue 实例和全局状态的持续挂载。
-* **响应式邻接矩阵与双向触控滚动 (Responsive Matrix & Bidirectional Touch Scrolling)**：针对移动端小屏幕展示密集矩阵（30 兴趣 / 100 活动）时的挤压遮挡问题，设计并实现了基于 Canvas 的视口平移 Interaction Handler。设置单元格最小宽度 `28px`，引入 X/Y 双向触控滑动（Touch Pan Tracking）与 Shift+Wheel 横向滚动，并在底部动态渲染微型滚动条，确保在移动端也能流畅、清晰地交互和阅读海量拓扑关联。
+* **底层 IndexedDB 异步数据库迁移 (IndexedDB Persistence)**：针对自定义兴趣、自定义活动和报名表数据可能溢出 5MB 限制以及同步 JSON 读写阻塞主线程的问题，将底层持久化层从 `localStorage` 全面升级为基于 Promise 异步事务的 `IndexedDB`（使用全局单例 `graphDb`）。同时在 headless 单测环境中自动切换为高效的同步内存 Map 结构，保障开发与测试流程的高度一致与高健壮性。
+* **四叉树 (d3.quadtree) 空间分割命中检测优化 (Canvas Quadtree Optimization)**：为了消除高频 `mousemove` 命中检测带来的 $O(N)$ 线性距离平方计算瓶颈，在力导向渲染 tick 流程中实时构建二维空间分割四叉树，将缩放、拖拽和悬停的节点检测开销降到 $O(\log N)$。保证在大规模图谱和移动端设备下也有稳定的 60FPS 画布帧率。
+* **离线 SVG 交互式矢量报告 (Scalable SVG Report Exporter)**：导出的 HTML 报告中，人脉网络拓扑图全面重写为响应式 `<svg>` 矢量结构，支持无损缩放和高保真局部排版打印。通过 vanilla 鼠标事件及 CSS 过渡样式实现了极低渲染开销的悬停高亮、连线发光及动态卡片式 Tooltip。
+* **响应式邻接矩阵与双向触控滚动 (Responsive Matrix & Bidirectional Touch Scrolling)**：针对移动端小屏幕展示密集矩阵（30 兴趣 / 100 活动）时的挤压遮挡问题，设计并实现了基于 Canvas 的视口平移 Interaction Handler。设置单元格最小宽度 `28px`，引入 X/Y 双向触控滑动（Touch Pan Tracking）与 Shift+Wheel 横向滚动，并在底部动态渲染微型滚动条，确保在移动端也能流畅、清晰地交互 and 阅读海量拓扑关联。
 * **局部自我聚焦子图 (Ego Network)**：避免直接在前端绘制包含 1,500+ 节点和千条边的全局大图，当选择特定学生时，仅抓取其 2跳 范围内的聚焦子图（节点数 15~35 个），实现 60FPS 丝滑的拓扑图拖拽和缩放体验。
 * **LOD（Level of Detail）视口文字剔除**：在 Canvas 渲染层，根据视口缩放比例自动隐藏过小的文字标签，减少每帧文字绘制的重绘开销。
 * **Session 动态随机种子**：在 [stores/graph.ts](file:///e:/学习/大二下课程/数据结构与算法/数据结构大作业/Campus-Buddy/frontend/src/stores/graph.ts) 和 [utils/graph-metrics.ts](file:///e:/学习/大二下课程/数据结构与算法/数据结构大作业/Campus-Buddy/frontend/src/utils/graph-metrics.ts) 中设计了页面级的随机种子：每次页面加载或管理员点击“重置数据”时刷新，但在同一个页面周期内保持稳定。既保证了刷新的新颖性，又杜绝了因局部状态更新导致 UI 拓扑图或指标发生震荡跳变。

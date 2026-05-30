@@ -2,9 +2,9 @@ import { INTEREST_CATEGORIES } from '@/constants/interests'
 
 /**
  * Regular expression for validating student names:
- * 2-20 characters, allowing Chinese characters, English letters, numbers, spaces, and hyphens.
+ * 2-20 characters, allowing Chinese characters, English letters, spaces, and hyphens.
  */
-export const NAME_VALIDATION_REGEX = /^[\u4e00-\u9fa5a-zA-Z0-9\s-]{2,20}$/
+export const NAME_VALIDATION_REGEX = /^[\u4e00-\u9fa5a-zA-Z\s-]{2,20}$/
 
 /**
  * Computes the student's persona based on their selected interests categories count.

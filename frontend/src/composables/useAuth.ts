@@ -1,34 +1,82 @@
 import { useAuthStore } from '@/stores/auth'
-import { computed, customRef } from 'vue'
 import { getActivePinia } from 'pinia'
+import type { Ref } from 'vue'
 
-export const currentUser = computed(() => useAuthStore().currentUser)
-export const currentUserRole = customRef<'student' | 'admin' | null>((track, trigger) => ({
-  get: () => {
-    track()
+export const currentUser = {
+  __v_isRef: true,
+  get value() { return useAuthStore().currentUser }
+} as unknown as Ref<any>
+
+let mockRole: 'student' | 'admin' | null = null
+
+export const currentUserRole = {
+  __v_isRef: true,
+  get value(): 'student' | 'admin' | null {
+    if (mockRole !== null) return mockRole
     if (!getActivePinia()) return null
     return useAuthStore().currentUserRole
   },
-  set: (val) => {
+  set value(val: 'student' | 'admin' | null) {
+    if (mockRole !== null) {
+      mockRole = val
+      return
+    }
     if (getActivePinia()) {
       useAuthStore().currentUserRole = val
-      trigger()
     }
+  },
+  setMockValue(val: 'student' | 'admin' | null) {
+    mockRole = val
   }
-}))
-export const currentUserAvatar = computed(() => useAuthStore().currentUserAvatar)
-export const userPersona = computed(() => useAuthStore().userPersona)
-export const signedUpActivities = computed(() => useAuthStore().signedUpActivities)
-export const regForm = computed(() => useAuthStore().regForm)
+} as unknown as Ref<'student' | 'admin' | null> & { setMockValue(val: 'student' | 'admin' | null): void }
+
+export const currentUserAvatar = {
+  __v_isRef: true,
+  get value() { return useAuthStore().currentUserAvatar }
+} as unknown as Ref<string>
+
+export const userPersona = {
+  __v_isRef: true,
+  get value() { return useAuthStore().userPersona }
+} as unknown as Ref<string>
+
+export const signedUpActivities = {
+  __v_isRef: true,
+  get value() { return useAuthStore().signedUpActivities }
+} as unknown as Ref<string[]>
+
+export const regForm = {
+  __v_isRef: true,
+  get value() { return useAuthStore().regForm }
+} as unknown as Ref<any>
 
 export const computePersona = (interests: string[]): string =>
   useAuthStore().computePersona(interests)
 
-export const userInterestTags = computed(() => useAuthStore().userInterestTags)
-export const domainDistribution = computed(() => useAuthStore().domainDistribution)
-export const personaBadgeClass = computed(() => useAuthStore().personaBadgeClass)
-export const previewPersona = computed(() => useAuthStore().previewPersona)
-export const previewPersonaClass = computed(() => useAuthStore().previewPersonaClass)
+export const userInterestTags = {
+  __v_isRef: true,
+  get value() { return useAuthStore().userInterestTags }
+} as unknown as Ref<string[]>
+
+export const domainDistribution = {
+  __v_isRef: true,
+  get value() { return useAuthStore().domainDistribution }
+} as unknown as Ref<any>
+
+export const personaBadgeClass = {
+  __v_isRef: true,
+  get value() { return useAuthStore().personaBadgeClass }
+} as unknown as Ref<string>
+
+export const previewPersona = {
+  __v_isRef: true,
+  get value() { return useAuthStore().previewPersona }
+} as unknown as Ref<string>
+
+export const previewPersonaClass = {
+  __v_isRef: true,
+  get value() { return useAuthStore().previewPersonaClass }
+} as unknown as Ref<string>
 
 export const toggleInterestTag = (interest: string): void => {
   useAuthStore().toggleInterestTag(interest)
@@ -45,8 +93,8 @@ export const restoreSession = (): void => {
   useAuthStore().restoreSession()
 }
 
-export const logout = async (): Promise<void> => {
-  await useAuthStore().logout()
+export const logout = async (shouldReset: boolean = false): Promise<void> => {
+  await useAuthStore().logout(shouldReset)
 }
 
 export const signUpForActivity = (activity: string): void => {
@@ -60,12 +108,20 @@ export const cancelSignUpForActivity = (activity: string): void => {
 export const isSignedUp = (activity: string): boolean =>
   useAuthStore().isSignedUp(activity)
 
-export const isPrivateMode = computed(() => useAuthStore().isPrivateMode)
+export const isPrivateMode = {
+  __v_isRef: true,
+  get value() { return useAuthStore().isPrivateMode }
+} as unknown as Ref<boolean>
+
 export const togglePrivacyMode = (): void => {
   useAuthStore().togglePrivacyMode()
 }
 
-export const isSocialMode = computed(() => useAuthStore().isSocialMode)
+export const isSocialMode = {
+  __v_isRef: true,
+  get value() { return useAuthStore().isSocialMode }
+} as unknown as Ref<boolean>
+
 export const toggleSocialMode = (): void => {
   useAuthStore().toggleSocialMode()
 }

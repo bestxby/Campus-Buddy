@@ -155,12 +155,14 @@ export class ForceGraphCanvasPainter {
       }
     }
 
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+
     // Perform batched drawing
-    drawLinkBatch(defaultLines, '255, 255, 255', 1.5, [], 0.08)
+    drawLinkBatch(defaultLines, isDark ? '255, 255, 255' : '29, 24, 22', 1.5, [], 0.08)
     drawLinkBatch(studentActLines, '6, 182, 212', 1.5, [], 0.6)
-    drawLinkBatch(regLines, '253, 151, 31', 1.5, [3, 3], 0.45)
-    drawLinkBatch(activeRegLines, '74, 222, 128', 2.5, [4, 4], 0.9)
-    drawLinkBatch(pathLines, '250, 204, 21', 4.0, [], 1.0)
+    drawLinkBatch(regLines, isDark ? '253, 151, 31' : '217, 110, 72', 1.5, [3, 3], 0.45)
+    drawLinkBatch(activeRegLines, isDark ? '74, 222, 128' : '21, 128, 61', 2.5, [4, 4], 0.9)
+    drawLinkBatch(pathLines, isDark ? '250, 204, 21' : '217, 119, 6', 4.0, [], 1.0)
 
     // Reset dash array
     ctx.setLineDash([])
@@ -179,25 +181,29 @@ export class ForceGraphCanvasPainter {
       const radius = isFocal ? 22 : d.type === 'interest' ? 14 : 10
 
       // Calculate fill color
-      let fillColor = '#06b6d4'
+      let fillColor = isDark ? '#0ea5e9' : '#0D9488'
       if (isFocal) {
-        fillColor = '#ec4899'
+        fillColor = isDark ? '#ec4899' : '#BE185D'
       } else if (d.type === 'student') {
-        fillColor = '#fd971f'
+        fillColor = isDark ? '#fd971f' : '#D96E48'
       } else if (d.type === 'interest') {
-        fillColor = '#3b82f6'
-      } else if (d.type === 'activity' && activeStudent && graph?.get(nodeKey('student', activeStudent))?.has(d.id)) {
-        fillColor = '#4ade80'
+        fillColor = isDark ? '#60a5fa' : '#1D4ED8'
+      } else if (d.type === 'activity') {
+        if (activeStudent && graph?.get(nodeKey('student', activeStudent))?.has(d.id)) {
+          fillColor = isDark ? '#4ade80' : '#15803D'
+        } else {
+          fillColor = isDark ? 'rgba(52, 211, 153, 0.45)' : 'rgba(21, 128, 61, 0.45)'
+        }
       }
 
       // Calculate stroke
-      let strokeColor = '#0f172a'
+      let strokeColor = isDark ? '#0f172a' : '#ffffff'
       let strokeWidth = 2
       if (inPath) {
-        strokeColor = isFocal ? '#ec4899' : '#facc15'
+        strokeColor = isFocal ? '#ec4899' : (isDark ? '#facc15' : '#D96E48')
         strokeWidth = 3.5
       } else if (isFocal) {
-        strokeColor = '#facc15'
+        strokeColor = isDark ? '#facc15' : '#D96E48'
         strokeWidth = 3.5
       } else if (activeStudent && d.type === 'activity' && graph?.get(nodeKey('student', activeStudent))?.has(d.id)) {
         strokeColor = '#22c55e'
@@ -241,9 +247,6 @@ export class ForceGraphCanvasPainter {
       const inPath = pathResult && pathResult.path.includes(d.id)
       const isHovered = hoveredNode && d.id === hoveredNode.id
 
-      // Student, Interest, and Activity labels are always shown directly for immediate visibility.
-      let showLabel = true
-
       const dx = isFocal ? 26 : d.type === 'interest' ? 18 : 14
 
       // Viewport bounds culling (in simulation coordinates)
@@ -259,13 +262,13 @@ export class ForceGraphCanvasPainter {
 
       ctx.save()
       ctx.globalAlpha = opacity
-      ctx.fillStyle = '#f8fafc'
-      ctx.font = isFocal || inPath ? 'bold 11px "Outfit", "Inter", sans-serif' : '10px "Outfit", "Inter", sans-serif'
+      ctx.fillStyle = isDark ? '#f8fafc' : '#1D1816'
+      ctx.font = isFocal || inPath || isHovered ? 'bold 11px "Outfit", "Inter", sans-serif' : '10px "Outfit", "Inter", sans-serif'
       ctx.textAlign = 'left'
       ctx.textBaseline = 'middle'
 
-      // Dark text outline to ensure legibility
-      ctx.strokeStyle = 'rgba(15, 23, 42, 0.8)'
+      // text outline to ensure legibility
+      ctx.strokeStyle = isDark ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)'
       ctx.lineWidth = 3
       ctx.strokeText(d.name, d.x + dx, d.y)
 

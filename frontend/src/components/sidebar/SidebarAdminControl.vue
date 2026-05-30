@@ -17,7 +17,7 @@
         <div 
           @click="triggerCreateActivity" 
           class="control-card action-card" 
-          style="--control-color: #34d399"
+          style="--control-color: var(--color-success)"
         >
           <div class="control-card-content">
             <div class="control-card-header">
@@ -38,7 +38,7 @@
         <div 
           @click="triggerCreateInterest" 
           class="control-card action-card" 
-          style="--control-color: #06b6d4"
+          style="--control-color: var(--color-accent-cyan)"
         >
           <div class="control-card-content">
             <div class="control-card-header">
@@ -59,7 +59,7 @@
         <div 
           @click="triggerResetGraph" 
           class="control-card action-card" 
-          style="--control-color: #fd971f"
+          style="--control-color: var(--color-accent-orange)"
         >
           <div class="control-card-content">
             <div class="control-card-header">
@@ -89,8 +89,8 @@
       </div>
       
       <div class="control-cards-grid">
-        <!-- 检索卡片 -->
-        <div class="control-card search-card" style="--control-color: #3b82f6">
+        <!-- 检索卡片 (紧凑内联设计) -->
+        <div class="control-card search-card" style="--control-color: var(--color-accent-cyan)">
           <div class="control-card-header">
             <span class="control-icon">
               <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
@@ -98,9 +98,41 @@
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
             </span>
-            <span class="control-label">网络检索</span>
+            <span class="control-label">{{ activeStudent ? '当前检索中' : '网络检索' }}</span>
           </div>
-          <div class="search-input-field">
+
+          <!-- 情况 A：已选中学生，内联展示，高度不变 -->
+          <div v-if="activeStudent" class="selected-student-inline-wrap fade-in">
+            <div class="selected-info-row">
+              <span class="selected-name-badge">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; color: var(--color-accent);">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                {{ activeStudent }}
+              </span>
+              <button @click="clearSearch" class="btn-text btn-xs clear-inline-btn" title="清除选中并重新搜索">清除</button>
+            </div>
+            <div class="inline-actions-row">
+              <button @click="triggerOpenIndividualGraph" class="btn btn-xs btn-secondary glow-cyan inline-action-btn">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                拓扑图
+              </button>
+              <button @click="isExportModalVisible = true" class="btn btn-xs btn-primary glow-orange inline-action-btn">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                分析报告
+              </button>
+            </div>
+          </div>
+          
+          <!-- 情况 B：没有选中学生，展示常规输入框 -->
+          <div v-else class="search-input-field">
             <input
               v-model="searchQuery"
               @input="onSearchInput"
@@ -125,41 +157,6 @@
             </div>
           </div>
         </div>
-
-        <!-- 当前选中与操作区域 (仅当 activeStudent 有值时显示) -->
-        <div v-if="activeStudent" class="selected-student-actions card glow-orange fade-in">
-          <div class="selected-student-header">
-            <span class="selected-icon">
-              <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-orange);">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-            </span>
-            <div class="selected-info">
-              <span class="selected-label">当前选中</span>
-              <span class="selected-name">{{ activeStudent }}</span>
-            </div>
-          </div>
-          <div class="selected-buttons-row">
-            <div style="display: flex; gap: 6px;">
-              <button @click="triggerOpenIndividualGraph" class="btn btn-xs btn-secondary glow-cyan" style="display: flex; align-items: center; gap: 4px;">
-                <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                </svg>
-                查看拓扑图
-              </button>
-              <button @click="isExportModalVisible = true" class="btn btn-xs btn-primary glow-orange" style="display: flex; align-items: center; gap: 4px;">
-                <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                导出分析报告
-              </button>
-            </div>
-            <button @click="clearSearch" class="btn-text btn-xs">清除</button>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -177,6 +174,7 @@
 import { ref } from 'vue'
 import ExportModal from '@/components/ExportModal.vue'
 import { loadGraphData } from '@/composables/useGraph'
+import { logout } from '@/composables/useAuth'
 
 const isExportModalVisible = ref(false)
 import { searchQuery, suggestions, onSearchInput, selectStudent, activeStudent, clearSearch } from '@/composables/useRecommendations'
@@ -210,6 +208,7 @@ const triggerCreateInterest = () => {
 
 const triggerResetGraph = async () => {
   if (confirm('确认要重置系统数据吗？这将清除当前所有动态修改，并重新加载校园关系网络。')) {
+    await logout(true)
     emit('logout')
     await loadGraphData()
     addLog('action', '🔄 重置系统数据：成功重新生成了校园社交网络，包含 4 名需要关怀帮扶的同学')

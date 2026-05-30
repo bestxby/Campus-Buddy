@@ -192,7 +192,7 @@ const handleSubmit = () => {
 
 .modal-header {
   padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -206,13 +206,13 @@ const handleSubmit = () => {
 .modal-title-group h3 {
   margin: 0;
   font-size: 15px;
-  color: var(--text-primary);
+  color: var(--color-text);
   font-weight: 700;
 }
 
 .modal-subtitle {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   display: block;
   margin-top: 4px;
 }
@@ -220,14 +220,14 @@ const handleSubmit = () => {
 .close-btn {
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   font-size: 22px;
   cursor: pointer;
   line-height: 1;
 }
 
 .close-btn:hover {
-  color: var(--text-primary);
+  color: var(--color-text);
 }
 
 .modal-body {
@@ -247,19 +247,19 @@ const handleSubmit = () => {
 .form-label {
   font-size: 11px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-text);
 }
 
 .form-hint {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
 }
 
 .form-input {
   background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  color: var(--text-primary);
+  color: var(--color-text);
   padding: 10px 12px;
   font-size: 11px;
   outline: none;
@@ -267,7 +267,7 @@ const handleSubmit = () => {
 }
 
 .form-input:focus {
-  border-color: var(--accent-orange);
+  border-color: var(--color-accent);
   box-shadow: 0 0 8px rgba(253, 151, 31, 0.15);
 }
 
@@ -286,8 +286,8 @@ const handleSubmit = () => {
 
 .domain-btn {
   background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
+  border: 1px solid var(--color-border);
+  color: var(--color-subtext);
   border-radius: 8px;
   padding: 12px;
   cursor: pointer;
@@ -320,7 +320,7 @@ const handleSubmit = () => {
 
 .modal-footer {
   padding: 14px 20px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
   gap: 12px;

@@ -156,14 +156,14 @@ const getInterestClass = (interestName: string) => {
   flex-direction: column;
   overflow: visible;
   height: 100%;
-  background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
+  background: var(--color-surface);
   padding: 12px 16px !important;
 }
 .col-header {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 8px;
   margin-bottom: 8px;
   flex-shrink: 0;
@@ -171,13 +171,13 @@ const getInterestClass = (interestName: string) => {
 .col-header h3 {
   font-size: 12px;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--color-text);
   font-weight: bold;
   text-align: left;
 }
 .col-header .header-sub {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   text-align: left;
 }
 .flex-1-scroll {
@@ -198,9 +198,9 @@ const getInterestClass = (interestName: string) => {
   flex: 1;
   min-height: 80px;
   overflow-y: auto;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  background-color: rgba(0, 0, 0, 0.15);
+  background-color: var(--color-surface-2);
 }
 .saturation-table {
   width: 100%;
@@ -210,22 +210,22 @@ const getInterestClass = (interestName: string) => {
 }
 .saturation-table th, .saturation-table td {
   padding: 6px 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--color-border);
 }
 .saturation-table th {
-  background-color: #141a29; /* Opaque solid color to prevent text overlapping on scroll */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-secondary);
+  background-color: var(--color-muted); /* Opaque solid color to prevent text overlapping on scroll */
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-subtext);
   font-weight: bold;
   position: sticky;
   top: 0;
   z-index: 2;
 }
 .saturation-table tr:hover {
-  background-color: rgba(255, 255, 255, 0.015);
+  background-color: var(--color-surface);
 }
 .saturation-table tr.row-selected {
-  background-color: rgba(6, 182, 212, 0.08);
+  background-color: var(--color-accent-light);
 }
 .act-name-td {
   font-weight: 600;
@@ -241,29 +241,29 @@ const getInterestClass = (interestName: string) => {
   font-weight: bold;
 }
 .interest-badge-light.tag-sports {
-  background: rgba(6, 182, 212, 0.06);
-  border: 1px solid rgba(6, 182, 212, 0.15);
-  color: #22d3ee;
+  background: var(--bg-sports);
+  border: 1px solid var(--color-border);
+  color: var(--color-sports);
 }
 .interest-badge-light.tag-arts {
-  background: rgba(244, 114, 182, 0.06);
-  border: 1px solid rgba(244, 114, 182, 0.15);
-  color: #f472b6;
+  background: var(--bg-arts);
+  border: 1px solid var(--color-border);
+  color: var(--color-arts);
 }
 .interest-badge-light.tag-tech {
-  background: rgba(255, 183, 77, 0.06);
-  border: 1px solid rgba(255, 183, 77, 0.15);
-  color: #ffb74d;
+  background: var(--bg-tech);
+  border: 1px solid var(--color-border);
+  color: var(--color-tech);
 }
 .interest-badge-light.tag-social {
-  background: rgba(52, 211, 153, 0.06);
-  border: 1px solid rgba(52, 211, 153, 0.15);
-  color: #34d399;
+  background: var(--bg-social);
+  border: 1px solid var(--color-border);
+  color: var(--color-social);
 }
 .interest-badge-light.tag-neutral {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-secondary);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-subtext);
 }
 .count-td {
   font-family: Consolas, monospace;
@@ -276,18 +276,18 @@ const getInterestClass = (interestName: string) => {
   display: inline-block;
 }
 .status-pill.hot {
-  background-color: rgba(239, 68, 68, 0.12);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background-color: rgba(239, 68, 68, 0.08);
+  color: var(--color-danger);
+  border: 1px solid rgba(239, 68, 68, 0.15);
 }
 .status-pill.normal {
   background-color: rgba(52, 211, 153, 0.06);
-  color: #34d399;
+  color: var(--color-social);
   border: 1px solid rgba(52, 211, 153, 0.15);
 }
 .status-pill.cold {
-  background-color: rgba(251, 191, 36, 0.08);
-  color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.2);
+  background-color: rgba(251, 191, 36, 0.06);
+  color: var(--color-warning);
+  border: 1px solid rgba(251, 191, 36, 0.15);
 }
 </style>

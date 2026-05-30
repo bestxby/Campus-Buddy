@@ -31,14 +31,32 @@ export class ForceGraphRenderer {
   // Cache configuration for redrawing on hover, zoom, ticks
   private currentConfig: any = null
   private hoveredNode: ForceGraphNode | null = null
+  private quadtree: d3.Quadtree<ForceGraphNode> | null = null
+
+  private lastNodes: ForceGraphNode[] = []
+  private lastLinks: ForceGraphLink[] = []
+
+  private onThemeChanged = () => {
+    requestAnimationFrame(() => {
+      const ctx = this.canvasElement.getContext('2d')
+      if (ctx && this.lastNodes.length > 0) {
+        const dpi = window.devicePixelRatio || 1
+        const width = this.canvasElement.width / dpi
+        const height = this.canvasElement.height / dpi
+        this.renderCanvas(ctx, width, height, this.lastNodes, this.lastLinks)
+      }
+    })
+  }
 
   constructor(canvasElement: HTMLCanvasElement, callbacks: ForceGraphCallbacks = {}) {
     this.canvasElement = canvasElement
     this.callbacks = callbacks
     this.physics = new ForceGraphPhysics()
+    window.addEventListener('theme-changed', this.onThemeChanged)
   }
 
   public destroy() {
+    window.removeEventListener('theme-changed', this.onThemeChanged)
     this.physics.stop()
     if (this.zoomBehavior) {
       this.zoomBehavior.on('zoom', null)
@@ -131,8 +149,27 @@ export class ForceGraphRenderer {
     if (!this.zoomBehavior) {
       this.zoomBehavior = d3.zoom<HTMLCanvasElement, unknown>()
         .scaleExtent([ZOOM_SCALE_MIN, ZOOM_SCALE_MAX])
+        .filter((event: any) => {
+          // Block zoom panning/gestures when clicking directly on graph nodes
+          // to let D3 drag listeners process node translations without canvas scrolling.
+          const sim = this.physics.getSimulation()
+          if (sim) {
+            const [mx, my] = d3.pointer(event, canvas)
+            const simX = this.transform.invertX(mx)
+            const simY = this.transform.invertY(my)
+            const matchedNode = this.quadtree
+              ? this.quadtree.find(simX, simY, HOVER_FIND_RADIUS)
+              : sim.find(simX, simY, HOVER_FIND_RADIUS)
+            if (matchedNode) {
+              return false // Disable zoom event processing on this node click
+            }
+          }
+          // Fall back to default D3 zoom event filter conditions (!event.ctrlKey && !event.button)
+          return !event.ctrlKey && !event.button
+        })
       d3.select(canvas).call(this.zoomBehavior)
     }
+
 
     // Always update zoom listener to capture current draw closures
     this.zoomBehavior.on('zoom', (event: any) => {
@@ -151,8 +188,10 @@ export class ForceGraphRenderer {
         const [mx, my] = d3.pointer(event, canvas)
         const simX = this.transform.invertX(mx)
         const simY = this.transform.invertY(my)
-        // Find nearest node within find radius
-        return simulation.find(simX, simY, HOVER_FIND_RADIUS)
+        // Find nearest node within find radius using quadtree if available
+        return this.quadtree
+          ? this.quadtree.find(simX, simY, HOVER_FIND_RADIUS)
+          : simulation.find(simX, simY, HOVER_FIND_RADIUS)
       })
       .on('start', (event: any) => {
         if (!event.subject) return
@@ -179,7 +218,9 @@ export class ForceGraphRenderer {
       const [mx, my] = d3.pointer(event, canvas)
       const simX = this.transform.invertX(mx)
       const simY = this.transform.invertY(my)
-      const node = simulation.find(simX, simY, HOVER_FIND_RADIUS)
+      const node = this.quadtree
+        ? this.quadtree.find(simX, simY, HOVER_FIND_RADIUS)
+        : simulation.find(simX, simY, HOVER_FIND_RADIUS)
       if (node && this.callbacks.onNodeClick) {
         this.callbacks.onNodeClick(node)
       }
@@ -190,7 +231,9 @@ export class ForceGraphRenderer {
       const [mx, my] = d3.pointer(event, canvas)
       const simX = this.transform.invertX(mx)
       const simY = this.transform.invertY(my)
-      const node = simulation.find(simX, simY, HOVER_FIND_RADIUS)
+      const node = this.quadtree
+        ? this.quadtree.find(simX, simY, HOVER_FIND_RADIUS)
+        : simulation.find(simX, simY, HOVER_FIND_RADIUS)
 
       if (node !== this.hoveredNode) {
         this.hoveredNode = node as ForceGraphNode | null
@@ -262,6 +305,15 @@ export class ForceGraphRenderer {
     nodes: ForceGraphNode[],
     links: ForceGraphLink[]
   ) {
+    this.lastNodes = nodes
+    this.lastLinks = links
+    
+    // Rebuild spatial quadtree index for O(log N) queries
+    this.quadtree = d3.quadtree<ForceGraphNode>()
+      .x(d => d.x ?? 0)
+      .y(d => d.y ?? 0)
+      .addAll(nodes)
+
     ForceGraphCanvasPainter.draw(ctx, width, height, nodes, links, this.transform, this.currentConfig, this.hoveredNode)
   }
 }

@@ -33,9 +33,9 @@ const getTagClass = (tag: string) => {
 
 <style scoped>
 .sidebar-interests-panel {
-  margin: 10px 10px 0;
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 0 10px; /* top margin handled by sidebar gap:8px */
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 12px;
   flex-shrink: 0;
@@ -44,7 +44,7 @@ const getTagClass = (tag: string) => {
   font-size: 11.5px;
   font-weight: 800;
   letter-spacing: 0.8px;
-  color: #22d3ee;
+  color: var(--color-accent);
   margin-bottom: 10px;
   text-transform: uppercase;
 }
@@ -54,39 +54,66 @@ const getTagClass = (tag: string) => {
   gap: 6px;
 }
 .profile-interest-chip {
-  font-size: 10px;
-  padding: 2.5px 8px;
+  font-size: 10.5px;
+  padding: 3px 9px;
   border-radius: 12px;
   transition: all 0.2s ease;
-  font-weight: bold;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: default; /* tags are display-only */
 }
+/* Sports: vivid cyan-teal */
 .tag-sports {
-  background: rgba(6, 182, 212, 0.06);
-  border: 1px solid rgba(6, 182, 212, 0.15);
+  background: rgba(6, 182, 212, 0.12);
+  border: 1.5px solid rgba(6, 182, 212, 0.5);
+  color: #0891b2;
+}
+:global([data-theme="dark"]) .tag-sports {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.45);
   color: #22d3ee;
 }
+/* Arts: warm rose-pink */
 .tag-arts {
-  background: rgba(244, 114, 182, 0.06);
-  border: 1px solid rgba(244, 114, 182, 0.15);
-  color: #f472b6;
+  background: rgba(244, 63, 94, 0.10);
+  border: 1.5px solid rgba(244, 63, 94, 0.45);
+  color: #e11d48;
 }
+:global([data-theme="dark"]) .tag-arts {
+  background: rgba(244, 63, 94, 0.14);
+  border-color: rgba(244, 63, 94, 0.45);
+  color: #fb7185;
+}
+/* Tech: electric amber/gold */
 .tag-tech {
-  background: rgba(255, 183, 77, 0.06);
-  border: 1px solid rgba(255, 183, 77, 0.15);
-  color: #ffb74d;
+  background: rgba(234, 179, 8, 0.10);
+  border: 1.5px solid rgba(234, 179, 8, 0.50);
+  color: #b45309;
 }
+:global([data-theme="dark"]) .tag-tech {
+  background: rgba(250, 204, 21, 0.12);
+  border-color: rgba(250, 204, 21, 0.45);
+  color: #fbbf24;
+}
+/* Social: vivid violet/purple */
 .tag-social {
-  background: rgba(52, 211, 153, 0.06);
-  border: 1px solid rgba(52, 211, 153, 0.15);
-  color: #34d399;
+  background: rgba(139, 92, 246, 0.10);
+  border: 1.5px solid rgba(139, 92, 246, 0.45);
+  color: #7c3aed;
+}
+:global([data-theme="dark"]) .tag-social {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.45);
+  color: #a78bfa;
 }
 .profile-interest-chip:hover {
   transform: translateY(-1px);
-  filter: brightness(1.2);
+  filter: brightness(1.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .interests-empty {
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--color-subtext);
   font-style: italic;
 }
 </style>

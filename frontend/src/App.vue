@@ -12,14 +12,18 @@
 
     <!-- Main dashboard (rendered concurrently when currentUser is set to allow split panels to reveal it) -->
     <div v-if="currentUser" class="dashboard">
-    <AppSidebar 
-      :width="sidebarWidth" 
-      :class="{ 'sidebar-open': sidebarOpen }"
-      @logout="onLogout" 
-      @open-graph="openGraph" 
-      @create-activity="showCreateActivity = true"
-      @create-interest="showCreateInterest = true"
-    />
+      <!-- Faint background glow blobs for premium aurora visual depth -->
+      <div class="dashboard-bg-glow glow-1"></div>
+      <div class="dashboard-bg-glow glow-2"></div>
+
+      <AppSidebar 
+        :width="sidebarWidth" 
+        :class="{ 'sidebar-open': sidebarOpen }"
+        @logout="onLogout" 
+        @open-graph="openGraph" 
+        @create-activity="showCreateActivity = true"
+        @create-interest="showCreateInterest = true"
+      />
     <div v-if="sidebarOpen" class="sidebar-backdrop" @click="sidebarOpen = false" />
     <div class="layout-splitter vertical-splitter" role="separator" @mousedown="startSidebarResize" />
 
@@ -34,7 +38,16 @@
           ☰
         </button>
         <span class="mobile-title">Campus Buddy</span>
-        <div class="mobile-avatar">{{ currentUserRole === 'admin' ? '🤖' : '👤' }}</div>
+        <div class="mobile-avatar">
+          <svg v-if="currentUserRole === 'admin'" class="icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <svg v-else class="icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
       </div>
 
 
@@ -48,15 +61,22 @@
             @open-graph="openGraph"
           />
           <div v-else class="card welcome-card fade-in">
-            <h2>👋 欢迎，{{ currentUser }}！</h2>
+            <h2>欢迎，{{ currentUser }}！</h2>
             <p>
               系统已分析您的多选兴趣并与 1,500+ 的校园图网络合并。点击下方按钮即可开启您的画像分析与社交推荐匹配。
             </p>
-            <button @click="selectStudent(currentUser!)" class="btn glow-orange select-self-btn">
+            <button @click="selectStudent(currentUser!)" class="btn select-self-btn">
               查看我的匹配推荐
             </button>
             <div class="tip-box">
-              <strong>💡 D3.js 力导向画布提示：</strong>
+              <strong style="display: flex; align-items: center; gap: 6px;">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                D3.js 力导向画布提示：
+              </strong>
               <p>
                 右侧画布将渲染您的专属<b>二步关系子图 (Focal Subgraph)</b>，支持拖拽节点 and 滚动缩放，悬停节点可高亮连接路径。
               </p>

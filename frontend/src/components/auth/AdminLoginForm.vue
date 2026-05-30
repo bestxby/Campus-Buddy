@@ -122,19 +122,19 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(6, 182, 212, 0.05);
-  border: 1px solid rgba(6, 182, 212, 0.15);
+  background: var(--color-admin-active-bg);
+  border: 1px solid var(--color-admin-active-border);
   border-radius: 20px;
   padding: 4px 10px;
   font-size: 10px;
-  color: #67e8f9;
+  color: var(--color-admin-active-text);
   font-weight: 600;
   transition: all 0.3s ease;
 }
 .security-badge.badge-locked {
   background: rgba(239, 68, 68, 0.05);
   border-color: rgba(239, 68, 68, 0.25);
-  color: #f87171;
+  color: var(--color-danger);
 }
 .form-group {
   display: flex;
@@ -145,12 +145,12 @@ onUnmounted(() => {
 .label-bold {
   font-size: 12.5px;
   font-weight: bold;
-  color: var(--text-primary);
+  color: var(--color-text);
 }
 .admin-password-input {
-  background-color: rgba(0, 0, 0, 0.45);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
   border-radius: 8px;
   padding: 0 14px;
   font-size: 13px;
@@ -161,12 +161,12 @@ onUnmounted(() => {
 }
 .admin-password-input:focus {
   outline: none !important;
-  border-color: var(--accent-cyan) !important;
-  background-color: rgba(0, 0, 0, 0.6);
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+  border-color: var(--color-accent-cyan) !important;
+  background-color: var(--color-surface);
+  box-shadow: 0 0 10px var(--color-accent-cyan-glow);
 }
 .warning-text {
-  color: #f87171;
+  color: var(--color-danger);
   font-size: 11px;
   margin-bottom: 6px;
   font-weight: bold;

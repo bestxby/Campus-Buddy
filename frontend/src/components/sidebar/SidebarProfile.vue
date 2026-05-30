@@ -12,7 +12,7 @@
           <svg v-else class="icon-svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10" stroke="var(--accent-cyan)" stroke-width="1.5"></circle>
             <!-- Needle split into two halves for a premium 3D neon compass effect -->
-            <polygon points="12,12 16.24,7.76 14.12,14.12" fill="var(--accent-orange)" stroke="var(--accent-orange)" stroke-width="0.5"></polygon>
+            <polygon points="12,12 16.24,7.76 14.12,14.12" fill="var(--color-accent)" stroke="var(--color-accent)" stroke-width="0.5"></polygon>
             <polygon points="12,12 16.24,7.76 9.88,9.88" fill="#b35a00" stroke="#b35a00" stroke-width="0.5"></polygon>
             <polygon points="12,12 7.76,16.24 9.88,9.88" fill="var(--accent-cyan)" stroke="var(--accent-cyan)" stroke-width="0.5"></polygon>
             <polygon points="12,12 7.76,16.24 14.12,14.12" fill="#0099ab" stroke="#0099ab" stroke-width="0.5"></polygon>

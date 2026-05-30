@@ -1,12 +1,38 @@
+:root {
+  --profile-card-bg: linear-gradient(135deg, rgba(217, 110, 72, 0.07) 0%, rgba(255, 255, 255, 0.95) 100%);
+  --profile-card-border: rgba(217, 110, 72, 0.35);
+  --profile-card-shadow: 0 2px 12px rgba(217, 110, 72, 0.12), 0 0 0 0.5px rgba(217, 110, 72, 0.08);
+  --profile-text-color: var(--accent-orange);
+  --profile-logout-color: var(--color-subtext);
+  --profile-logout-bg: var(--color-surface-2);
+  --profile-logout-border: var(--color-border);
+}
+
+[data-theme="dark"] {
+  --profile-card-bg: linear-gradient(135deg, rgba(253,151,31,0.10) 0%, rgba(20,16,12,0.85) 100%);
+  --profile-card-border: rgba(253,151,31,0.45);
+  --profile-card-shadow: 0 2px 16px rgba(253, 151, 31, 0.18), 0 0 0 0.5px rgba(253, 151, 31, 0.10);
+  --profile-text-color: var(--accent-orange);
+  --profile-logout-color: rgba(255,255,255,0.55);
+  --profile-logout-bg: rgba(239,68,68,0.07);
+  --profile-logout-border: rgba(239,68,68,0.25);
+}
+
 .profile-card {
-  margin: 10px 10px 0;
-  background: linear-gradient(135deg, rgba(253,151,31,0.06) 0%, rgba(255,255,255,0.02) 100%);
-  border: 1px solid rgba(253,151,31,0.2);
+  margin: 0 10px; /* top margin handled by sidebar gap:8px */
+  background: var(--profile-card-bg);
+  border: 1.5px solid var(--profile-card-border);
   border-radius: 12px;
   padding: 12px 12px 10px;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: var(--profile-card-shadow);
+  transition: all 0.25s ease;
+}
+.profile-card:hover {
+  box-shadow: var(--profile-card-shadow), var(--shadow-md);
+  transform: translateY(-1px);
 }
 .profile-card::after {
   content: '';
@@ -87,7 +113,7 @@
 .profile-name {
   font-size: 13px;
   font-weight: 700;
-  color: #ffb74d;
+  color: var(--profile-text-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -115,9 +141,9 @@
   border-radius: 8px;
   font-size: 13px;
   cursor: pointer;
-  background: rgba(239,68,68,0.07);
-  border: 1px solid rgba(239,68,68,0.2);
-  color: rgba(255,255,255,0.55);
+  background: var(--profile-logout-bg);
+  border: 1px solid var(--profile-logout-border);
+  color: var(--profile-logout-color);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: inherit;
 }
@@ -151,33 +177,34 @@
   white-space: nowrap;
 }
 .mode-btn-inactive {
-  background: rgba(255,255,255,0.03);
-  border-color: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.55);
+  background: var(--color-surface-2);
+  border-color: var(--color-border);
+  color: var(--color-subtext);
 }
 .mode-btn-inactive:hover {
-  background: rgba(255,255,255,0.07);
-  color: rgba(255,255,255,0.7);
+  background: var(--color-muted);
+  color: var(--color-text);
+  border-color: var(--color-subtext);
 }
 .mode-btn-active-private {
-  background: rgba(244,114,182,0.12);
-  border-color: rgba(244,114,182,0.3);
-  color: #f472b6;
-  box-shadow: 0 0 8px rgba(244,114,182,0.15);
+  background: var(--color-private-active-bg);
+  border-color: var(--color-private-active-border);
+  color: var(--color-private-active-text);
+  box-shadow: 0 0 8px var(--color-private-active-bg);
 }
 .mode-btn-active-private:hover {
-  background: rgba(244,114,182,0.2);
-  border-color: rgba(244,114,182,0.5);
+  background: var(--color-private-active-bg);
+  filter: brightness(1.05);
 }
 .mode-btn-active-social {
-  background: rgba(253,151,31,0.12);
-  border-color: rgba(253,151,31,0.3);
-  color: #ffb74d;
-  box-shadow: 0 0 8px rgba(253,151,31,0.15);
+  background: var(--color-social-active-bg);
+  border-color: var(--color-social-active-border);
+  color: var(--color-social-active-text);
+  box-shadow: 0 0 8px var(--color-social-active-bg);
 }
 .mode-btn-active-social:hover {
-  background: rgba(253,151,31,0.2);
-  border-color: rgba(253,151,31,0.5);
+  background: var(--color-social-active-bg);
+  filter: brightness(1.05);
 }
 .mode-icon { font-size: 10px; line-height: 1; }
 .mode-label { line-height: 1; }
@@ -188,26 +215,26 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(244,114,182,0.06);
-  border: 1px solid rgba(244,114,182,0.18);
+  background: var(--color-private-active-bg);
+  border: 1px solid var(--color-private-active-border);
   border-radius: 6px;
   padding: 5px 9px;
   font-size: 10px;
-  color: rgba(244,114,182,0.9);
+  color: var(--color-private-active-text);
   letter-spacing: 0.2px;
 }
 .privacy-status-dot {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #f472b6;
-  box-shadow: 0 0 5px rgba(244,114,182,0.7);
+  background: var(--color-private-active-text);
+  box-shadow: 0 0 5px var(--color-private-active-border);
   flex-shrink: 0;
   animation: privDotPulse 2s ease-in-out infinite;
 }
 @keyframes privDotPulse {
-  0%,100% { opacity: 0.6; box-shadow: 0 0 4px rgba(244,114,182,0.5); }
-  50% { opacity: 1; box-shadow: 0 0 8px rgba(244,114,182,0.9); }
+  0%,100% { opacity: 0.6; box-shadow: 0 0 4px var(--color-private-active-border); }
+  50% { opacity: 1; box-shadow: 0 0 8px var(--color-private-active-border); }
 }
 
 /* ── SOCIAL STATUS BAR ────────────────────────── */
@@ -216,47 +243,47 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(253,151,31,0.06);
-  border: 1px solid rgba(253,151,31,0.18);
+  background: var(--color-social-active-bg);
+  border: 1px solid var(--color-social-active-border);
   border-radius: 6px;
   padding: 5px 9px;
   font-size: 10px;
-  color: rgba(255,183,77,0.9);
+  color: var(--color-social-active-text);
   letter-spacing: 0.2px;
 }
 .social-status-dot {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #fd971f;
-  box-shadow: 0 0 5px rgba(253,151,31,0.7);
+  background: var(--color-social-active-text);
+  box-shadow: 0 0 5px var(--color-social-active-border);
   flex-shrink: 0;
   animation: socialDotPulse 2s ease-in-out infinite;
 }
 @keyframes socialDotPulse {
-  0%,100% { opacity: 0.6; box-shadow: 0 0 4px rgba(253,151,31,0.5); }
-  50% { opacity: 1; box-shadow: 0 0 8px rgba(253,151,31,0.9); }
+  0%,100% { opacity: 0.6; box-shadow: 0 0 4px var(--color-social-active-border); }
+  50% { opacity: 1; box-shadow: 0 0 8px var(--color-social-active-border); }
 }
 
 /* ── ADMIN STYLES ─────────────────────────────── */
 .admin-card-border {
-  border-color: rgba(6, 182, 212, 0.3) !important;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%) !important;
+  border-color: var(--color-admin-active-border) !important;
+  background: linear-gradient(135deg, var(--color-admin-active-bg) 0%, rgba(255, 255, 255, 0.015) 100%) !important;
 }
 .admin-access-badge {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(6, 182, 212, 0.05);
-  border: 1px solid rgba(6, 182, 212, 0.15);
+  background: var(--color-admin-active-bg);
+  border: 1px solid var(--color-admin-active-border);
   border-radius: 6px;
   padding: 5px 8px;
 }
 .admin-access-badge .pulse-dot {
   width: 6px; height: 6px;
   border-radius: 50%;
-  background: #22d3ee;
-  box-shadow: 0 0 6px #22d3ee;
+  background: var(--color-admin-active-text);
+  box-shadow: 0 0 6px var(--color-admin-active-border);
   animation: adminPulse 2s infinite;
   flex-shrink: 0;
 }
@@ -266,7 +293,7 @@
 .admin-access-badge .badge-text {
   font-size: 10px;
   font-weight: bold;
-  color: #67e8f9;
+  color: var(--color-admin-active-text);
 }
 
 /* ── EXPORT REPORT ROW ────────────────────────── */
@@ -285,18 +312,18 @@
   font-size: 11px;
   font-weight: bold;
   cursor: pointer;
-  background: rgba(6, 182, 212, 0.08);
-  border: 1px solid rgba(6, 182, 212, 0.25);
-  color: #67e8f9;
+  background: var(--color-admin-active-bg);
+  border: 1px solid var(--color-admin-active-border);
+  color: var(--color-admin-active-text);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: inherit;
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.05);
+  box-shadow: 0 0 10px var(--color-admin-active-bg);
 }
 .export-report-btn:hover {
-  background: rgba(6, 182, 212, 0.18);
-  color: #ffffff;
-  border-color: #06b6d4;
-  box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+  background: var(--color-admin-active-text);
+  color: var(--color-surface);
+  border-color: var(--color-admin-active-text);
+  box-shadow: 0 0 15px var(--color-admin-active-border);
   transform: translateY(-1px);
 }
 .export-report-btn:active {

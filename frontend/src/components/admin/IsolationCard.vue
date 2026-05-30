@@ -145,14 +145,14 @@ const handleApplied = (studentName: string) => {
   flex-direction: column;
   overflow: visible;
   height: 100%;
-  background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
+  background: var(--color-surface);
   padding: 12px 16px !important;
 }
 .col-header {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 4px;
   margin-bottom: 6px;
   flex-shrink: 0;
@@ -160,7 +160,7 @@ const handleApplied = (studentName: string) => {
 .col-header h3 {
   font-size: 12px;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--color-text);
   font-weight: bold;
   text-align: left;
 }
@@ -192,7 +192,7 @@ const handleApplied = (studentName: string) => {
 }
 .alert-text {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   line-height: 1.3;
 }
 .alert-text strong {
@@ -224,10 +224,10 @@ const handleApplied = (studentName: string) => {
   flex-direction: column;
   gap: 4px;
   overflow-y: auto;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   padding: 3px;
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--color-surface-2);
   flex: 1;
 }
 .isolated-student-item {
@@ -235,20 +235,20 @@ const handleApplied = (studentName: string) => {
   align-items: center;
   justify-content: space-between;
   padding: 4px 8px;
-  background-color: rgba(255, 255, 255, 0.008);
-  border: 1px solid var(--border-color);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
   flex-shrink: 0;
 }
 .isolated-student-item:hover {
-  background-color: rgba(253, 151, 31, 0.02);
-  border-color: rgba(253, 151, 31, 0.1);
+  background-color: var(--color-surface-2);
+  border-color: var(--color-accent);
 }
 .isolated-student-item.item-selected {
-  background-color: rgba(253, 151, 31, 0.06);
-  border-color: rgba(253, 151, 31, 0.3);
+  background-color: var(--bg-tech);
+  border-color: var(--color-tech);
 }
 .student-left {
   display: flex;
@@ -262,13 +262,13 @@ const handleApplied = (studentName: string) => {
 .student-name-text {
   font-size: 10px;
   font-weight: bold;
-  color: var(--text-primary);
+  color: var(--color-text);
 }
 .student-deg-badge {
   font-size: 10px;
-  color: #f87171;
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.15);
+  color: var(--color-danger);
+  background: var(--color-accent-light);
+  border: 1px solid var(--color-border);
   padding: 0px 4px;
   border-radius: 3px;
 }
@@ -277,16 +277,16 @@ const handleApplied = (studentName: string) => {
   padding: 2px 5px;
 }
 .select-bridge-btn.suggested-btn {
-  background-color: rgba(253, 151, 31, 0.12) !important;
-  border-color: rgba(253, 151, 31, 0.4) !important;
-  color: #ffb74d !important;
-  box-shadow: 0 0 6px rgba(253, 151, 31, 0.2);
+  background-color: var(--bg-tech) !important;
+  border-color: var(--color-tech) !important;
+  color: var(--color-tech) !important;
+  box-shadow: var(--shadow-sm);
 }
 .suggestion-sent-badge {
   font-size: 7.5px;
-  color: #ffb74d;
-  background: rgba(253, 151, 31, 0.08);
-  border: 1px solid rgba(253, 151, 31, 0.2);
+  color: var(--color-tech);
+  background: var(--bg-tech);
+  border: 1px solid var(--color-tech);
   padding: 0px 3px;
   border-radius: 3px;
   margin-left: 2px;

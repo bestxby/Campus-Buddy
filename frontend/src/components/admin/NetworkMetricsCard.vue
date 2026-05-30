@@ -141,13 +141,13 @@ import {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
+  background: var(--color-surface);
   padding: 12px 16px !important;
   box-sizing: border-box;
 }
 
 .col-header {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 4px;
   margin-bottom: 6px;
   flex-shrink: 0;
@@ -156,7 +156,7 @@ import {
 .col-header h3 {
   font-size: 12px;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--color-text);
   font-weight: bold;
   text-align: left;
 }
@@ -174,8 +174,8 @@ import {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.02);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 8px 12px;
   box-sizing: border-box;
@@ -184,8 +184,8 @@ import {
 }
 
 .metric-row:hover {
-  background: rgba(255, 255, 255, 0.02);
-  border-color: rgba(255, 255, 255, 0.05);
+  background: var(--color-surface);
+  border-color: var(--color-accent);
 }
 
 .metric-info {
@@ -203,7 +203,7 @@ import {
 
 .metric-label {
   font-size: 10.5px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   white-space: nowrap;
 }
 
@@ -211,13 +211,14 @@ import {
   font-size: 10px;
   width: 11px;
   height: 11px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: help;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--color-subtext);
   margin-left: 2px;
 }
 
@@ -237,30 +238,27 @@ import {
 
 .metric-desc {
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--color-subtext);
   line-height: 1.1;
   margin-top: 2px;
+  opacity: 0.8;
 }
 
-/* Colors with soft glow shadows */
+/* Colors with soft theme-aware styling */
 .text-cyan {
-  color: var(--accent-cyan);
-  text-shadow: 0 0 6px rgba(6, 182, 212, 0.2);
+  color: var(--color-sports);
 }
 
 .text-orange {
-  color: #ffa726;
-  text-shadow: 0 0 6px rgba(255, 167, 38, 0.2);
+  color: var(--color-tech);
 }
 
 .text-pink {
-  color: #f472b6;
-  text-shadow: 0 0 6px rgba(244, 114, 182, 0.2);
+  color: var(--color-arts);
 }
 
 .text-green {
-  color: #34d399;
-  text-shadow: 0 0 6px rgba(52, 211, 153, 0.2);
+  color: var(--color-social);
 }
 
 /* Make tooltips in this card pop up upwards */

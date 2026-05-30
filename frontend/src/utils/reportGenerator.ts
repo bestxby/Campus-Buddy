@@ -23,7 +23,7 @@ function escapeHtml(str: string): string {
 }
 
 // ─── Admin Diagnostic Data (shared between MD and HTML admin reports) ────────
-interface AdminDiagnosticData {
+export interface AdminDiagnosticData {
   studentsList: { name: string; degree: number }[]
   studentRank: number
   studentDegree: number
@@ -48,7 +48,7 @@ interface AdminDiagnosticData {
  * from the graph store. Used by both generateAdminMarkdownReport and generateAdminHtmlReport
  * to eliminate ~150 lines of duplicated logic.
  */
-function computeAdminDiagnosticData(name: string, useHtmlMarkup: boolean): AdminDiagnosticData {
+export function computeAdminDiagnosticData(name: string, useHtmlMarkup: boolean): AdminDiagnosticData {
   let graph: Map<string, Set<string>> = new Map()
   let privateStudents: Set<string> = new Set()
   let bridgeStudents: any[] = []
@@ -283,17 +283,17 @@ export function generateMarkdownReport(
   return md.join('\n')
 }
 
-export function generateHtmlReport(
+/**
+ * Builds the nodes and links data structure for the interactive SVG/Canvas graph
+ * embedded in the HTML reports. Extracted to eliminate duplicate graphing logic.
+ */
+function buildHtmlReportGraphData(
   name: string,
   userInterests: string[],
   acts: string[],
   buddiesList: RecommendedBuddy[],
   getSharedInterest: (name: string, actName: string, type: 'activity' | 'student') => string
-): string {
-  const interestsHtml = buildInterestsHtml(userInterests, '您目前尚未登记 any 兴趣。')
-  const actsHtml = buildActivitiesHtml(name, acts, getSharedInterest, '暂时没有基于您的兴趣推荐的活动。')
-  const buddiesHtml = buildBuddiesHtml(buddiesList, '暂时没有找到与您拥有共同兴趣的学生。')
-
+): { nodesData: any[]; linksData: any[] } {
   const displayInterests = userInterests.slice(0, 4)
   const nodesData: any[] = [
     { id: `student:${name}`, label: name, type: 'student', x: 350, y: 200, size: 9, color: '#f43f5e' }
@@ -330,12 +330,29 @@ export function generateHtmlReport(
     }
   })
 
+  return { nodesData, linksData }
+}
+
+function buildBaseHtmlReport(params: {
+  title: string
+  name: string
+  subtitle: string
+  primaryColor: string
+  borderColor: string
+  highlightColor: string
+  interestsHtml: string
+  actsHtml: string
+  buddiesHtml: string
+  nodesData: any[]
+  linksData: any[]
+  extraHtmlContent?: string
+}): string {
   return `
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>Campus Buddy 个性化校园推荐报告 — ${escapeHtml(name)}</title>
+  <title>${escapeHtml(params.title)} — ${escapeHtml(params.name)}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -344,9 +361,9 @@ export function generateHtmlReport(
       --bg-color: #0b0f19;
       --card-bg: rgba(30, 41, 59, 0.45);
       --text-color: #f1f5f9;
-      --primary-color: #22d3ee;
+      --primary-color: ${params.primaryColor};
       --accent-color: #c084fc;
-      --border-color: rgba(6, 182, 212, 0.25);
+      --border-color: ${params.borderColor};
     }
     body {
       font-family: "Outfit", "Inter", "Fira Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -363,7 +380,7 @@ export function generateHtmlReport(
       width: 100%;
     }
     .header {
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+      background: linear-gradient(135deg, ${params.borderColor.replace('0.25', '0.15')} 0%, rgba(139, 92, 246, 0.1) 100%);
       border: 1px solid var(--border-color);
       color: white;
       padding: 30px 40px;
@@ -417,10 +434,10 @@ export function generateHtmlReport(
       margin-bottom: 8px;
     }
     .tag-primary {
-      background-color: rgba(6, 182, 212, 0.08);
-      border-color: rgba(6, 182, 212, 0.25);
+      background-color: ${params.primaryColor.startsWith('#') ? params.primaryColor + '14' : params.primaryColor.replace('rgb', 'rgba').replace(')', ', 0.08)')};
+      border-color: ${params.primaryColor.startsWith('#') ? params.primaryColor + '40' : params.primaryColor.replace('rgb', 'rgba').replace(')', ', 0.25)')};
       color: var(--primary-color);
-      box-shadow: 0 0 8px rgba(6, 182, 212, 0.05);
+      box-shadow: 0 0 8px ${params.primaryColor.startsWith('#') ? params.primaryColor + '0d' : params.primaryColor.replace('rgb', 'rgba').replace(')', ', 0.05)')};
     }
     .activity-item {
       padding: 16px 0;
@@ -486,197 +503,265 @@ export function generateHtmlReport(
       margin-top: 10px;
       text-align: center;
     }
+    /* Admin specific CSS styles */
+    .diag-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .diag-item-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .diag-item-cell strong {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+    .diag-item-cell span {
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .diag-card {
+      border-color: #ffb74d !important;
+      background: rgba(255, 183, 77, 0.04) !important;
+    }
+    .diag-card h2 {
+      color: #ffb74d !important;
+      border-color: rgba(255, 183, 77, 0.15) !important;
+    }
+    .diag-note-box, .diag-status-box {
+      margin-top: 12px;
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+    .diag-note-box {
+      margin-top: 18px;
+    }
+    .path-container {
+      padding: 12px;
+      background: rgba(0,0,0,0.25);
+      border-left: 3px solid #ffb74d;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #e2e8f0;
+      font-family: monospace;
+      overflow-x: auto;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🧭 Campus Buddy 匹配推荐报告</h1>
-      <p>报告学生: <strong>${escapeHtml(name)}</strong> &nbsp;|&nbsp; 生成时间: ${new Date().toLocaleDateString('zh-CN')}</p>
+      <h1>🧭 ${escapeHtml(params.title)}</h1>
+      <p>报告学生: <strong>${escapeHtml(params.name)}</strong> &nbsp;|&nbsp; ${params.subtitle}</p>
     </div>
+    
+    ${params.extraHtmlContent || ''}
     
     <div class="card">
       <h2>👤 个人画像与登记兴趣</h2>
-      <div>${interestsHtml}</div>
+      <div>${params.interestsHtml}</div>
     </div>
  
-    <!-- Interactive Canvas Graph Box -->
+    <!-- Interactive SVG Graph Box -->
     <div class="card">
       <h2>📡 我的校园社交圈 (互动图谱)</h2>
-      <div class="graph-container" style="display: flex; flex-direction: column; align-items: center;">
-        <canvas id="interactive-canvas" width="1400" height="800" style="width: 700px; height: 400px; background: rgba(0,0,0,0.15); border-radius: 12px; border: 1px solid var(--border-color);"></canvas>
+      <div class="graph-container" style="display: flex; flex-direction: column; align-items: center; position: relative;">
+        <svg id="interactive-svg" viewBox="0 0 700 400" style="width: 100%; max-width: 700px; height: 400px; background: rgba(0,0,0,0.15); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;"></svg>
+        
+        <!-- Tooltip overlay -->
+        <div id="graph-tooltip" style="position: absolute; top: 15px; left: 15px; background: rgba(15, 23, 42, 0.85); border: 1.5px solid transparent; border-radius: 8px; padding: 10px 12px; font-size: 11px; display: none; pointer-events: none; width: 160px; box-sizing: border-box; z-index: 10;">
+          <div id="tooltip-title" style="font-weight: bold; color: #ffffff; margin-bottom: 4px;"></div>
+          <div id="tooltip-desc" style="color: #94a3b8; font-size: 10px;"></div>
+        </div>
+
         <div class="graph-hint">💡 提示：将鼠标悬停在节点上，可以高亮显示并查看兴趣、搭子与活动关联的匹配细节。</div>
       </div>
     </div>
  
     <div class="card">
       <h2>🎉 智能活动推荐</h2>
-      <div>${actsHtml}</div>
+      <div>${params.actsHtml}</div>
     </div>
  
     <div class="card">
       <h2>🤝 志同道合的活动搭子</h2>
-      <div>${buddiesHtml}</div>
+      <div>${params.buddiesHtml}</div>
     </div>
   </div>
- 
+  
   <script>
     (function() {
-      const nodes = ${JSON.stringify(nodesData)};
-      const links = ${JSON.stringify(linksData)};
+      const nodes = ${JSON.stringify(params.nodesData)};
+      const links = ${JSON.stringify(params.linksData)};
       
-      const canvas = document.getElementById('interactive-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(2, 2);
-      let hoveredNode = null;
+      const svg = document.getElementById('interactive-svg');
+      const tooltip = document.getElementById('graph-tooltip');
+      const tooltipTitle = document.getElementById('tooltip-title');
+      const tooltipDesc = document.getElementById('tooltip-desc');
+      if (!svg || !tooltip) return;
 
-      const isPrintMode = document.body.classList.contains('print-mode');
-      if (isPrintMode) {
-        nodes.forEach(node => {
-          if (node.type === 'student') node.color = '#e11d48';
-          else if (node.type === 'interest') node.color = '#0284c7';
-          else if (node.type === 'activity') node.color = '#7c3aed';
-          else if (node.type === 'buddy') node.color = '#059669';
-        });
-      }
- 
-      function drawRoundRect(c, x, y, w, h, r) {
-        c.beginPath();
-        c.moveTo(x + r, y);
-        c.lineTo(x + w - r, y);
-        c.quadraticCurveTo(x + w, y, x + w, y + r);
-        c.lineTo(x + w, y + h - r);
-        c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        c.lineTo(x + r, y + h);
-        c.quadraticCurveTo(x, y + h, x, y + h - r);
-        c.lineTo(x, y + r);
-        c.quadraticCurveTo(x, y, x + r, y);
-        c.closePath();
-      }
- 
-      function draw() {
-        ctx.clearRect(0, 0, 700, 400);
- 
-        // Draw connections
-        links.forEach(link => {
-          const sourceNode = nodes.find(n => n.id === link.source);
-          const targetNode = nodes.find(n => n.id === link.target);
-          if (!sourceNode || !targetNode) return;
- 
-          const isHighlighted = hoveredNode && 
-            (hoveredNode.id === link.source || hoveredNode.id === link.target);
- 
-          ctx.beginPath();
-          ctx.moveTo(sourceNode.x, sourceNode.y);
-          ctx.lineTo(targetNode.x, targetNode.y);
-          
-          if (isHighlighted) {
-            ctx.strokeStyle = isPrintMode ? '#0284c7' : '#22d3ee';
-            ctx.lineWidth = 2.5;
-            ctx.shadowColor = isPrintMode ? 'transparent' : '#22d3ee';
-            ctx.shadowBlur = isPrintMode ? 0 : 8;
-          } else {
-            ctx.strokeStyle = isPrintMode ? 'rgba(15, 23, 42, 0.08)' : 'rgba(255, 255, 255, 0.08)';
-            ctx.lineWidth = 1.2;
-            ctx.shadowBlur = 0;
-          }
-          ctx.stroke();
-        });
-        ctx.shadowBlur = 0;
- 
-        // Draw nodes
-        nodes.forEach(node => {
-          const isHovered = hoveredNode && hoveredNode.id === node.id;
-          const size = isHovered ? node.size + 3.5 : node.size;
- 
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
-          ctx.fillStyle = node.color;
-          if (isHovered && !isPrintMode) {
-            ctx.shadowColor = node.color;
-            ctx.shadowBlur = 12;
-          } else {
-            ctx.shadowBlur = 0;
-          }
-          ctx.fill();
-          ctx.shadowBlur = 0;
- 
-          // Label text styling
-          ctx.font = isPrintMode 
-            ? 'bold 11px "Outfit", "Inter", "Fira Sans", sans-serif' 
-            : (isHovered ? 'bold 11px "Outfit", "Inter", "Fira Sans", sans-serif' : '10px "Outfit", "Inter", "Fira Sans", sans-serif');
-          ctx.textAlign = 'center';
+      // 1. Draw links
+      links.forEach(link => {
+        const sourceNode = nodes.find(n => n.id === link.source);
+        const targetNode = nodes.find(n => n.id === link.target);
+        if (!sourceNode || !targetNode) return;
 
-          // Label text vertical offset
-          const textY = node.y - size - 8;
-
-          if (!isPrintMode) {
-            const textWidth = ctx.measureText(node.label).width;
-            ctx.fillStyle = isHovered ? 'rgba(15, 23, 42, 0.9)' : 'rgba(15, 23, 42, 0.6)';
-            ctx.strokeStyle = isHovered ? node.color : 'rgba(6, 182, 212, 0.15)';
-            ctx.lineWidth = 1;
-            drawRoundRect(ctx, node.x - textWidth / 2 - 6, textY - 11, textWidth + 12, 16, 4);
-            ctx.fill();
-            ctx.stroke();
-          }
-
-          // Label text fill
-          ctx.fillStyle = isPrintMode ? '#334155' : (isHovered ? '#ffffff' : '#cbd5e1');
-          ctx.fillText(node.label, node.x, textY);
-        });
- 
-        // Tooltip
-        if (hoveredNode && !isPrintMode) {
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-          ctx.strokeStyle = hoveredNode.color;
-          ctx.lineWidth = 1.5;
-          drawRoundRect(ctx, 15, 15, 180, 55, 8);
-          ctx.fill();
-          ctx.stroke();
- 
-          ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 11px "Outfit", "Inter", "Fira Sans", sans-serif';
-          ctx.textAlign = 'left';
-          ctx.fillText(hoveredNode.label, 25, 33);
- 
-          ctx.fillStyle = '#94a3b8';
-          ctx.font = '10px "Outfit", "Inter", "Fira Sans", sans-serif';
-          const typeLabel = hoveredNode.type === 'student' ? '个人姓名' : 
-                            (hoveredNode.type === 'interest' ? '兴趣标签' : 
-                            (hoveredNode.type === 'activity' ? '推荐活动' : '匹配同学'));
-          ctx.fillText('类型: ' + typeLabel, 25, 48);
-        }
-      }
- 
-      canvas.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const mx = (e.clientX - rect.left) * (700 / rect.width);
-        const my = (e.clientY - rect.top) * (400 / rect.height);
- 
-        let found = null;
-        for (const node of nodes) {
-          const dx = node.x - mx;
-          const dy = node.y - my;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < node.size + 6) {
-            found = node;
-            break;
-          }
-        }
- 
-        if (found !== hoveredNode) {
-          hoveredNode = found;
-          draw();
-        }
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('class', 'graph-link');
+        line.setAttribute('x1', sourceNode.x);
+        line.setAttribute('y1', sourceNode.y);
+        line.setAttribute('x2', targetNode.x);
+        line.setAttribute('y2', targetNode.y);
+        line.setAttribute('stroke', 'rgba(255, 255, 255, 0.08)');
+        line.setAttribute('stroke-width', '1.2');
+        line.setAttribute('data-source', link.source);
+        line.setAttribute('data-target', link.target);
+        line.style.transition = 'stroke 0.2s, stroke-width 0.2s';
+        svg.appendChild(line);
       });
- 
-      draw();
+
+      // 2. Draw nodes
+      nodes.forEach(node => {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'graph-node');
+        g.setAttribute('id', node.id);
+        g.setAttribute('data-label', node.label);
+        g.setAttribute('data-type', node.type);
+        g.setAttribute('transform', 'translate(' + node.x + ', ' + node.y + ')');
+        g.style.cursor = 'pointer';
+
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('r', node.size);
+        circle.setAttribute('fill', node.color);
+        circle.setAttribute('stroke', 'rgba(255, 255, 255, 0.15)');
+        circle.setAttribute('stroke-width', '1');
+        circle.style.transition = 'r 0.2s, stroke-width 0.2s, filter 0.2s';
+        g.appendChild(circle);
+
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('y', String(-(node.size + 8)));
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', '#cbd5e1');
+        text.setAttribute('font-size', '10');
+        text.setAttribute('font-family', 'Outfit, Inter, sans-serif');
+        text.style.userSelect = 'none';
+        text.style.transition = 'fill 0.2s, font-weight 0.2s';
+        text.textContent = node.label;
+        g.appendChild(text);
+
+        svg.appendChild(g);
+      });
+
+      // 3. Setup event listeners
+      const nodeGroups = svg.querySelectorAll('.graph-node');
+      const linkLines = svg.querySelectorAll('.graph-link');
+
+      nodeGroups.forEach(g => {
+        const nodeId = g.getAttribute('id');
+        const nodeLabel = g.getAttribute('data-label');
+        const nodeType = g.getAttribute('data-type');
+        const circle = g.querySelector('circle');
+        const text = g.querySelector('text');
+        const baseColor = circle.getAttribute('fill');
+        const baseSize = parseFloat(circle.getAttribute('r'));
+
+        g.addEventListener('mouseenter', () => {
+          circle.setAttribute('r', baseSize + 3.5);
+          circle.setAttribute('stroke', baseColor);
+          circle.setAttribute('stroke-width', '2.5');
+          circle.style.filter = 'drop-shadow(0 0 6px ' + baseColor + ')';
+          text.setAttribute('font-weight', 'bold');
+          text.setAttribute('fill', '#ffffff');
+
+          tooltip.style.display = 'block';
+          tooltip.style.borderColor = baseColor;
+          tooltipTitle.textContent = nodeLabel;
+          const typeLabel = nodeType === 'student' ? '个人姓名' : 
+                            (nodeType === 'interest' ? '兴趣标签' : 
+                            (nodeType === 'activity' ? '推荐活动' : '匹配同学'));
+          tooltipDesc.textContent = '类型: ' + typeLabel;
+
+          linkLines.forEach(line => {
+            const src = line.getAttribute('data-source');
+            const tgt = line.getAttribute('data-target');
+            if (src === nodeId || tgt === nodeId) {
+              line.setAttribute('stroke', baseColor);
+              line.setAttribute('stroke-width', '2.5');
+              line.style.filter = 'drop-shadow(0 0 5px ' + baseColor + ')';
+            } else {
+              line.setAttribute('stroke', 'rgba(255, 255, 255, 0.02)');
+            }
+          });
+        });
+
+        g.addEventListener('mouseleave', () => {
+          circle.setAttribute('r', baseSize);
+          circle.setAttribute('stroke', 'rgba(255, 255, 255, 0.15)');
+          circle.setAttribute('stroke-width', '1');
+          circle.style.filter = 'none';
+          text.setAttribute('font-weight', 'normal');
+          text.setAttribute('fill', '#cbd5e1');
+
+          tooltip.style.display = 'none';
+
+          linkLines.forEach(line => {
+            line.setAttribute('stroke', 'rgba(255, 255, 255, 0.08)');
+            line.setAttribute('stroke-width', '1.2');
+            line.style.filter = 'none';
+          });
+        });
+      });
     })();
   </script>
 </body>
 </html>
   `;
+}
+
+export function generateHtmlReport(
+  name: string,
+  userInterests: string[],
+  acts: string[],
+  buddiesList: RecommendedBuddy[],
+  getSharedInterest: (name: string, actName: string, type: 'activity' | 'student') => string
+): string {
+  const interestsHtml = buildInterestsHtml(userInterests, '您目前尚未登记 any 兴趣。')
+  const actsHtml = buildActivitiesHtml(name, acts, getSharedInterest, '暂时没有基于您的兴趣推荐的活动。')
+  const buddiesHtml = buildBuddiesHtml(buddiesList, '暂时没有找到与您拥有共同兴趣的学生。')
+
+  const { nodesData, linksData } = buildHtmlReportGraphData(
+    name,
+    userInterests,
+    acts,
+    buddiesList,
+    getSharedInterest
+  )
+
+  return buildBaseHtmlReport({
+    title: 'Campus Buddy 个性化校园推荐报告',
+    name,
+    subtitle: `报告学生: <strong>${escapeHtml(name)}</strong>`,
+    primaryColor: '#22d3ee',
+    borderColor: 'rgba(6, 182, 212, 0.25)',
+    highlightColor: '#22d3ee',
+    interestsHtml,
+    actsHtml,
+    buddiesHtml,
+    nodesData,
+    linksData
+  })
 }
 
 export function generateAdminMarkdownReport(
@@ -763,261 +848,15 @@ export function generateAdminHtmlReport(
   const actsHtml = buildActivitiesHtml(name, acts, getSharedInterest, '暂时没有基于该生兴趣推荐的活动。')
   const buddiesHtml = buildBuddiesHtml(buddiesList, '暂时没有找到具有共同兴趣的搭子。')
 
-  const displayInterests = userInterests.slice(0, 4)
-  const nodesData: any[] = [
-    { id: `student:${name}`, label: name, type: 'student', x: 350, y: 200, size: 9, color: '#f43f5e' }
-  ]
-  const linksData: any[] = []
+  const { nodesData, linksData } = buildHtmlReportGraphData(
+    name,
+    userInterests,
+    acts,
+    buddiesList,
+    getSharedInterest
+  )
 
-  displayInterests.forEach((tag, idx) => {
-    const angle = (idx * Math.PI * 2) / Math.max(displayInterests.length, 1)
-    const x = 350 + Math.cos(angle) * 95
-    const y = 200 + Math.sin(angle) * 95
-    nodesData.push({ id: `interest:${tag}`, label: tag, type: 'interest', x, y, size: 6.5, color: '#22d3ee' })
-    linksData.push({ source: `student:${name}`, target: `interest:${tag}` })
-  })
-
-  const outerList: any[] = []
-  acts.slice(0, 3).forEach(act => {
-    const shared = getSharedInterest(name, act, 'activity')
-    outerList.push({ name: act, type: 'activity', interest: shared, color: '#c084fc' })
-  })
-  buddiesList.slice(0, 4).forEach(buddy => {
-    const shared = buddy.sharedInterests[0] || ''
-    outerList.push({ name: buddy.name, type: 'buddy', interest: shared, color: '#10b981' })
-  })
-
-  outerList.forEach((item, idx) => {
-    const angle = ((idx + 0.5) * Math.PI * 2) / Math.max(outerList.length, 1)
-    const x = 350 + Math.cos(angle) * 170
-    const y = 200 + Math.sin(angle) * 170
-    nodesData.push({ id: `${item.type}:${item.name}`, label: item.name, type: item.type, x, y, size: 5.5, color: item.color })
-    if (item.interest) {
-      linksData.push({ source: `interest:${item.interest}`, target: `${item.type}:${item.name}` })
-    } else {
-      linksData.push({ source: `student:${name}`, target: `${item.type}:${item.name}` })
-    }
-  })
-
-  return `
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <title>Campus Buddy 社交匹配与社交圈分析报告 — ${escapeHtml(name)}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-color: #0b0f19;
-      --card-bg: rgba(30, 41, 59, 0.45);
-      --text-color: #f1f5f9;
-      --primary-color: #ffb74d;
-      --accent-color: #c084fc;
-      --border-color: rgba(245, 158, 11, 0.25);
-    }
-    body {
-      font-family: "Outfit", "Inter", "Fira Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: linear-gradient(135deg, #090d16 0%, #0d121f 100%);
-      color: var(--text-color);
-      margin: 0;
-      padding: 40px 20px;
-      display: flex;
-      justify-content: center;
-      line-height: 1.6;
-    }
-    .container {
-      max-width: 800px;
-      width: 100%;
-    }
-    .header {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
-      border: 1px solid var(--border-color);
-      color: white;
-      padding: 30px 40px;
-      border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(245, 158, 11, 0.08);
-      margin-bottom: 24px;
-      position: relative;
-    }
-    .header h1 {
-      margin: 0 0 8px 0;
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      color: var(--primary-color);
-      text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
-    }
-    .header p {
-      margin: 0;
-      color: #94a3b8;
-      font-size: 13px;
-    }
-    .card {
-      background: var(--card-bg);
-      border-radius: 18px;
-      padding: 28px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border-color);
-      backdrop-filter: blur(8px);
-    }
-    .card h2 {
-      margin-top: 0;
-      font-size: 18px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding-bottom: 12px;
-      color: #f8fafc;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .tag {
-      display: inline-block;
-      background-color: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #cbd5e1;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-right: 8px;
-      margin-bottom: 8px;
-    }
-    .tag-primary {
-      background-color: rgba(245, 158, 11, 0.08);
-      border-color: rgba(245, 158, 11, 0.25);
-      color: var(--primary-color);
-      box-shadow: 0 0 8px rgba(245, 158, 11, 0.05);
-    }
-    .activity-item {
-      padding: 16px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .activity-item:last-child {
-      border-bottom: none;
-    }
-    .activity-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: #f8fafc;
-      margin-bottom: 4px;
-    }
-    .activity-path {
-      background-color: rgba(0, 0, 0, 0.2);
-      border-left: 3px solid var(--primary-color);
-      padding: 10px;
-      font-family: Menlo, Monaco, Consolas, monospace;
-      font-size: 12px;
-      color: #94a3b8;
-      border-radius: 6px;
-      margin-top: 8px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 16px;
-    }
-    th, td {
-      text-align: left;
-      padding: 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    th {
-      background-color: rgba(0, 0, 0, 0.15);
-      font-weight: 600;
-      color: #94a3b8;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    td {
-      font-size: 14px;
-    }
-    .badge-percent {
-      background-color: rgba(52, 199, 89, 0.1);
-      color: #34c759;
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 12px;
-    }
-    .empty-state {
-      color: #8e8e93;
-      font-size: 14px;
-      text-align: center;
-      padding: 20px;
-    }
-    .graph-hint {
-      color: #94a3b8;
-      font-size: 12px;
-      margin-top: 10px;
-      text-align: center;
-    }
-    .diag-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-top: 15px;
-    }
-    .diag-item-cell {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 5px;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    }
-    .diag-item-cell strong {
-      color: #94a3b8;
-      font-size: 13px;
-    }
-    .diag-item-cell span {
-      font-weight: 600;
-      font-size: 13px;
-    }
-    .diag-card {
-      border-color: #ffb74d !important;
-      background: rgba(255, 183, 77, 0.04) !important;
-    }
-    .diag-card h2 {
-      color: #ffb74d !important;
-      border-color: rgba(255, 183, 77, 0.15) !important;
-    }
-    .diag-note-box, .diag-status-box {
-      margin-top: 12px;
-      padding: 12px;
-      background: rgba(15, 23, 42, 0.5);
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 13px;
-      line-height: 1.5;
-      color: #cbd5e1;
-    }
-    .diag-note-box {
-      margin-top: 18px;
-    }
-    .path-container {
-      padding: 12px;
-      background: rgba(0,0,0,0.25);
-      border-left: 3px solid #ffb74d;
-      border-radius: 6px;
-      font-size: 13px;
-      color: #e2e8f0;
-      font-family: monospace;
-      overflow-x: auto;
-      line-height: 1.4;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>📊 Campus Buddy 社交匹配与社交圈分析报告</h1>
-      <p>报告学生: <strong>${escapeHtml(name)}</strong> &nbsp;|&nbsp; 生成时间: ${new Date().toLocaleDateString('zh-CN')} &nbsp;|&nbsp; 级别: 全局管理员</p>
-    </div>
-
+  const extraHtml = `
     <!-- Diagnostic Panel -->
     <div class="card diag-card">
       <h2>🧭 校园社交定位与分析指标</h2>
@@ -1055,187 +894,20 @@ export function generateAdminHtmlReport(
       </div>
       <p style="font-size: 11px; color: #64748b; margin-top: 6px; margin-bottom: 0;">* 注：路径通过广度优先搜索 (BFS) 遍历，已自动避开途中开启了隐私保护模式的同学节点。</p>
     </div>
-    
-    <div class="card">
-      <h2>👤 登记兴趣</h2>
-      <div>${interestsHtml}</div>
-    </div>
- 
-    <!-- Interactive Canvas Graph Box -->
-    <div class="card">
-      <h2>📡 局部社交网络图谱 (互动)</h2>
-      <div class="graph-container" style="display: flex; flex-direction: column; align-items: center;">
-        <canvas id="interactive-canvas" width="1400" height="800" style="width: 700px; height: 400px; background: rgba(0,0,0,0.15); border-radius: 12px; border: 1px solid var(--border-color);"></canvas>
-        <div class="graph-hint">💡 提示：将鼠标悬停在节点上，可以高亮显示并查看兴趣、搭子与活动关联的匹配细节。</div>
-      </div>
-    </div>
-  
-    <div class="card">
-      <h2>🎉 智能活动推荐</h2>
-      <div>${actsHtml}</div>
-    </div>
- 
-    <div class="card">
-      <h2>🤝 志同道合的活动搭子</h2>
-      <div>${buddiesHtml}</div>
-    </div>
-  </div>
- 
-  <script>
-    (function() {
-      const nodes = ${JSON.stringify(nodesData)};
-      const links = ${JSON.stringify(linksData)};
-      
-      const canvas = document.getElementById('interactive-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(2, 2);
-      let hoveredNode = null;
- 
-      const isPrintMode = document.body.classList.contains('print-mode');
-      if (isPrintMode) {
-        nodes.forEach(node => {
-          if (node.type === 'student') node.color = '#e11d48';
-          else if (node.type === 'interest') node.color = '#0284c7';
-          else if (node.type === 'activity') node.color = '#7c3aed';
-          else if (node.type === 'buddy') node.color = '#059669';
-        });
-      }
- 
-      function drawRoundRect(c, x, y, w, h, r) {
-        c.beginPath();
-        c.moveTo(x + r, y);
-        c.lineTo(x + w - r, y);
-        c.quadraticCurveTo(x + w, y, x + w, y + r);
-        c.lineTo(x + w, y + h - r);
-        c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        c.lineTo(x + r, y + h);
-        c.quadraticCurveTo(x, y + h, x, y + h - r);
-        c.lineTo(x, y + r);
-        c.quadraticCurveTo(x, y, x + r, y);
-        c.closePath();
-      }
- 
-      function draw() {
-        ctx.clearRect(0, 0, 700, 400);
- 
-        // Draw connections
-        links.forEach(link => {
-          const sourceNode = nodes.find(n => n.id === link.source);
-          const targetNode = nodes.find(n => n.id === link.target);
-          if (!sourceNode || !targetNode) return;
- 
-          const isHighlighted = hoveredNode && 
-            (hoveredNode.id === link.source || hoveredNode.id === link.target);
- 
-          ctx.beginPath();
-          ctx.moveTo(sourceNode.x, sourceNode.y);
-          ctx.lineTo(targetNode.x, targetNode.y);
-          
-          if (isHighlighted) {
-            ctx.strokeStyle = isPrintMode ? '#0284c7' : '#ffb74d';
-            ctx.lineWidth = 2.5;
-            ctx.shadowColor = isPrintMode ? 'transparent' : '#ffb74d';
-            ctx.shadowBlur = isPrintMode ? 0 : 8;
-          } else {
-            ctx.strokeStyle = isPrintMode ? 'rgba(15, 23, 42, 0.08)' : 'rgba(255, 255, 255, 0.08)';
-            ctx.lineWidth = 1.2;
-            ctx.shadowBlur = 0;
-          }
-          ctx.stroke();
-        });
-        ctx.shadowBlur = 0;
- 
-        // Draw nodes
-        nodes.forEach(node => {
-          const isHovered = hoveredNode && hoveredNode.id === node.id;
-          const size = isHovered ? node.size + 3.5 : node.size;
- 
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
-          ctx.fillStyle = node.color;
-          if (isHovered && !isPrintMode) {
-            ctx.shadowColor = node.color;
-            ctx.shadowBlur = 12;
-          } else {
-            ctx.shadowBlur = 0;
-          }
-          ctx.fill();
-          ctx.shadowBlur = 0;
- 
-          // Label text styling
-          ctx.font = isPrintMode 
-            ? 'bold 11px "Outfit", "Inter", "Fira Sans", sans-serif' 
-            : (isHovered ? 'bold 11px "Outfit", "Inter", "Fira Sans", sans-serif' : '10px "Outfit", "Inter", "Fira Sans", sans-serif');
-          ctx.textAlign = 'center';
- 
-          // Label text vertical offset
-          const textY = node.y - size - 8;
- 
-          if (!isPrintMode) {
-            const textWidth = ctx.measureText(node.label).width;
-            ctx.fillStyle = isHovered ? 'rgba(15, 23, 42, 0.9)' : 'rgba(15, 23, 42, 0.6)';
-            ctx.strokeStyle = isHovered ? node.color : 'rgba(6, 182, 212, 0.15)';
-            ctx.lineWidth = 1;
-            drawRoundRect(ctx, node.x - textWidth / 2 - 6, textY - 11, textWidth + 12, 16, 4);
-            ctx.fill();
-            ctx.stroke();
-          }
- 
-          // Label text fill
-          ctx.fillStyle = isPrintMode ? '#334155' : (isHovered ? '#ffffff' : '#cbd5e1');
-          ctx.fillText(node.label, node.x, textY);
-        });
- 
-        // Tooltip
-        if (hoveredNode && !isPrintMode) {
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-          ctx.strokeStyle = hoveredNode.color;
-          ctx.lineWidth = 1.5;
-          drawRoundRect(ctx, 15, 15, 180, 55, 8);
-          ctx.fill();
-          ctx.stroke();
- 
-          ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 11px "Outfit", "Inter", "Fira Sans", sans-serif';
-          ctx.textAlign = 'left';
-          ctx.fillText(hoveredNode.label, 25, 33);
- 
-          ctx.fillStyle = '#94a3b8';
-          ctx.font = '10px "Outfit", "Inter", "Fira Sans", sans-serif';
-          const typeLabel = hoveredNode.type === 'student' ? '个人姓名' : 
-                            (hoveredNode.type === 'interest' ? '兴趣标签' : 
-                            (hoveredNode.type === 'activity' ? '推荐活动' : '匹配同学'));
-          ctx.fillText('类型: ' + typeLabel, 25, 48);
-        }
-      }
- 
-      canvas.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const mx = (e.clientX - rect.left) * (700 / rect.width);
-        const my = (e.clientY - rect.top) * (400 / rect.height);
- 
-        let found = null;
-        for (const node of nodes) {
-          const dx = node.x - mx;
-          const dy = node.y - my;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < node.size + 6) {
-            found = node;
-            break;
-          }
-        }
- 
-        if (found !== hoveredNode) {
-          hoveredNode = found;
-          draw();
-        }
-      });
- 
-      draw();
-    })();
-  </script>
-</body>
-</html>
-  `;
+  `
+
+  return buildBaseHtmlReport({
+    title: 'Campus Buddy 社交匹配与社交圈分析报告',
+    name,
+    subtitle: `报告学生: <strong>${escapeHtml(name)}</strong> &nbsp;|&nbsp; 级别: 全局管理员`,
+    primaryColor: '#ffb74d',
+    borderColor: 'rgba(245, 158, 11, 0.25)',
+    highlightColor: '#ffb74d',
+    interestsHtml,
+    actsHtml,
+    buddiesHtml,
+    nodesData,
+    linksData,
+    extraHtmlContent: extraHtml
+  });
 }

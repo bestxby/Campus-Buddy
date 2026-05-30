@@ -4,6 +4,7 @@ import type { GraphStats } from '@/types'
 import { GraphAlgorithms, nodeKey } from '@/utils/graph-algorithms'
 import { ADMIN_NAME, addInterestTagToTaxonomy } from '@/constants/interests'
 import { regenerateSessionSeed } from '@/utils/graph-metrics'
+import { graphDb } from '@/utils/indexedDb'
 
 const safeStorage = {
   getItem(key: string): string | null {
@@ -233,7 +234,7 @@ export const useGraphStore = defineStore('graph', () => {
       // Load custom interest taxonomy additions
       let customInterests: { name: string, domain: 'sports'|'arts'|'tech'|'social' }[] = []
       try {
-        customInterests = JSON.parse(safeStorage.getItem('campus_buddy_custom_interests') || '[]')
+        customInterests = await graphDb.get<any[]>('campus_buddy_custom_interests') || []
       } catch (e) {}
       for (const item of customInterests) {
         addInterestTagToTaxonomy(item.name, item.domain)
@@ -246,25 +247,25 @@ export const useGraphStore = defineStore('graph', () => {
       // Load custom activities
       let customActivities: { name: string, interests: string[] }[] = []
       try {
-        customActivities = JSON.parse(safeStorage.getItem('campus_buddy_custom_activities') || '[]')
+        customActivities = await graphDb.get<any[]>('campus_buddy_custom_activities') || []
       } catch (e) {}
       for (const item of customActivities) {
-        addActivity(item.name, item.interests, false)
+        await addActivity(item.name, item.interests, false)
       }
 
       // Remove deleted default activities
       let deletedActivities: string[] = []
       try {
-        deletedActivities = JSON.parse(safeStorage.getItem('campus_buddy_deleted_activities') || '[]')
+        deletedActivities = await graphDb.get<string[]>('campus_buddy_deleted_activities') || []
       } catch (e) {}
       for (const name of deletedActivities) {
-        deleteActivity(name, false)
+        await deleteActivity(name, false)
       }
 
       // Load registered students
       let registeredStudents: { name: string, avatar: string, interests: string[], signups: string[], privateMode: boolean, socialMode: boolean }[] = []
       try {
-        registeredStudents = JSON.parse(safeStorage.getItem('campus_buddy_registered_students') || '[]')
+        registeredStudents = await graphDb.get<any[]>('campus_buddy_registered_students') || []
       } catch (e) {}
       for (const student of registeredStudents) {
         const sNode = `student:${student.name}`
@@ -295,7 +296,7 @@ export const useGraphStore = defineStore('graph', () => {
     }
   }
 
-  function addActivity(name: string, interests: string[], persist = true): void {
+  async function addActivity(name: string, interests: string[], persist = true): Promise<void> {
     const actNode = `activity:${name}`
     if (!graph.value.has(actNode)) {
       graph.value.set(actNode, new Set())
@@ -305,20 +306,20 @@ export const useGraphStore = defineStore('graph', () => {
     }
     if (persist) {
       try {
-        const custom = JSON.parse(safeStorage.getItem('campus_buddy_custom_activities') || '[]')
+        const custom = await graphDb.get<any[]>('campus_buddy_custom_activities') || []
         if (!custom.some((a: any) => a.name === name)) {
           custom.push({ name, interests })
-          safeStorage.setItem('campus_buddy_custom_activities', JSON.stringify(custom))
+          await graphDb.set('campus_buddy_custom_activities', custom)
         }
-        const deleted = JSON.parse(safeStorage.getItem('campus_buddy_deleted_activities') || '[]')
+        const deleted = await graphDb.get<string[]>('campus_buddy_deleted_activities') || []
         const updatedDeleted = deleted.filter((n: string) => n !== name)
-        safeStorage.setItem('campus_buddy_deleted_activities', JSON.stringify(updatedDeleted))
+        await graphDb.set('campus_buddy_deleted_activities', updatedDeleted)
       } catch (e) {}
     }
     updateStats()
   }
 
-  function deleteActivity(name: string, persist = true): void {
+  async function deleteActivity(name: string, persist = true): Promise<void> {
     const actNode = `activity:${name}`
     if (!graph.value.has(actNode)) return
     const neighbors = graph.value.get(actNode) ?? new Set()
@@ -331,16 +332,16 @@ export const useGraphStore = defineStore('graph', () => {
     graph.value.delete(actNode)
     if (persist) {
       try {
-        const custom = JSON.parse(safeStorage.getItem('campus_buddy_custom_activities') || '[]')
+        const custom = await graphDb.get<any[]>('campus_buddy_custom_activities') || []
         const isCustom = custom.some((a: any) => a.name === name)
         if (isCustom) {
           const updated = custom.filter((a: any) => a.name !== name)
-          safeStorage.setItem('campus_buddy_custom_activities', JSON.stringify(updated))
+          await graphDb.set('campus_buddy_custom_activities', updated)
         } else {
-          const deleted = JSON.parse(safeStorage.getItem('campus_buddy_deleted_activities') || '[]')
+          const deleted = await graphDb.get<string[]>('campus_buddy_deleted_activities') || []
           if (!deleted.includes(name)) {
             deleted.push(name)
-            safeStorage.setItem('campus_buddy_deleted_activities', JSON.stringify(deleted))
+            await graphDb.set('campus_buddy_deleted_activities', deleted)
           }
         }
       } catch (e) {}
@@ -348,7 +349,7 @@ export const useGraphStore = defineStore('graph', () => {
     updateStats()
   }
 
-  function addInterestNode(name: string, domain: 'sports' | 'arts' | 'tech' | 'social', persist = true): void {
+  async function addInterestNode(name: string, domain: 'sports' | 'arts' | 'tech' | 'social', persist = true): Promise<void> {
     const interestNode = `interest:${name}`
     if (!graph.value.has(interestNode)) {
       graph.value.set(interestNode, new Set())
@@ -356,10 +357,10 @@ export const useGraphStore = defineStore('graph', () => {
     addInterestTagToTaxonomy(name, domain)
     if (persist) {
       try {
-        const custom = JSON.parse(safeStorage.getItem('campus_buddy_custom_interests') || '[]')
+        const custom = await graphDb.get<any[]>('campus_buddy_custom_interests') || []
         if (!custom.some((i: any) => i.name === name)) {
           custom.push({ name, domain })
-          safeStorage.setItem('campus_buddy_custom_interests', JSON.stringify(custom))
+          await graphDb.set('campus_buddy_custom_interests', custom)
         }
       } catch (e) {}
     }

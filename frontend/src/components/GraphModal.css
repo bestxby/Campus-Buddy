@@ -10,8 +10,8 @@
   position: fixed;
   inset: 0;
   z-index: 400;
-  background: rgba(8,12,21,0.7);
-  backdrop-filter: blur(15px);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,24 +22,22 @@
   width: 95vw;
   height: 90vh;
   max-width: 1400px;
-  background: rgba(18, 24, 38, 0.75) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 30px rgba(6, 182, 212, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.05) !important;
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-xl) !important;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
   padding: 24px !important;
   overflow: hidden;
   box-sizing: border-box;
-  position: relative; /* Position relative for the close button */
+  position: relative;
 }
 .fullscreen-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 16px;
   margin-bottom: 16px;
   flex-wrap: wrap;
@@ -77,8 +75,8 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  background-color: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
+  background-color: var(--color-muted);
+  border: 1px solid var(--color-border);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 11px;
@@ -106,16 +104,16 @@
 .checkbox-box {
   width: 12px;
   height: 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: 3px;
   display: inline-block;
   position: relative;
   transition: all 0.2s;
 }
 .neon-checkbox input:checked + .checkbox-box {
-  background-color: var(--accent-cyan);
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 6px rgba(6,182,212,0.6);
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent-light);
 }
 .neon-checkbox input:checked + .checkbox-box::after {
   content: "";
@@ -124,7 +122,7 @@
   top: 1px;
   width: 4px;
   height: 6px;
-  border: solid #090d16;
+  border: solid #FFFFFF;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
@@ -132,7 +130,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  border-left: 1px solid rgba(255,255,255,0.1);
+  border-left: 1px solid var(--color-border);
   padding-left: 12px;
 }
 .slider-label {
@@ -144,7 +142,7 @@
   width: 80px;
   height: 4px;
   border-radius: 2px;
-  background: rgba(255,255,255,0.1);
+  background: var(--color-border);
   outline: none;
   cursor: pointer;
 }
@@ -154,8 +152,8 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--accent-cyan);
-  box-shadow: 0 0 5px var(--accent-cyan);
+  background: var(--color-accent);
+  box-shadow: 0 0 5px var(--color-accent);
   cursor: pointer;
   transition: transform 0.1s;
 }
@@ -165,14 +163,14 @@
 .zoom-controls-modal {
   display: flex;
   gap: 6px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
   padding: 4px;
   border-radius: 6px;
 }
 .zoom-btn {
-  background-color: rgba(18,24,38,0.85);
-  border: 1px solid var(--border-color);
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
   color: var(--text-primary);
   width: 32px;
   height: 32px;
@@ -185,18 +183,17 @@
   transition: all 0.2s;
 }
 .zoom-btn:hover {
-  background-color: rgba(6,182,212,0.2);
-  border-color: var(--accent-cyan);
-  color: #cffafe;
-  box-shadow: 0 0 8px rgba(6,182,212,0.3);
+  background-color: var(--color-accent-light);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 .close-modal-btn {
   position: absolute;
   top: 20px;
   right: 20px;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
   color: var(--text-secondary);
   width: 32px;
   height: 32px;
@@ -208,17 +205,17 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .close-modal-btn:hover {
-  color: #ffffff;
-  background: rgba(236, 72, 153, 0.2);
-  border-color: #ec4899;
-  box-shadow: 0 0 8px rgba(236, 72, 153, 0.4);
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
   transform: scale(1.05);
 }
 .fullscreen-canvas-container {
   flex: 1;
   position: relative;
-  background-color: rgba(0,0,0,0.3);
-  border: 1px solid var(--border-color);
+  background-color: var(--color-muted);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
   min-height: 0;
@@ -229,10 +226,10 @@
   left: 12px;
   z-index: 10;
   width: 250px;
-  background: rgba(18,24,38,0.9);
+  background: var(--color-surface);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(6,182,212,0.3);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 15px rgba(6,182,212,0.1);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
   border-radius: 8px;
   padding: 12px;
   pointer-events: none;
@@ -242,7 +239,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 6px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 6px;
 }
 .tooltip-icon {
@@ -267,15 +264,14 @@
   font-size: 10px;
   color: var(--text-secondary);
   pointer-events: none;
-  text-shadow: 0 0 3px rgba(0,0,0,0.6);
   text-align: right;
 }
 @keyframes focalPulse {
   0% {
-    filter: drop-shadow(0 0 8px rgba(236,72,153,0.6));
+    filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.4));
   }
   100% {
-    filter: drop-shadow(0 0 16px rgba(236,72,153,1));
+    filter: drop-shadow(0 0 16px rgba(37, 99, 235, 0.8));
   }
 }
 :global(.node-focal-pulse) {
@@ -285,8 +281,8 @@
 /* ─── Adjacency Matrix UI Controls ────────────────────────────────────────── */
 .view-mode-tabs {
   display: flex;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 3px;
   gap: 4px;
@@ -304,11 +300,11 @@
 }
 .tab-btn:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.05);
 }
 .tab-btn.active {
-  background: var(--accent-cyan);
-  color: #090d16;
+  background: var(--color-accent);
+  color: #FFFFFF;
   box-shadow: none;
 }
 .matrix-mode-select-wrap {
@@ -316,32 +312,31 @@
   align-items: center;
 }
 .matrix-select-neon {
-  background: rgba(18, 24, 38, 0.85);
-  border: 1px solid rgba(6, 182, 212, 0.3);
-  color: #cffafe;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  color: var(--text-primary);
   font-size: 11px;
   font-weight: 600;
   padding: 6px 12px;
   border-radius: 6px;
   outline: none;
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(6, 182, 212, 0.1);
   transition: all 0.2s;
 }
 .matrix-select-neon:hover,
 .matrix-select-neon:focus {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
 }
 .matrix-select-neon option {
-  background-color: #0f172a;
-  color: #cffafe;
+  background-color: #FFFFFF;
+  color: var(--text-primary);
 }
 
 .view-network-btn-neon {
-  background: rgba(6, 182, 212, 0.12);
-  border: 1px solid rgba(6, 182, 212, 0.3);
-  color: #cffafe;
+  background: var(--color-accent-light);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
   font-size: 11px;
   font-weight: 600;
   padding: 6px 12px;
@@ -355,9 +350,8 @@
   gap: 4px;
 }
 .view-network-btn-neon:hover {
-  background: rgba(6, 182, 212, 0.25);
-  border-color: #22d3ee;
-  box-shadow: 0 0 8px rgba(6, 182, 212, 0.15);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
   color: #ffffff;
   transform: translateY(-1px);
 }
@@ -366,25 +360,23 @@
 }
 
 .return-matrix-btn-neon {
-  background: rgba(6, 182, 212, 0.15);
-  border: 1px solid rgba(6, 182, 212, 0.4);
-  color: #cffafe;
+  background: var(--color-accent-light);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
   font-size: 11px;
   font-weight: 600;
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 8px rgba(6, 182, 212, 0.15);
   margin-right: 10px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
 .return-matrix-btn-neon:hover {
-  background: rgba(6, 182, 212, 0.3);
-  border-color: #22d3ee;
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
   color: #ffffff;
   transform: translateY(-1px);
 }
@@ -457,7 +449,9 @@
 .vis-loading-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(8, 12, 21, 0.92);
+  background: rgba(var(--color-surface), 0.92);
+  background: var(--color-surface);
+  opacity: 0.96;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -465,7 +459,6 @@
   gap: 20px;
   z-index: 100;
   border-radius: 8px;
-  backdrop-filter: blur(8px);
 }
 .vis-spinner-container {
   position: relative;
@@ -475,31 +468,26 @@
 .vis-spinner {
   width: 100%;
   height: 100%;
-  border: 3px solid rgba(6, 182, 212, 0.1);
-  border-top-color: var(--accent-cyan);
+  border: 3px solid var(--color-accent-light);
+  border-top-color: var(--color-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+  box-shadow: 0 0 15px var(--color-accent-light);
 }
 .vis-spinner-inner {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 30px;
-  height: 30px;
-  border: 3px solid rgba(253, 151, 31, 0.1);
-  border-bottom-color: var(--accent-orange);
+  top: 10px; left: 10px;
+  width: 30px; height: 30px;
+  border: 3px solid rgba(96, 165, 250, 0.1);
+  border-bottom-color: var(--color-accent);
   border-radius: 50%;
   animation: spin-reverse 1.2s linear infinite;
-  box-shadow: 0 0 10px rgba(253, 151, 31, 0.15);
 }
 .vis-loading-text {
-  font-family: "Outfit", "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #94a3b8;
+  color: var(--text-secondary);
   letter-spacing: 0.5px;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.05);
 }
 
 @keyframes spin {

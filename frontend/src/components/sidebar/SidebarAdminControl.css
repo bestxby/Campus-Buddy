@@ -1,5 +1,39 @@
-.stats-grid-panel { margin: 10px 10px 0; background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; flex-shrink: 0; }
-.stats-grid-title { font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 8px; text-align: left; }
+:root {
+  --selected-student-bg: linear-gradient(135deg, rgba(217, 110, 72, 0.04) 0%, rgba(255, 255, 255, 0.95) 100%);
+  --selected-student-border: rgba(217, 110, 72, 0.25);
+  --selected-student-name: var(--color-accent);
+}
+
+[data-theme="dark"] {
+  --selected-student-bg: linear-gradient(135deg, rgba(253, 151, 31, 0.05) 0%, rgba(30, 41, 59, 0.95) 100%);
+  --selected-student-border: rgba(253, 151, 31, 0.25);
+  --selected-student-name: #ffb74d;
+}
+
+.admin-controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stats-grid-panel {
+  margin: 0 10px; /* top margin now handled by sidebar gap:8px */
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px;
+  flex-shrink: 0;
+}
+
+.stats-grid-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--color-subtext);
+  margin-bottom: 8px;
+  text-align: left;
+}
 
 .control-cards-grid {
   display: flex;
@@ -9,8 +43,8 @@
 }
 
 .control-card {
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 8px 12px;
   position: relative;
@@ -47,7 +81,7 @@
 .control-label {
   font-size: 11px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-text);
 }
 
 /* Search Card details */
@@ -60,8 +94,8 @@
 
 .search-input-field {
   position: relative;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--border-color);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: 5px 8px;
   display: flex;
@@ -78,14 +112,15 @@
   flex: 1;
   background: transparent;
   border: none;
-  color: var(--text-primary);
+  color: var(--color-text);
   font-size: 11px;
   outline: none;
   width: 100%;
 }
 
 .sidebar-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--color-subtext);
+  opacity: 0.7;
 }
 
 .suggestions-dropdown {
@@ -95,9 +130,9 @@
   right: 0;
   margin-top: 4px;
   z-index: 100;
-  background-color: var(--panel-bg);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  border: 1px solid var(--border-color);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
   padding: 4px 0;
   border-radius: 4px;
 }
@@ -107,11 +142,12 @@
   font-size: 11px;
   cursor: pointer;
   text-align: left;
+  color: var(--color-text);
 }
 
 .sug-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: var(--accent-orange);
+  background-color: var(--color-surface-2);
+  color: var(--color-accent);
 }
 
 /* Action card details */
@@ -124,9 +160,9 @@
 }
 
 .action-card:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.09);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 0 10px var(--control-color) !important;
+  background: var(--color-surface-2);
+  border-color: var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 0 10px var(--control-color) !important;
 }
 
 .action-card:hover::before {
@@ -146,60 +182,82 @@
 
 .action-hint {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   margin-top: 1px;
 }
 
 .action-arrow {
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   transition: transform 0.25s;
 }
 
 .action-card:hover .action-arrow {
   transform: translateX(3px);
-  color: var(--text-primary);
+  color: var(--color-text);
 }
 
-/* Selected student action card */
-.selected-student-actions {
-  background: linear-gradient(135deg, rgba(253, 151, 31, 0.05) 0%, rgba(18, 24, 38, 0.95) 100%) !important;
-  border: 1px solid rgba(253, 151, 31, 0.25) !important;
-  padding: 10px !important;
-  border-radius: 8px;
+/* Selected student inline layout */
+.selected-student-inline-wrap {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 4px;
+  gap: 6px;
+  margin-top: 2px;
 }
-.selected-student-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.selected-icon {
-  font-size: 14px;
-}
-.selected-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1px;
-}
-.selected-label {
-  font-size: 10px;
-  color: var(--text-secondary);
-}
-.selected-name {
-  font-size: 11.5px;
-  font-weight: 800;
-  color: #ffb74d;
-}
-.selected-buttons-row {
+.selected-info-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding-top: 6px;
 }
+.selected-name-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--selected-student-name);
+  background: var(--selected-student-bg);
+  border: 1px solid var(--selected-student-border);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.clear-inline-btn {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  font-size: 10px;
+  padding: 2px 6px;
+  color: var(--color-subtext);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.clear-inline-btn:hover {
+  color: var(--color-danger);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.clear-inline-btn:focus,
+.clear-inline-btn:active {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.inline-actions-row {
+  display: flex;
+  gap: 6px;
+}
+.inline-action-btn {
+  flex: 1;
+  font-size: 9.5px;
+  padding: 5px 0;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+

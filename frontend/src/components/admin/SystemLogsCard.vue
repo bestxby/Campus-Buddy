@@ -48,14 +48,14 @@ import { logs } from '@/composables/useLogs'
   flex-direction: column;
   overflow: visible;
   height: 100%;
-  background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
+  background: var(--color-surface);
   padding: 12px 16px !important;
 }
 .col-header {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 8px;
   margin-bottom: 8px;
   flex-shrink: 0;
@@ -63,13 +63,13 @@ import { logs } from '@/composables/useLogs'
 .col-header h3 {
   font-size: 12px;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--color-text);
   font-weight: bold;
   text-align: left;
 }
 .col-header .header-sub {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   text-align: left;
 }
 .flex-1-scroll-no-padding {
@@ -79,7 +79,7 @@ import { logs } from '@/composables/useLogs'
   flex-direction: column;
 }
 .log-console-fullscreen {
-  background: #060913;
+  background: var(--color-muted);
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 6px;
   padding: 10px;
@@ -91,13 +91,7 @@ import { logs } from '@/composables/useLogs'
   position: relative;
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.8);
 }
-.log-console-fullscreen::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, transparent 80%, rgba(6, 9, 19, 0.85) 100%);
-}
+
 .console-body {
   flex: 1;
   overflow-y: auto;
@@ -117,19 +111,25 @@ import { logs } from '@/composables/useLogs'
   text-align: left;
 }
 .console-line.info {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--color-text);
+  opacity: 0.75;
 }
 .console-line.query {
-  color: #22d3ee;
+  color: var(--color-admin-active-text);
 }
 .console-line.action {
-  color: #34d399;
+  --green-active-text: #15803D;
+  color: var(--green-active-text);
+}
+[data-theme="dark"] .console-line.action {
+  --green-active-text: #34d399;
 }
 .console-line.warn {
-  color: #f87171;
+  color: var(--color-danger);
 }
 .line-time {
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--color-subtext);
+  opacity: 0.45;
   flex-shrink: 0;
 }
 .line-tag {

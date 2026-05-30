@@ -37,8 +37,9 @@
               cy="50" 
               r="40" 
               fill="none" 
-              stroke="rgba(255,255,255,0.03)" 
+              stroke="var(--color-border)" 
               stroke-width="9" 
+              style="opacity: 0.4;"
             />
             <!-- Donut segments -->
             <circle
@@ -134,14 +135,14 @@ const slices = computed(() => {
   flex-direction: column;
   overflow: visible;
   height: 100%;
-  background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
+  background: var(--color-surface);
   padding: 12px 16px !important;
 }
 .col-header {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 4px;
   margin-bottom: 6px;
   flex-shrink: 0;
@@ -149,7 +150,7 @@ const slices = computed(() => {
 .col-header h3 {
   font-size: 12px;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--color-text);
   font-weight: bold;
   text-align: left;
 }
@@ -197,16 +198,16 @@ const slices = computed(() => {
 .center-title {
   font-size: 10px;
   font-weight: 700;
-  fill: var(--text-primary);
+  fill: var(--color-text);
 }
 .center-value {
   font-size: 10px;
   font-weight: bold;
-  fill: #ffb74d;
+  fill: var(--color-accent);
 }
 .center-sub {
   font-size: 5.5px;
-  fill: var(--text-secondary);
+  fill: var(--color-subtext);
 }
 .donut-legend-list {
   flex: 1;
@@ -216,8 +217,8 @@ const slices = computed(() => {
   justify-content: center;
 }
 .legend-item {
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 5px 8px;
   display: flex;
@@ -229,9 +230,9 @@ const slices = computed(() => {
 }
 .legend-item:hover,
 .legend-item-active {
-  background: rgba(30, 41, 59, 0.7);
+  background: var(--color-muted);
   border-color: var(--theme-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 .legend-header {
   display: flex;
@@ -247,7 +248,7 @@ const slices = computed(() => {
 }
 .legend-label {
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-text);
 }
 .legend-percentage {
   margin-left: auto;
@@ -258,7 +259,7 @@ const slices = computed(() => {
   display: flex;
   gap: 8px;
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   padding-left: 12px;
 }
 .legend-deg {

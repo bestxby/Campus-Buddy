@@ -23,6 +23,9 @@ export class AdjacencyMatrixPainter {
     scrollLeft: number,
     maxScrollLeft: number,
     isDraggingScrollbar: boolean,
+    isDraggingHScrollbar: boolean,
+    hoveredVScrollbar: boolean,
+    hoveredHScrollbar: boolean,
     hoveredRowIdx: number | null,
     hoveredColIdx: number | null,
     scrollbarWidth: number
@@ -32,6 +35,18 @@ export class AdjacencyMatrixPainter {
     // Reserve space for horizontal scrollbar at bottom if needed
     const hScrollbarHeight = needsHorizontalScroll ? 14 : 0
     const effectiveGridH = gridH - hScrollbarHeight
+
+    // ─── Theme Adaptive Colors for Canvas (Fallback from CSS vars) ───
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+    const colorText = isDark ? '#f8fafc' : '#1D1816'
+    const colorSubtext = isDark ? '#94a3b8' : '#6B635F'
+    const colorBorder = isDark ? '#1E293B' : '#E8E3DD'
+    const colorActiveText = isDark ? '#ffb74d' : '#D96E48'
+
+    // Cyan / Admin colors
+    const colorCyanText = isDark ? '#67E8F9' : '#0284C7'
+    const colorCyanBg = isDark ? 'rgba(14, 165, 233, 0.12)' : 'rgba(2, 132, 199, 0.12)'
+    const colorCyanThumb = isDark ? 'rgba(14, 165, 233, 0.5)' : 'rgba(2, 132, 199, 0.5)'
 
     // 1.2 Render Virtualized Matrix Cells
     const startRow = Math.floor(scrollTop / cellHeight)
@@ -53,14 +68,14 @@ export class AdjacencyMatrixPainter {
       const rowY = gridY + r * cellHeight - scrollTop
       const isActiveStudent = (matrixMode !== 'interest-cooccurrence') && (rowName === activeStudent)
       if (isActiveStudent) {
-        ctx.fillStyle = 'rgba(6, 182, 212, 0.08)' // cyan glow bg
+        ctx.fillStyle = colorCyanBg // cyan glow bg
         ctx.fillRect(gridX, rowY, gridW, cellHeight)
       }
     }
 
     // 1.1 Draw Grid Crosshair Highlight Background (draw under matrix cells)
     if (hoveredRowIdx !== null && hoveredColIdx !== null) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.04)'
+      ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(29, 24, 22, 0.035)'
       // Row highlight
       const hoverY = gridY + hoveredRowIdx * cellHeight - scrollTop
       ctx.fillRect(gridX, hoverY, gridW, cellHeight)
@@ -102,20 +117,20 @@ export class AdjacencyMatrixPainter {
         const cellX = gridX + c * cellWidth - scrollLeft
 
         let isActive = false
-        let cellColor = 'rgba(255, 255, 255, 0.02)'
+        let cellColor = isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(29, 24, 22, 0.03)'
         let cellText = ''
 
         if (matrixMode === 'student-interest') {
           isActive = graph.get(`student:${rowName}`)?.has(`interest:${colName}`) || false
-          cellColor = isActive ? 'rgba(6, 182, 212, 0.85)' : 'rgba(255, 255, 255, 0.02)'
+          cellColor = isActive ? (isDark ? 'rgba(14, 165, 233, 0.85)' : 'rgba(2, 132, 199, 0.85)') : (isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(29, 24, 22, 0.03)')
         } else if (matrixMode === 'student-activity') {
           isActive = graph.get(`student:${rowName}`)?.has(`activity:${colName}`) || false
-          cellColor = isActive ? 'rgba(74, 222, 128, 0.85)' : 'rgba(255, 255, 255, 0.02)'
+          cellColor = isActive ? (isDark ? 'rgba(74, 222, 128, 0.85)' : 'rgba(21, 128, 61, 0.85)') : (isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(29, 24, 22, 0.03)')
         } else if (matrixMode === 'interest-cooccurrence') {
           if (r === c) {
             // Self co-occurrence shows total students in that interest
             const rStudents = Array.from(graph.get(`interest:${rowName}`) || []).filter((s: any) => s.startsWith('student:'))
-            cellColor = 'rgba(15, 23, 42, 0.5)'
+            cellColor = isDark ? 'rgba(15, 23, 42, 0.5)' : 'rgba(217, 110, 72, 0.15)'
             cellText = `${rStudents.length}`
           } else {
             const rStudents = graph.get(`interest:${rowName}`) || new Set()
@@ -128,7 +143,10 @@ export class AdjacencyMatrixPainter {
             }
             if (overlapCount > 0) {
               const ratio = overlapCount / maxOverlap
-              cellColor = `rgba(253, 151, 31, ${0.15 + ratio * 0.85})` // orange intensity
+              const rVal = isDark ? 253 : 217
+              const gVal = isDark ? 151 : 110
+              const bVal = isDark ? 31 : 72
+              cellColor = `rgba(${rVal}, ${gVal}, ${bVal}, ${0.15 + ratio * 0.85})` // Orange intensity
               cellText = `${overlapCount}`
             }
           }
@@ -141,7 +159,7 @@ export class AdjacencyMatrixPainter {
         // Draw text inside cell (only for interest-cooccurrence)
         if (cellText && cellWidth >= 16) {
           ctx.save()
-          ctx.fillStyle = '#f8fafc'
+          ctx.fillStyle = colorText
           ctx.font = 'bold 8.5px "Outfit", "Inter", sans-serif'
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
@@ -151,7 +169,7 @@ export class AdjacencyMatrixPainter {
 
         // Highlight Cell Border on Hover
         if (hoveredRowIdx === r && hoveredColIdx === c) {
-          ctx.strokeStyle = '#ffb74d'
+          ctx.strokeStyle = colorActiveText
           ctx.lineWidth = 1.2
           ctx.strokeRect(cellX + 0.5, rowY + 0.5, cellWidth - 1, cellHeight - 1)
         }
@@ -174,7 +192,7 @@ export class AdjacencyMatrixPainter {
 
       // Draw active row header background
       if (isActiveStudent) {
-        ctx.fillStyle = 'rgba(6, 182, 212, 0.12)'
+        ctx.fillStyle = colorCyanBg
         ctx.fillRect(0, rowY, gridX, cellHeight)
       }
 
@@ -183,7 +201,7 @@ export class AdjacencyMatrixPainter {
         const isMobile = ctx.canvas.width < 768
         if (isMobile) {
           if (isActiveStudent) {
-            ctx.fillStyle = '#06b6d4'
+            ctx.fillStyle = colorCyanText
             ctx.font = 'bold 9px "Outfit", monospace'
             ctx.textAlign = 'left'
             ctx.textBaseline = 'middle'
@@ -191,13 +209,13 @@ export class AdjacencyMatrixPainter {
           }
         } else {
           if (isActiveStudent) {
-            ctx.fillStyle = '#06b6d4'
+            ctx.fillStyle = colorCyanText
             ctx.font = 'bold 9px "Outfit", monospace'
             ctx.textAlign = 'left'
             ctx.textBaseline = 'middle'
             ctx.fillText(`▶`, 10, rowY + cellHeight / 2)
           } else {
-            ctx.fillStyle = isHovered ? 'rgba(253, 151, 31, 0.45)' : 'rgba(255, 255, 255, 0.18)'
+            ctx.fillStyle = isHovered ? (isDark ? 'rgba(253, 151, 31, 0.45)' : 'rgba(217, 110, 72, 0.65)') : (isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(29, 24, 22, 0.4)')
             ctx.font = '9px "Outfit", monospace'
             ctx.textAlign = 'left'
             ctx.textBaseline = 'middle'
@@ -208,10 +226,10 @@ export class AdjacencyMatrixPainter {
       }
 
       if (isActiveStudent) {
-        ctx.fillStyle = '#06b6d4'
+        ctx.fillStyle = colorCyanText
         ctx.font = 'bold 11px "Outfit", "Inter", sans-serif'
       } else {
-        ctx.fillStyle = isHovered ? '#ffb74d' : '#94a3b8'
+        ctx.fillStyle = isHovered ? colorActiveText : colorSubtext
         ctx.font = isHovered ? 'bold 11px "Outfit", "Inter", sans-serif' : '10px "Outfit", "Inter", sans-serif'
       }
       ctx.textAlign = 'right'
@@ -237,7 +255,7 @@ export class AdjacencyMatrixPainter {
       ctx.translate(colX, gridY - 8)
       ctx.rotate(-Math.PI / 3) // Rotate 60deg
 
-      ctx.fillStyle = isHovered ? '#ffb74d' : '#94a3b8'
+      ctx.fillStyle = isHovered ? colorActiveText : colorSubtext
       ctx.font = isHovered ? 'bold 10px "Outfit", "Inter", sans-serif' : '9px "Outfit", "Inter", sans-serif'
       ctx.textAlign = 'left'
       ctx.textBaseline = 'middle'
@@ -261,12 +279,13 @@ export class AdjacencyMatrixPainter {
       const thumbY = gridY + (scrollTop / maxScrollTop) * (effectiveGridH - thumbH)
 
       // Scrollbar Track
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.01)'
+      ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.01)' : 'rgba(29, 24, 22, 0.01)'
       ctx.fillRect(scrollbarX, gridY, scrollbarWidth, effectiveGridH)
 
       // Scrollbar Thumb
-      ctx.fillStyle = isDraggingScrollbar ? 'rgba(6, 182, 212, 0.5)' : 'rgba(255, 255, 255, 0.08)'
-      ctx.strokeStyle = isDraggingScrollbar ? '#00f0ff' : 'rgba(255, 255, 255, 0.15)'
+      const isVActive = isDraggingScrollbar || hoveredVScrollbar
+      ctx.fillStyle = isVActive ? colorCyanThumb : (isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(29, 24, 22, 0.08)')
+      ctx.strokeStyle = isVActive ? (isDark ? '#38bdf8' : '#0284C7') : (isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(29, 24, 22, 0.15)')
       ctx.lineWidth = 1
       
       // Draw rounded thumb
@@ -285,12 +304,13 @@ export class AdjacencyMatrixPainter {
       const hThumbX = gridX + (scrollLeft / maxScrollLeft) * (gridW - hThumbW)
 
       // Track
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.01)'
+      ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.01)' : 'rgba(29, 24, 22, 0.01)'
       ctx.fillRect(gridX, hBarY, gridW, hBarH)
 
       // Thumb
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
+      const isHActive = isDraggingHScrollbar || hoveredHScrollbar
+      ctx.fillStyle = isHActive ? colorCyanThumb : (isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(29, 24, 22, 0.08)')
+      ctx.strokeStyle = isHActive ? (isDark ? '#38bdf8' : '#0284C7') : (isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(29, 24, 22, 0.15)')
       ctx.lineWidth = 1
       ctx.beginPath()
       ctx.roundRect(hThumbX, hBarY + 3, hThumbW, hBarH - 6, 4)
@@ -299,7 +319,7 @@ export class AdjacencyMatrixPainter {
     }
 
     // 6. Draw Grid Border Lines
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
+    ctx.strokeStyle = colorBorder
     ctx.lineWidth = 1
     ctx.strokeRect(gridX, gridY, gridW, effectiveGridH)
   }

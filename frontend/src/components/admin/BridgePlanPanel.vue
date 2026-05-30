@@ -160,13 +160,13 @@ const applyBridgePlan = () => {
 .close-promo-btn {
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   font-size: 14px;
   cursor: pointer;
   line-height: 1;
 }
 .close-promo-btn:hover {
-  color: var(--text-primary);
+  color: var(--color-text);
 }
 .bridge-body {
   display: flex;
@@ -201,7 +201,7 @@ const applyBridgePlan = () => {
 }
 .hidden-radio {
   margin-right: 6px;
-  accent-color: var(--accent-orange);
+  accent-color: var(--color-accent);
   cursor: pointer;
 }
 .option-content {
@@ -224,14 +224,14 @@ const applyBridgePlan = () => {
 .option-badge.opt-activity { background-color: rgba(253, 151, 31, 0.12); color: #ffb74d; }
 .option-title {
   font-size: 10px;
-  color: var(--text-primary);
+  color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .opt-sub {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
 }
 .apply-bridge-btn {
   margin-top: 4px;

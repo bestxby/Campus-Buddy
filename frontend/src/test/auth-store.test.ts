@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '../stores/auth'
+import { computePersona } from '../utils/auth-helpers'
 import { useGraphStore } from '../stores/graph'
+import { graphDb } from '../utils/indexedDb'
 // @ts-ignore
 import { webcrypto } from 'node:crypto'
 
@@ -13,6 +15,7 @@ describe('Auth Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     localStorage.clear()
+    graphDb.clearFallback()
 
     // Mock global fetch to prevent relative URL fetch warnings during logout/loadGraphData
     globalThis.fetch = vi.fn().mockImplementation(() =>
@@ -56,12 +59,12 @@ describe('Auth Store', () => {
     expect(store.currentUser).toBeNull()
   })
 
-  it('should submit registration and save student details', () => {
+  it('should submit registration and save student details', async () => {
     const store = useAuthStore()
     store.regForm.name = 'Alice'
     store.regForm.selectedInterests = ['Python']
     
-    store.submitRegistration()
+    await store.submitRegistration()
 
     expect(store.currentUser).toBe('Alice')
     expect(store.currentUserRole).toBe('student')
@@ -100,17 +103,17 @@ describe('Auth Store', () => {
     expect(localStorage.getItem('campus_buddy_user')).toBeNull()
   })
 
-  it('should handle signing up for and cancelling activities', () => {
+  it('should handle signing up for and cancelling activities', async () => {
     const store = useAuthStore()
     store.regForm.name = 'Alice'
     store.regForm.selectedInterests = ['Python']
-    store.submitRegistration()
+    await store.submitRegistration()
 
-    store.signUpForActivity('周三篮球赛')
+    await store.signUpForActivity('周三篮球赛')
     expect(store.isSignedUp('周三篮球赛')).toBe(true)
     expect(store.signedUpActivities).toContain('周三篮球赛')
 
-    store.cancelSignUpForActivity('周三篮球赛')
+    await store.cancelSignUpForActivity('周三篮球赛')
     expect(store.isSignedUp('周三篮球赛')).toBe(false)
     expect(store.signedUpActivities).not.toContain('周三篮球赛')
   })
@@ -149,8 +152,8 @@ describe('Auth Store', () => {
   })
 
   it('should keep custom activities and custom interests on logout but clear session keys', async () => {
-    localStorage.setItem('campus_buddy_custom_activities', JSON.stringify([{ name: '活动A', interests: ['Python'] }]))
-    localStorage.setItem('campus_buddy_custom_interests', JSON.stringify([{ name: 'Python', domain: 'tech' }]))
+    await graphDb.set('campus_buddy_custom_activities', [{ name: '活动A', interests: ['Python'] }])
+    await graphDb.set('campus_buddy_custom_interests', [{ name: 'Python', domain: 'tech' }])
     localStorage.setItem('campus_buddy_user', 'Bob')
 
     const store = useAuthStore()
@@ -161,38 +164,74 @@ describe('Auth Store', () => {
     expect(localStorage.getItem('campus_buddy_user')).toBeNull()
     
     // Persistent graph items are preserved
-    expect(localStorage.getItem('campus_buddy_custom_activities')).not.toBeNull()
-    expect(localStorage.getItem('campus_buddy_custom_interests')).not.toBeNull()
+    expect(await graphDb.get('campus_buddy_custom_activities')).not.toBeNull()
+    expect(await graphDb.get('campus_buddy_custom_interests')).not.toBeNull()
   })
 
-  it('should toggle privacy mode and social mode with mutual exclusion and update registry', () => {
+  it('should clear custom activities and custom interests on logout if shouldReset is true', async () => {
+    await graphDb.set('campus_buddy_custom_activities', [{ name: '活动A', interests: ['Python'] }])
+    await graphDb.set('campus_buddy_custom_interests', [{ name: 'Python', domain: 'tech' }])
+    localStorage.setItem('campus_buddy_user', 'Bob')
+
+    const store = useAuthStore()
+    await store.logout(true)
+
+    expect(store.currentUser).toBeNull()
+    expect(localStorage.getItem('campus_buddy_user')).toBeNull()
+    expect(await graphDb.get('campus_buddy_custom_activities')).toBeNull()
+    expect(await graphDb.get('campus_buddy_custom_interests')).toBeNull()
+  })
+
+  it('should toggle privacy mode and social mode with mutual exclusion and update registry', async () => {
     const store = useAuthStore()
     store.regForm.name = 'Bob'
     store.regForm.selectedInterests = ['足球']
-    store.submitRegistration()
+    await store.submitRegistration()
 
     // 1. Enable privacy mode
-    store.togglePrivacyMode()
+    await store.togglePrivacyMode()
     expect(store.isPrivateMode).toBe(true)
     expect(localStorage.getItem('campus_buddy_private_mode')).toBe('true')
 
     // 2. Enable social mode (should disable privacy mode)
-    store.toggleSocialMode()
+    await store.toggleSocialMode()
     expect(store.isSocialMode).toBe(true)
     expect(store.isPrivateMode).toBe(false)
     expect(localStorage.getItem('campus_buddy_social_mode')).toBe('true')
     expect(localStorage.getItem('campus_buddy_private_mode')).toBe('false')
 
     // 3. Re-enable privacy mode (should disable social mode)
-    store.togglePrivacyMode()
+    await store.togglePrivacyMode()
     expect(store.isPrivateMode).toBe(true)
     expect(store.isSocialMode).toBe(false)
     
     // Check registered student info reflects the updates
-    const list = JSON.parse(localStorage.getItem('campus_buddy_registered_students') || '[]')
+    const list = await graphDb.get<any[]>('campus_buddy_registered_students') || []
     const student = list.find((s: any) => s.name === 'Bob')
     expect(student).toBeDefined()
     expect(student.privateMode).toBe(true)
     expect(student.socialMode).toBe(false)
+  })
+
+  it('should reject registration if the name contains numbers', async () => {
+    const store = useAuthStore()
+    store.regForm.name = 'Alice123'
+    store.regForm.selectedInterests = ['Python']
+    await store.submitRegistration()
+    
+    // The registration should fail and current user should remain null due to digits in name
+    expect(store.currentUser).toBeNull()
+  })
+
+  it('should correctly compute persona with tie-breakers and zero-interests', () => {
+    // 1. Zero interests should return '社交达人'
+    expect(computePersona([])).toBe('社交达人')
+
+    // 2. Tied interests (sports & tech) should return '斜杠青年'
+    expect(computePersona(['足球', 'Python'])).toBe('斜杠青年')
+
+    // 3. Single dominant domain should return corresponding persona
+    expect(computePersona(['Python'])).toBe('科技极客')
+    expect(computePersona(['足球'])).toBe('运动健将')
   })
 })

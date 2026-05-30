@@ -58,14 +58,14 @@ const maxInterestCount = computed(() => {
   flex-direction: column;
   overflow: visible;
   height: 100%;
-  background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
+  background: var(--color-surface);
   padding: 12px 16px !important;
 }
 .col-header {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 4px;
   margin-bottom: 6px;
   flex-shrink: 0;
@@ -73,13 +73,13 @@ const maxInterestCount = computed(() => {
 .col-header h3 {
   font-size: 12px;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--color-text);
   font-weight: bold;
   text-align: left;
 }
 .col-header .header-sub {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   text-align: left;
 }
 .card-scroll-body {
@@ -100,7 +100,7 @@ const maxInterestCount = computed(() => {
 }
 .rank-badge {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   font-family: monospace;
   width: 18px;
   text-align: left;
@@ -109,7 +109,7 @@ const maxInterestCount = computed(() => {
   width: 50px;
   text-align: left;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -118,7 +118,7 @@ const maxInterestCount = computed(() => {
   flex: 1;
   height: 8px;
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   overflow: hidden;
   position: relative;

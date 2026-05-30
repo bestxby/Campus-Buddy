@@ -62,12 +62,12 @@ import { stats } from '@/composables/useGraph'
 </script>
 
 <style scoped>
-.stats-grid-panel { margin: 10px 10px 0; background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; flex-shrink: 0; }
-.stats-grid-title { font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 8px; }
+.stats-grid-panel { margin: 0 10px; background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 10px; padding: 10px; flex-shrink: 0; }
+.stats-grid-title { font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--color-subtext); margin-bottom: 8px; }
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .stat-card {
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 8px 10px;
   display: flex;
@@ -89,9 +89,9 @@ import { stats } from '@/composables/useGraph'
   transition: all 0.25s ease;
 }
 .stat-card:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.09);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  background: var(--color-surface-2);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
 .stat-card:hover::before {
   opacity: 1;
@@ -103,10 +103,12 @@ import { stats } from '@/composables/useGraph'
   font-family: Consolas, "SF Mono", Monaco, monospace;
   line-height: 1.2;
   letter-spacing: -0.2px;
+  font-variant-numeric: tabular-nums; /* prevent layout shift as numbers change */
+  font-feature-settings: 'tnum';
 }
 .stat-card-label {
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--color-subtext);
   letter-spacing: 0.2px;
   display: flex;
   align-items: center;

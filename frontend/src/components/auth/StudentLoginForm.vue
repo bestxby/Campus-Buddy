@@ -155,7 +155,7 @@
     </div>
 
     <div v-if="regForm.name.trim() && !isNameValid" class="warning-text">
-      ⚠️ 姓名格式不合法：只允许中文、英文字母、数字和空格/连字符（长度为2-20字）！
+      ⚠️ 姓名格式不合法：只允许中文、英文字母和空格/连字符（长度为2-20字）！
     </div>
 
     <div v-if="regForm.selectedInterests.length === 0" class="warning-text">
@@ -209,15 +209,15 @@ const handleStudentSubmit = () => {
 .student-form-section {
   text-align: left;
 }
-.section-title { font-size: 12px; color: var(--accent-orange); margin: 8px 0 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.section-title { font-size: 12px; color: var(--color-accent); margin: 8px 0 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 .form-split-row { display: flex; gap: 20px; margin-bottom: 8px; }
 .form-left-col, .form-right-col { flex: 1; display: flex; flex-direction: column; gap: 6px; }
 .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
 .label-bold { font-size: 12.5px; font-weight: bold; line-height: 18px; display: block; }
 .form-group input {
-  background-color: rgba(0, 0, 0, 0.45);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
   border-radius: 8px;
   padding: 0 14px;
   font-size: 13px;
@@ -229,40 +229,38 @@ const handleStudentSubmit = () => {
 .form-group input:focus,
 .form-group input:focus-visible {
   outline: none !important;
-  border-color: var(--accent-orange) !important;
-  background-color: rgba(0, 0, 0, 0.6);
-  box-shadow: 0 0 10px rgba(253, 151, 31, 0.15);
+  border-color: var(--color-accent) !important;
+  background-color: var(--color-surface);
+  box-shadow: 0 0 10px var(--color-accent-orange-glow);
 }
 .avatar-picker-grid { display: flex; gap: 8px; flex-wrap: nowrap; justify-content: space-between; padding: 0; align-items: center; height: 38px; }
 .avatar-picker-btn {
-  width: 38px; height: 38px; border-radius: 50%; background: rgba(0,0,0,0.4);
-  border: 1px solid var(--border-color); font-size: 16px; display: flex;
+  width: 38px; height: 38px; border-radius: 50%; background: var(--color-surface-2);
+  border: 1px solid var(--color-border); font-size: 16px; display: flex;
   align-items: center; justify-content: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.avatar-picker-btn:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 2px; }
-.avatar-picker-btn:hover { border-color: var(--accent-orange); background-color: rgba(253,151,31,0.08); transform: translateY(-2px); }
-.avatar-active { border-color: var(--accent-orange) !important; background-color: rgba(253,151,31,0.15) !important; box-shadow: 0 0 10px var(--accent-orange-glow); transform: scale(1.05); }
-.live-identity-card { background-color: rgba(6,182,212,0.03); border: 1px solid rgba(6,182,212,0.15); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
-.live-identity-card h4 { font-size: 11px; margin: 0 0 8px 0; color: var(--accent-orange); text-transform: uppercase; letter-spacing: 0.5px; }
+.avatar-picker-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.avatar-picker-btn:hover { border-color: var(--color-accent); background-color: var(--color-social-active-bg); transform: translateY(-2px); }
+.avatar-active { border-color: var(--color-accent) !important; background-color: var(--color-social-active-bg) !important; box-shadow: 0 0 10px var(--color-social-active-border); transform: scale(1.05); }
+.live-identity-card { background-color: var(--color-admin-active-bg); border: 1px solid var(--color-admin-active-border); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
+.live-identity-card h4 { font-size: 11px; margin: 0 0 8px 0; color: var(--color-social-active-text); text-transform: uppercase; letter-spacing: 0.5px; }
 .live-card-body { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.live-avatar-preview { font-size: 32px; background-color: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
+.live-avatar-preview { font-size: 32px; background-color: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 8px; padding: 6px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
 .live-info-preview { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.live-name-preview { font-size: 13px; font-weight: bold; color: var(--text-primary); }
+.live-name-preview { font-size: 13px; font-weight: bold; color: var(--color-text); }
 .live-persona-preview { font-size: 11px; font-weight: bold; }
-.live-interests-preview { width: 100%; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 6px; }
-.preview-tag { background-color: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.2); color: #e0f7fa; font-size: 10px; padding: 1px 6px; border-radius: 12px; }
-.placeholder-text { font-size: 11px; color: var(--text-secondary); font-style: italic; }
+.live-interests-preview { width: 100%; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; border-top: 1px solid var(--color-border); padding-top: 6px; }
+.preview-tag { background-color: var(--color-admin-active-bg); border: 1px solid var(--color-admin-active-border); color: var(--color-admin-active-text); font-size: 10px; padding: 1px 6px; border-radius: 12px; }
+.placeholder-text { font-size: 11px; color: var(--color-subtext); font-style: italic; }
 .interests-picker-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-.picker-section h5 { font-size: 11.5px; color: var(--text-secondary); margin: 0 0 4px 0; border-left: 2px solid var(--accent-cyan); padding-left: 6px; }
+.picker-section h5 { font-size: 11.5px; color: var(--color-subtext); margin: 0 0 4px 0; border-left: 2px solid var(--color-accent-cyan); padding-left: 6px; }
 .tags-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-.interest-tag { background-color: rgba(255,255,255,0.02); border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 20px; padding: 5px 12px; font-size: 11px; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
-.interest-tag:hover { background-color: rgba(255,255,255,0.06); color: var(--text-primary); border-color: rgba(255,255,255,0.15); transform: translateY(-1.5px); }
-.tag-active { background-color: rgba(253,151,31,0.12) !important; border-color: rgba(253,151,31,0.45) !important; color: #ffe0b2 !important; box-shadow: 0 4px 12px rgba(253, 151, 31, 0.12); transform: translateY(-1.5px); }
-.warning-text { color: #f87171; font-size: 11px; margin-bottom: 6px; font-weight: bold; }
-.btn-primary { width: 100%; padding: 12px; font-size: 13px; background-color: rgba(253,151,31,0.1); border-color: rgba(253,151,31,0.3); color: #ffb74d; margin-top: 10px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-.btn-primary:hover:not(:disabled) { background-color: rgba(253,151,31,0.18); border-color: rgba(253,151,31,0.5); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(253, 151, 31, 0.15); }
-.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-.divider { border: 0; border-top: 1px solid var(--border-color); margin: 12px 0; }
+.interest-tag { background-color: var(--color-surface-2); border: 1px solid var(--color-border); color: var(--color-subtext); border-radius: 20px; padding: 5px 12px; font-size: 11px; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
+.interest-tag:hover { background-color: var(--color-muted); color: var(--color-text); border-color: var(--color-subtext); transform: translateY(-1.5px); }
+.tag-active { background-color: var(--buddy-node-student-bg) !important; border-color: var(--buddy-node-student-border) !important; color: var(--buddy-node-student-text) !important; box-shadow: 0 4px 12px var(--color-accent-orange-glow); transform: translateY(-1.5px); }
+.warning-text { color: var(--color-danger); font-size: 11px; margin-bottom: 6px; font-weight: bold; }
+.student-form-section .btn-primary { margin-top: 10px; padding: 12px; font-size: 13px; }
+.divider { border: 0; border-top: 1px solid var(--color-border); margin: 12px 0; }
 
 @media (max-width: 640px) {
   .form-split-row {

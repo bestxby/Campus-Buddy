@@ -108,14 +108,14 @@ const togglePromotion = (name: string) => {
   flex-direction: column;
   overflow: visible;
   height: 100%;
-  background: linear-gradient(180deg, rgba(18, 24, 38, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
+  background: var(--color-surface);
   padding: 12px 16px !important;
 }
 .col-header {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 4px;
   margin-bottom: 6px;
   flex-shrink: 0;
@@ -123,13 +123,13 @@ const togglePromotion = (name: string) => {
 .col-header h3 {
   font-size: 12px;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--color-text);
   font-weight: bold;
   text-align: left;
 }
 .col-header .header-sub {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   text-align: left;
 }
 .card-scroll-body {
@@ -147,8 +147,8 @@ const togglePromotion = (name: string) => {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  background: rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.02);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 4px 8px;
 }
@@ -160,22 +160,23 @@ const togglePromotion = (name: string) => {
 }
 .pop-rank {
   font-weight: 800;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   font-family: monospace;
 }
 .pop-name {
   flex: 1;
   text-align: left;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .pop-interest {
-  background-color: rgba(6, 182, 212, 0.06);
-  border: 1px solid rgba(6, 182, 212, 0.15);
-  color: #22d3ee;
+  background-color: var(--bg-sports);
+  border: 1px solid var(--color-sports);
+  border-color: rgba(6, 182, 212, 0.2);
+  color: var(--color-sports);
   padding: 1px 4px;
   border-radius: 4px;
   font-size: 10px;
@@ -196,21 +197,21 @@ const togglePromotion = (name: string) => {
 }
 .progress-bar-track {
   height: 4px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-color);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 2px;
   overflow: hidden;
 }
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1e3a8a 0%, #06b6d4 100%);
-  box-shadow: 0 0 6px rgba(6, 182, 212, 0.6);
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-sports) 100%);
+  box-shadow: 0 0 6px rgba(6, 182, 212, 0.3);
   border-radius: 2px;
   transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 .progress-value {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   font-weight: 600;
 }
 .action-btn {
@@ -220,8 +221,8 @@ const togglePromotion = (name: string) => {
   min-width: 70px;
 }
 .btn-promoted {
-  background-color: rgba(253, 151, 31, 0.12) !important;
-  border-color: rgba(253, 151, 31, 0.4) !important;
-  color: #ffb74d !important;
+  background-color: var(--bg-tech) !important;
+  border-color: var(--color-tech) !important;
+  color: var(--color-tech) !important;
 }
 </style>

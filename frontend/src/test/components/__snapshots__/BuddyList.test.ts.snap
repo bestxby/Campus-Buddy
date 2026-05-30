@@ -2,12 +2,12 @@
 
 exports[`BuddyList.vue > should render buddies list correctly matches snapshot 1`] = `
 "<div data-v-720877be="" class="card result-card">
-  <div data-v-720877be="" class="result-card-header">
-    <h3 data-v-720877be=""><svg data-v-720877be="" class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1px;">
-        <path data-v-720877be="" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-        <circle data-v-720877be="" cx="9" cy="7" r="4"></circle>
-        <path data-v-720877be="" d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-        <path data-v-720877be="" d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+  <div class="result-card-header" data-v-720877be="">
+    <h3 data-v-720877be=""><svg class="icon-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" data-v-720877be="">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" data-v-720877be=""></path>
+        <circle cx="9" cy="7" r="4" data-v-720877be=""></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" data-v-720877be=""></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" data-v-720877be=""></path>
       </svg> 兴趣契合的活动搭子 </h3>
   </div><!-- Shortest Path Finder (人脉搭桥) -->
   <!-- Shortest Path Finder (人脉搭桥) -->
@@ -22,7 +22,7 @@ exports[`BuddyList.vue > should render buddies list correctly matches snapshot 1
     <li data-v-720877be="" class="path-item">
       <div data-v-720877be="" class="buddy-row">
         <div data-v-720877be="" class="path-flow"><span data-v-720877be="" class="node student" title="Alice">Alice <!--v-if--></span><span data-v-720877be="" class="arrow">➔</span><span data-v-720877be="" class="node interest" title=""></span><span data-v-720877be="" class="arrow">➔</span><span data-v-720877be="" class="node student" title="Bob">Bob <!--v-if--></span></div><!-- Jaccard badge -->
-        <div data-v-720877be="" class="jaccard-badge" title="Jaccard 相似度: 67%"><span data-v-720877be="" class="jaccard-icon" style="display: inline-flex; align-items: center; color: var(--accent-orange);"><svg data-v-720877be="" class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><circle data-v-720877be="" cx="12" cy="12" r="10"></circle><circle data-v-720877be="" cx="12" cy="12" r="4"></circle></svg></span><span data-v-720877be="" class="jaccard-count">2个共同</span><span data-v-720877be="" class="jaccard-score">67%</span></div>
+        <div data-v-720877be="" class="jaccard-badge" title="Jaccard 相似度: 67%"><span data-v-720877be="" class="jaccard-icon" style="display: inline-flex; align-items: center; color: var(--color-accent);"><svg data-v-720877be="" class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><circle data-v-720877be="" cx="12" cy="12" r="10"></circle><circle data-v-720877be="" cx="12" cy="12" r="4"></circle></svg></span><span data-v-720877be="" class="jaccard-count">2个共同</span><span data-v-720877be="" class="jaccard-score">67%</span></div>
       </div>
     </li>
   </ul>

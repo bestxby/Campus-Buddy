@@ -1,4 +1,3 @@
-import { vi } from 'vitest'
 import { webcrypto } from 'node:crypto'
 
 // Polyfill webcrypto if not present

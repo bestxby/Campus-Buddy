@@ -119,14 +119,14 @@ watch(activeStudent, () => {
 <style scoped>
 .pathfinder-container {
   margin-bottom: 14px;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  border-bottom: 1px dashed var(--color-border);
   padding-bottom: 14px;
   position: relative;
 }
 .pathfinder-container h4 {
   font-size: 11px;
   margin: 0 0 8px 0;
-  color: var(--accent-orange);
+  color: var(--color-accent);
   text-transform: uppercase;
   letter-spacing: 0.3px;
   text-align: left;
@@ -138,16 +138,19 @@ watch(activeStudent, () => {
 }
 .pathfinder-input {
   flex: 1;
-  background: rgba(0,0,0,0.25);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
   border-radius: 4px;
   padding: 6px 10px;
   font-size: 11px;
   outline: none;
+  transition: all 0.2s ease;
 }
 .pathfinder-input:focus {
-  border-color: var(--accent-cyan);
+  border-color: var(--color-accent-cyan);
+  background-color: var(--color-surface);
+  box-shadow: 0 0 8px var(--color-accent-cyan-glow);
 }
 .path-sug-dropdown {
   position: absolute;
@@ -155,9 +158,9 @@ watch(activeStudent, () => {
   left: 0;
   right: 0;
   z-index: 20;
-  background-color: var(--panel-bg);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-  border: 1px solid var(--border-color);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
   padding: 4px 0;
   border-radius: 4px;
 }
@@ -166,16 +169,17 @@ watch(activeStudent, () => {
   font-size: 11px;
   cursor: pointer;
   text-align: left;
+  color: var(--color-text);
 }
 .path-sug-item:hover {
-  background-color: rgba(255,255,255,0.04);
-  color: var(--accent-cyan);
+  background-color: var(--color-muted);
+  color: var(--color-accent-cyan);
 }
 .pathfinder-result {
   margin-top: 8px;
   padding: 8px 10px !important;
-  background: rgba(253, 151, 31, 0.02) !important;
-  border: 1px solid rgba(253,151,31,0.1) !important;
+  background: var(--color-social-active-bg) !important;
+  border: 1px solid var(--color-social-active-border) !important;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -187,27 +191,27 @@ watch(activeStudent, () => {
   align-items: center;
   font-size: 10.5px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-text);
 }
 .path-clear-btn {
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   font-size: 10px;
   cursor: pointer;
 }
 .path-clear-btn:hover {
-  color: #ef4444;
+  color: var(--color-danger);
 }
 .pathfinder-flow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 4px;
-  background: rgba(0,0,0,0.2);
+  background: var(--color-surface-2);
   padding: 6px;
   border-radius: 4px;
-  border: 1px solid rgba(255,255,255,0.02);
+  border: 1px solid var(--color-border);
 }
 .pathfinder-node {
   font-size: 10px;
@@ -216,17 +220,17 @@ watch(activeStudent, () => {
   font-weight: 600;
 }
 .node-person {
-  background-color: rgba(168,85,247,0.12);
-  border: 1px solid rgba(168,85,247,0.25);
-  color: #e9d5ff;
+  background-color: var(--buddy-node-student-bg);
+  border: 1px solid var(--buddy-node-student-border);
+  color: var(--buddy-node-student-text);
 }
 .node-link {
-  background-color: rgba(59,130,246,0.12);
-  border: 1px solid rgba(59,130,246,0.2);
-  color: #93c5fd;
+  background-color: var(--buddy-node-interest-bg);
+  border: 1px solid var(--buddy-node-interest-border);
+  color: var(--buddy-node-interest-text);
 }
 .pathfinder-arrow {
-  color: var(--text-secondary);
+  color: var(--color-subtext);
   font-size: 10px;
   font-weight: bold;
 }
@@ -238,7 +242,7 @@ watch(activeStudent, () => {
 }
 .pathfinder-error {
   font-size: 10px;
-  color: #f87171;
+  color: var(--color-danger);
   text-align: left;
   margin-top: 6px;
   font-weight: bold;

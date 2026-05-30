@@ -49,7 +49,7 @@ def main():
     # Compile the verification report
     reports = [
         os.path.join(root_dir, "system_verification_report.md"),
-        r"C:\Users\24740\.gemini\antigravity-ide\brain\0aa6c2f6-5066-4980-9111-fdad82b33925\system_verification_report.md"
+        r"C:\Users\24740\.gemini\antigravity-ide\brain\35b53b9a-4027-48b0-9c64-e47a6a1eead0\system_verification_report.md"
     ]
     
     for report_path in reports:
@@ -81,7 +81,7 @@ def main():
                 f.write("## 2. 后端算法测试细节\n\n")
                 if py_res["returncode"] == 0:
                     f.write("> [!TIP]\n")
-                    f.write("> 所有 21 个 Python 测试用例全部通过，其中包含推荐性能压测及边界条件过滤校验。\n\n")
+                    f.write("> 所有 23 个 Python 测试用例全部通过，其中包含推荐性能压测及边界条件过滤校验。\n\n")
                 else:
                     f.write("> [!CAUTION]\n")
                     f.write("> 后端算法测试未通过！请参见下方错误日志：\n\n")
@@ -96,7 +96,7 @@ def main():
                 f.write("## 3. 前端组件测试细节\n\n")
                 if vitest_res["returncode"] == 0:
                     f.write("> [!TIP]\n")
-                    f.write("> 所有 26 个 Vitest 测试用例全部通过，页面交互和状态机表现正常。\n\n")
+                    f.write("> 所有 70 个 Vitest 测试用例全部通过，页面交互和状态机表现正常。\n\n")
                 else:
                     f.write("> [!CAUTION]\n")
                     f.write("> 前端测试未通过！请参见下方错误日志：\n\n")

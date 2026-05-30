@@ -9,7 +9,7 @@
       社交破冰小贴士
     </div>
     <div class="tip-content" style="display: flex; align-items: flex-start; gap: 6px;">
-      <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--accent-orange)" stroke-width="2" style="margin-top: 2px;">
+      <svg class="icon-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--color-accent)" stroke-width="2" style="margin-top: 2px;">
         <path d="M9 18h6"></path>
         <path d="M10 22h4"></path>
         <path d="M15.09 14c.18-.33.3-.68.37-1.04A5 5 0 0 0 16 9a5 5 0 0 0-10 0 5 5 0 0 0 .54 2.96c.07.36.19.7.37 1.04l1.59 2h7l1.59-2z"></path>
@@ -58,41 +58,40 @@ const tipData = computed(() => {
 
 <style scoped>
 .sidebar-icebreaker-panel {
-  margin: 10px 10px 0;
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 0 10px; /* top margin handled by sidebar gap:8px */
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 12px;
   flex-shrink: 0;
   box-sizing: border-box;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
 .sidebar-icebreaker-panel:hover {
-  background: rgba(255, 255, 255, 0.035);
-  border-color: rgba(253, 151, 31, 0.25);
+  border-color: var(--color-accent);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 8px rgba(253, 151, 31, 0.04);
+  box-shadow: 0 4px 16px rgba(217, 110, 72, 0.10), 0 1px 4px rgba(0,0,0,0.05);
 }
 .panel-title {
   font-size: 11.5px;
   font-weight: 800;
   letter-spacing: 0.8px;
-  color: #ffb74d;
+  color: var(--color-accent);
   margin-bottom: 8px;
   text-transform: uppercase;
 }
 .tip-content {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--color-text);
   line-height: 1.5;
   text-align: left;
 }
 .highlight-buddy {
-  color: var(--accent-orange);
+  color: var(--color-accent);
   font-weight: bold;
 }
 .highlight-interest {
-  color: #22d3ee;
+  color: var(--color-sports);
   font-weight: bold;
 }
 .fade-enter-active,

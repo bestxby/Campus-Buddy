@@ -20,11 +20,20 @@ export class AdjacencyMatrixRenderer {
   private scrollLeft: number = 0
   private maxScrollLeft: number = 0
   private isDraggingScrollbar: boolean = false
+  private isDraggingHScrollbar: boolean = false
+  private hoveredVScrollbar: boolean = false
+  private hoveredHScrollbar: boolean = false
   private hoveredRowIdx: number | null = null
   private hoveredColIdx: number | null = null
 
   private scrollbarWidth: number = 14
   private interactionHandler: MatrixInteractionHandler
+
+  private onThemeChanged = () => {
+    requestAnimationFrame(() => {
+      this.redraw()
+    })
+  }
 
   constructor(canvasElement: HTMLCanvasElement, callbacks: MatrixCallbacks = {}) {
     this.canvasElement = canvasElement
@@ -46,7 +55,27 @@ export class AdjacencyMatrixRenderer {
         getScrollLeft: () => this.scrollLeft,
         setScrollLeft: (val) => { this.scrollLeft = val },
         isDraggingScrollbar: () => this.isDraggingScrollbar,
-        setDraggingScrollbar: (val) => { this.isDraggingScrollbar = val },
+        setDraggingScrollbar: (val) => {
+          this.isDraggingScrollbar = val
+          this.redraw()
+        },
+        isDraggingHScrollbar: () => this.isDraggingHScrollbar,
+        setDraggingHScrollbar: (val) => {
+          this.isDraggingHScrollbar = val
+          this.redraw()
+        },
+        setHoveredVScrollbar: (val) => {
+          if (this.hoveredVScrollbar !== val) {
+            this.hoveredVScrollbar = val
+            this.redraw()
+          }
+        },
+        setHoveredHScrollbar: (val) => {
+          if (this.hoveredHScrollbar !== val) {
+            this.hoveredHScrollbar = val
+            this.redraw()
+          }
+        },
         getHoveredState: () => ({ rowIdx: this.hoveredRowIdx, colIdx: this.hoveredColIdx }),
         setHoveredState: (rowIdx, colIdx) => {
           this.hoveredRowIdx = rowIdx
@@ -55,9 +84,11 @@ export class AdjacencyMatrixRenderer {
       },
       this.scrollbarWidth
     )
+    window.addEventListener('theme-changed', this.onThemeChanged)
   }
 
   public destroy() {
+    window.removeEventListener('theme-changed', this.onThemeChanged)
     this.interactionHandler.destroy()
     this.currentConfig = null
   }
@@ -136,6 +167,9 @@ export class AdjacencyMatrixRenderer {
       this.scrollLeft,
       this.maxScrollLeft,
       this.isDraggingScrollbar,
+      this.isDraggingHScrollbar,
+      this.hoveredVScrollbar,
+      this.hoveredHScrollbar,
       this.hoveredRowIdx,
       this.hoveredColIdx,
       this.scrollbarWidth

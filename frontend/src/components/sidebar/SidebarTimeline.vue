@@ -45,8 +45,8 @@ const handleCancel = (activity: string) => {
 </script>
 
 <style scoped>
-.activities-timeline-panel { margin: 10px 10px 0; background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; flex-shrink: 0; }
-.timeline-title { font-size: 11.5px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #34d399; margin-bottom: 10px; }
+.activities-timeline-panel { margin: 0 10px; background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 10px; padding: 12px; flex-shrink: 0; }
+.timeline-title { font-size: 11.5px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: var(--color-social); margin-bottom: 10px; }
 .timeline-list { display: flex; flex-direction: column; gap: 0; }
 .timeline-item {
   display: flex;
@@ -59,24 +59,24 @@ const handleCancel = (activity: string) => {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .timeline-item:last-child { padding-bottom: 4px; }
-.timeline-item:not(:last-child)::after { content: ''; position: absolute; left: 9px; top: 16px; bottom: 0; width: 1px; background: linear-gradient(180deg, rgba(52,211,153,0.3), transparent); }
+.timeline-item:not(:last-child)::after { content: ''; position: absolute; left: 9px; top: 16px; bottom: 0; width: 1px; background: linear-gradient(180deg, var(--color-social), transparent); opacity: 0.4; }
 .timeline-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--color-surface);
 }
 .timeline-item:hover .timeline-dot {
   transform: scale(1.3);
-  box-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+  box-shadow: 0 0 6px var(--color-social);
 }
 .timeline-item:hover .timeline-act-name {
-  color: var(--text-primary);
+  color: var(--color-text);
 }
-.timeline-dot { width: 6px; height: 6px; border-radius: 50%; background: #34d399; flex-shrink: 0; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-.timeline-act-name { font-size: 11px; color: rgba(255,255,255,0.85); line-height: 1.4; flex: 1; text-align: left; transition: color 0.25s ease; }
-.timeline-empty { font-size: 11px; color: rgba(255,255,255,0.25); text-align: center; padding: 8px 0; }
+.timeline-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-social); flex-shrink: 0; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+.timeline-act-name { font-size: 11px; color: var(--color-text); line-height: 1.4; flex: 1; text-align: left; transition: color 0.25s ease; }
+.timeline-empty { font-size: 11px; color: var(--color-subtext); text-align: center; padding: 8px 0; }
 .timeline-cancel-btn {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #f87171;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  color: var(--color-danger);
   border-radius: 4px;
   font-size: 10px;
   padding: 2px 6px;
@@ -87,7 +87,8 @@ const handleCancel = (activity: string) => {
   font-family: inherit;
 }
 .timeline-cancel-btn:hover {
-  background: rgba(239, 68, 68, 0.18);
-  border-color: rgba(239, 68, 68, 0.45);
+  background: var(--color-danger);
+  color: var(--color-surface);
+  border-color: var(--color-danger);
 }
 </style>
