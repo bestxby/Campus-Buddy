@@ -4,6 +4,7 @@ import type { MatchedFriend, PathResult } from '@/types'
 import { useGraphStore } from '@/stores/graph'
 import { nodeKey } from '@/composables/useGraph'
 import { getActivePinia } from 'pinia'
+import { INTEREST_CATEGORIES } from '@/constants/interests'
 
 // Helper function to safely fetch from store without throwing when Pinia is unmounted (e.g. in tests)
 function getStoreSafe<T>(cb: () => T, fallback: T): T {
@@ -149,16 +150,37 @@ export const filteredActivitiesGrouped = computed((): Record<string, string[]> =
   const sNode = nodeKey('student', activeStudent.value)
   const sInterests = Array.from(graphStore.graph.get(sNode) ?? [])
     .filter(n => n.startsWith('interest:'))
-  
+
+  // Build student domain set for fallback
+  const getDomain = (name: string): string | null => {
+    for (const [domain, tags] of Object.entries(INTEREST_CATEGORIES)) {
+      if (tags.includes(name)) return domain
+    }
+    return null
+  }
+  const sDomains = new Set(sInterests.map(i => getDomain(i.replace('interest:', ''))).filter(Boolean))
+
   for (const act of recommendations.value.activities) {
     const oNode = nodeKey('activity', act)
     const oInterests = new Set(
       Array.from(graphStore.graph.get(oNode) ?? [])
         .filter(n => n.startsWith('interest:'))
     )
+    // Try exact interest match first
     const match = sInterests.find(x => oInterests.has(x))
-    const interest = match ? match.replace('interest:', '') : ''
-    
+    let interest = match ? match.replace('interest:', '') : ''
+
+    // Domain-level fallback
+    if (!interest) {
+      for (const oInt of oInterests) {
+        const oDomain = getDomain(oInt.replace('interest:', ''))
+        if (oDomain && sDomains.has(oDomain)) {
+          interest = `[${oDomain}]`
+          break
+        }
+      }
+    }
+
     if (activeFilter.value === '全部' || interest === activeFilter.value) {
       if (!groups[interest]) groups[interest] = []
       groups[interest].push(act)

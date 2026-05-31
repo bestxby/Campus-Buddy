@@ -1,347 +1,244 @@
-# 🧭 Campus Buddy: 校园社交拓扑网络与智能匹配系统
+# 🧭 Campus Buddy v4.0.0 — 校园社交拓扑网络与智能匹配系统
 
 > 🌐 **在线演示**: [https://bestxby.github.io/Campus-Buddy/](https://bestxby.github.io/Campus-Buddy/)
-> 
-> 🧪 **测试覆盖率**: 70/70 前端 Vitest 通过, 23/23 后端 Pytest 通过, Vue-tsc 编译 0 报错
+>
+> 🧪 **测试覆盖率**: 70/70 前端 Vitest 通过 · 23/23 后端 Pytest 通过 · Vue-tsc 编译零报错
 
-`Campus Buddy` 是一个基于图数据结构（Graph Data Structure）的高性能校园社交与活动匹配推荐系统。本项目支持 **1,500+ 学生、30 种兴趣标签、100 个校园活动**的大规模数据关联，提供命令行 MVP 工具与基于 **Vue 3 + D3.js + TypeScript** 开发的极客霓虹感（Sleek Slate & Neon）现代化可视化 Web 交互面板。
+`Campus Buddy` 是一个基于**图数据结构**的高性能校园社交与活动匹配推荐系统。支持 **1,500+ 学生、30+ 种兴趣标签、100 个校园活动**的大规模数据关联，提供命令行 MVP 工具与基于 **Vue 3 + D3.js + TypeScript** 开发的现代化可视化 Web 交互面板。
 
-项目完全适配 **GitHub Pages 静态托管**，前端采用**模块化面向对象领域服务架构**（OOP Domain Services + Canvas Painter Separation + Facade Composables），提供 60FPS 丝滑的 ego-network 拓扑图与邻接矩阵性能体验。
+项目完全适配 **GitHub Pages 静态托管**，前端采用**模块化面向对象领域服务架构**，提供 60FPS 丝滑的拓扑图与邻接矩阵交互体验。
 
 ---
 
-## 📖 设计思路与算法架构
+## ✨ 核心功能
 
-本项目的核心是一个**异构无向图（Heterogeneous Undirected Graph）**。通过将不同类型的实体抽象为节点，并用关联边连接，编织成一张校园人脉关系网络：
+### 🎓 学生端
+
+| 功能 | 说明 |
+|------|------|
+| **智能活动推荐** | 基于双跳 BFS 路径穿透 + Jaccard 相似度，按兴趣匹配度排序推荐校园活动 |
+| **搭子匹配** | 自动寻找拥有共同兴趣的同学，按 Jaccard 系数降序排列，量化兴趣重合度 |
+| **社交画像** | 登录时选择兴趣标签，系统自动生成社交画像（运动健将 / 文艺青年 / 科技极客 / 社交达人 / 斜杠青年） |
+| **隐私模式** | 开启后不被推荐给他人，BFS 寻路自动绕道保护 |
+| **达人模式** | 开启后获得 1.3× 相似度加成，优先被推荐给有共同兴趣的同学 |
+| **多格式报告导出** | 支持 Markdown / 离线 HTML / PDF / PNG 海报四种格式一键导出个性化匹配报告 |
+| **活动报名** | 浏览全部活动，一键报名，状态实时同步到推荐系统 |
+
+### 🔧 管理员端
+
+| 功能 | 说明 |
+|------|------|
+| **邻接矩阵分析** | 学生×兴趣、兴趣×兴趣共现、学生×活动三种维度的全屏交互式矩阵 |
+| **社群划分** | 基于连通分量算法自动识别独立社群圈子，环形图可视化展示 |
+| **中心性分析** | 度中心性（社交达人）与介数中心性（跨界桥梁）实时计算 |
+| **孤立学生诊断** | 自动检测社交孤立学生，提供兴趣圈 / 社交达人 / 热门活动三种桥接方案 |
+| **活动管理** | 发布新活动、创建新兴趣标签，支持定向推广 |
+| **系统日志** | 实时记录所有操作与网络变化 |
+
+---
+
+## 🧠 算法架构
+
+本项目的核心是一个**异构无向图（Heterogeneous Undirected Graph）**：
 
 ```mermaid
 graph TD
-    subgraph node_types ["节点类型"]
-        S[学生节点 student:姓名]
-        I[兴趣节点 interest:名称]
-        A[活动节点 activity:名称]
-    end
-
-    S -- 兴趣归属 (1跳) --> I
-    A -- 兴趣分类 (1跳) --> I
-    S -- 活动报名 (1跳) --> A
+    S[🧑‍🎓 学生节点] -- 兴趣归属 --> I[🏷️ 兴趣节点]
+    A[🎯 活动节点] -- 兴趣分类 --> I
+    S -- 活动报名 --> A
 ```
 
-### 1. 核心图算法设计
+### 核心算法
 
-* **双跳路径穿透推荐（2-Hop BFS Recommendations）**：
-  * **活动匹配**：从给定学生节点出发，搜索其关联的所有兴趣节点（1跳），再由兴趣节点搜索关联的所有校园活动（2跳）。路径为 `Student -> Interest -> Activity`，返回去重并按报名热度排序的推荐活动。
-  * **搭子匹配**：同样通过两步搜索，寻找拥有共同兴趣的其他同学：`Student -> Interest -> Other Student`，排除学生自身。
-* **Jaccard 相似度搭子排序（Jaccard Similarity Ranking）**：
-  * 对搭子匹配结果按 Jaccard 系数降序排列，量化两人兴趣圈的重合程度：
-    $$J(A, B) = \frac{|Interests_A \cap Interests_B|}{|Interests_A \cup Interests_B|}$$
-  * **社交特权模式 (Social Boost)**：开启社交达人/社交模式的学生会获得 $1.3\times$ 的相似度加成，上限为数学极限值 `1.0`。该算法确保了即使被 boost 后，原本满分（1.0）的匹配也不会降级，保证了排名的逻辑正确性。
-* **BFS 隐私保护最短路径查找（Shortest Path via BFS & Privacy Filter）**：
-  * 实现了任意两个学生节点之间的 BFS 最短路径搜索（使用 **parent-map 回溯法**，空间复杂度 $O(V)$），展示跨兴趣圈人脉路径。
-  * **隐私过滤**：在寻路过程中，系统在 **TypeScript** 和 **Python** 两端同步实现了严格的**隐私过滤算法**。如果路径中的中间节点包含开启了隐私模式（`isPrivate`）的学生，则会自动绕道或跳过该路径；如果终点学生为隐私模式，则直接拒绝返回路径，从而在算法底层切实保护了用户隐私安全。
-* **社区划分与指标分析（Connected Components & Network Metrics）**：
-  * **连通社群划分**：使用 BFS 遍历全图，识别出相互独立的极大连通子图（社群圈子），并在前端以美观的环状比例图和信息卡片展示。
-  * **网络指标分析**：实时计算网络密度（Density）、聚类系数（Clustering Coefficient）以及平均路径长度（Average Path Length），帮助管理员把控网络健康度。
-  * **度中心性与介数中心性**：计算节点的关联度数（Degree Centrality）和最短路径通过频次（Betweenness Centrality），精确诊断出校园社交达人（Influencers）和跨界中介纽带（Bridges）。
+| 算法 | 复杂度 | 说明 |
+|------|--------|------|
+| **双跳 BFS 推荐** | O(V+E) | `Student → Interest → Activity`，返回去重并按热度排序的推荐活动 |
+| **Jaccard 相似度** | O(n·m) | $J(A,B) = \frac{\|I_A \cap I_B\|}{\|I_A \cup I_B\|}$，量化两人兴趣重合度 |
+| **领域级兜底推荐** | O(V) | 当新兴趣标签无人选定时，按归属领域（运动/艺术/科技/社交）匹配推荐 |
+| **BFS 最短路径** | O(V+E) | parent-map 回溯法，支持隐私过滤绕道 |
+| **连通分量** | O(V+E) | BFS 遍历识别极大连通子图 |
+| **度中心性** | O(V) | 统计节点关联边数 |
+| **介数中心性** | O(V·E) | 统计最短路径通过频次 |
+| **社交达人加成** | O(1) | Jaccard × 1.3，上限 1.0 |
 
 ---
 
-## 🏗️ 软件架构设计 (OOP Domain Services)
-
-为应对前端业务规模的扩大，系统进行了一次彻底的**架构解耦重构**，从原先的平铺逻辑升级为了面向对象领域服务架构，确保所有组件代码在 **300 行以内**：
+## 🏗️ 软件架构
 
 ```mermaid
 graph TD
-    %% Python Backend Data Processing
-    subgraph python_backend ["Python Backend (Data Layer)"]
-        GMD[generate_mock_data.py] -->|1. 生成 CSV| CSV[data/*.csv]
-        CSV -->|2. 加载与分析| CBP[campus_buddy.py]
-        CSV -->|3. 导出图结构| EGJ[export_graph_to_json.py]
-        EGJ -->|4. 存储静态 JSON 库| GJSON[frontend/public/graph_data.json]
-        
-        CBP -->|交互终端 MVP| IAPP[interactive_app.py]
-        CBP -->|经典演示 MVP| DR[demo_runner.py]
-        CBP -->|单元测试| TCB[test_campus_buddy.py]
+    subgraph backend ["🐍 Python 后端"]
+        GMD[generate_mock_data.py] --> CSV[data/*.csv]
+        CSV --> CBP[campus_buddy.py]
+        CSV --> EGJ[export_graph_to_json.py]
+        EGJ --> GJSON[graph_data.json]
     end
 
-    %% Frontend Layered Architecture
-    subgraph frontend_client ["Frontend Client (Vue 3 Client App)"]
-        GJSON -->|1. Fetch 加载| GStore[stores/graph.ts]
-        
-        subgraph stores ["Stores (Pinia 状态存储层)"]
-            GStore
-            AStore[stores/auth.ts]
-            RStore[stores/recommendation.ts]
-            LStore[stores/log.ts]
-        end
-        
-        subgraph composables ["Composables (Facade 外观适配层)"]
-            UC[useGraph.ts]
-            UA[useAuth.ts]
-            UR[useRecommendations.ts]
-            UL[useLogs.ts]
-        end
-        
-        AStore <--> UA
-        GStore <--> UC
-        RStore <--> UR
-        LStore <--> UL
-        
-        subgraph domain_services ["Domain Services (领域服务 & Painter 渲染器)"]
-            FGR[ForceGraphRenderer.ts] -->|物理仿真 & 拖动交互| FGCP[ForceGraphCanvasPainter.ts]
-            AMR[AdjacencyMatrixRenderer.ts] -->|手势处理| AMP[AdjacencyMatrixPainter.ts]
-            GAS[GraphAnalyticsService.ts] -->|后台诊断计算| GStore
-            LPE[LoadingParticleEngine.ts] -->|离子流动| LoginOverlay
-        end
-        
-        subgraph pure_utilities ["Pure Utilities (无状态图论算法纯函数)"]
-            GA[graph-algorithms.ts] -->|Jaccard & BFS 寻路| UR
-            GM[graph-metrics*.ts] -->|中心性 & 密度系数| GAS
-        end
-        
-        subgraph ui_components ["UI Components (Vue 组件层)"]
-            LoginOverlay[components/LoginOverlay.vue]
-            AppSidebar[components/AppSidebar.vue]
-            GraphModal[components/GraphModal.vue]
-            AdminDashboard[components/AdminDashboard.vue]
-        end
-        
-        UC --> ui_components
-        UA --> ui_components
-        UR --> ui_components
-        UL --> ui_components
-        
-        ui_components --> FGR
-        ui_components --> AMR
+    subgraph frontend ["⚡ Vue 3 前端"]
+        GJSON --> GStore[Pinia Stores]
+        GStore --> Composables[Composables]
+        Composables --> Services[Domain Services]
+        Services --> Components[UI Components]
+        Services --> Canvas[Canvas Painters]
     end
 ```
 
-1. **Painter 像素渲染器分离**：
-   - 将 Canvas 底层的绘图细节提取为独立的 `ForceGraphCanvasPainter` 和 `AdjacencyMatrixPainter`，使 `ForceGraphRenderer` 和 `AdjacencyMatrixRenderer` 只专注于事件监听、D3 Simulation 状态机管理与物理引擎微调。
-2. **纯算法函数解耦**：
-   - 将所有图论分析算法从 Service 中剥离为 `graph-metrics.ts` 中的 Stateless Pure Functions，方便在无 DOM 依赖下进行单元测试。
-3. **样式表分离 (CSS Isolation)**：
-   - 将 Vue 单文件组件（SFC）中庞大的样式块抽离成同级的 `.css` 文件，并利用 `<style scoped src="./App.css"></style>` 引入，在降低单个文件行数的同时，保障了样式的局部隔离性。
+**架构分层：**
+- **Stores (Pinia)**: 状态管理 — `graph.ts` / `auth.ts` / `recommendation.ts` / `log.ts`
+- **Composables**: Facade 外观适配层，隔离响应式 ref 与底层 Service
+- **Services**: OOP 领域服务 — 物理引擎、矩阵渲染、数据分析
+- **Utils**: 无状态纯函数 — 图论算法、报告生成、Canvas 海报
+- **Components**: Vue 纯渲染组件层
 
 ---
 
-## ⚡ 性能优化与技术亮点
+## 🛠️ 技术栈
 
-* **无刷新 SPA 路由跳转 (Zero-Flicker SPA Router Migration)**：全面重构页面跳转机制，使用 Vue Router `router.push` 和 `<router-link>` 替代原生 `<a>` 标签与 `window.location`，彻底解决页面切换时的“白屏闪烁”和“页面硬刷新”问题，维持 Vue 实例和全局状态的持续挂载。
-* **底层 IndexedDB 异步数据库迁移 (IndexedDB Persistence)**：针对自定义兴趣、自定义活动和报名表数据可能溢出 5MB 限制以及同步 JSON 读写阻塞主线程的问题，将底层持久化层从 `localStorage` 全面升级为基于 Promise 异步事务的 `IndexedDB`（使用全局单例 `graphDb`）。同时在 headless 单测环境中自动切换为高效的同步内存 Map 结构，保障开发与测试流程的高度一致与高健壮性。
-* **四叉树 (d3.quadtree) 空间分割命中检测优化 (Canvas Quadtree Optimization)**：为了消除高频 `mousemove` 命中检测带来的 $O(N)$ 线性距离平方计算瓶颈，在力导向渲染 tick 流程中实时构建二维空间分割四叉树，将缩放、拖拽和悬停的节点检测开销降到 $O(\log N)$。保证在大规模图谱和移动端设备下也有稳定的 60FPS 画布帧率。
-* **离线 SVG 交互式矢量报告 (Scalable SVG Report Exporter)**：导出的 HTML 报告中，人脉网络拓扑图全面重写为响应式 `<svg>` 矢量结构，支持无损缩放和高保真局部排版打印。通过 vanilla 鼠标事件及 CSS 过渡样式实现了极低渲染开销的悬停高亮、连线发光及动态卡片式 Tooltip。
-* **响应式邻接矩阵与双向触控滚动 (Responsive Matrix & Bidirectional Touch Scrolling)**：针对移动端小屏幕展示密集矩阵（30 兴趣 / 100 活动）时的挤压遮挡问题，设计并实现了基于 Canvas 的视口平移 Interaction Handler。设置单元格最小宽度 `28px`，引入 X/Y 双向触控滑动（Touch Pan Tracking）与 Shift+Wheel 横向滚动，并在底部动态渲染微型滚动条，确保在移动端也能流畅、清晰地交互 and 阅读海量拓扑关联。
-* **局部自我聚焦子图 (Ego Network)**：避免直接在前端绘制包含 1,500+ 节点和千条边的全局大图，当选择特定学生时，仅抓取其 2跳 范围内的聚焦子图（节点数 15~35 个），实现 60FPS 丝滑的拓扑图拖拽和缩放体验。
-* **LOD（Level of Detail）视口文字剔除**：在 Canvas 渲染层，根据视口缩放比例自动隐藏过小的文字标签，减少每帧文字绘制的重绘开销。
-* **Session 动态随机种子**：在 [stores/graph.ts](file:///e:/学习/大二下课程/数据结构与算法/数据结构大作业/Campus-Buddy/frontend/src/stores/graph.ts) 和 [utils/graph-metrics.ts](file:///e:/学习/大二下课程/数据结构与算法/数据结构大作业/Campus-Buddy/frontend/src/utils/graph-metrics.ts) 中设计了页面级的随机种子：每次页面加载或管理员点击“重置数据”时刷新，但在同一个页面周期内保持稳定。既保证了刷新的新颖性，又杜绝了因局部状态更新导致 UI 拓扑图或指标发生震荡跳变。
-* **健壮的节点名解析**：在 [ForceGraphDataBuilder.ts](file:///e:/学习/大二下课程/数据结构与算法/数据结构大作业/Campus-Buddy/frontend/src/services/ForceGraphDataBuilder.ts) 中将提取 subName 的切分方法升级为 substring 机制，即使节点名称本身包含冒号（如 `student:张三:计算机`），也能够完整保留而不被错误截断。
-* **全能画像 tie-breaker**：在 [auth-helpers.ts](file:///e:/学习/大二下课程/数据结构与算法/数据结构大作业/Campus-Buddy/frontend/src/utils/auth-helpers.ts) 中优化了画像判定算法，当并列最高兴趣域的数量大于 1 时，返回全新的 **“斜杠青年”**（Slash Youth）角色，彻底消除了原先判定时总是偏向 `tech`（科技极客）维度的程序偏置。
-* **无冲突递增 Log ID**：操作日志 ID 生成摒弃了 `Math.random`，改用内部 `idCounter` 递增方式，确保了日志 ID 的唯一性与确定性。
-
----
-
-## 📁 项目文件结构
-
-```text
-Campus-Buddy/
-├── data/                             # 模拟生成的 CSV 数据集（学生、兴趣、活动注册）
-│   ├── student_interests.csv
-│   ├── student_registrations.csv
-│   └── activity_interests.csv
-├── design-system/                    # 项目设计系统与规范文档
-│   └── campus-buddy/
-│       └── MASTER.md
-├── campus_buddy.py                   # Python 核心图算法（BFS寻路、Jaccard相似度、最短路径、连通分量）
-├── demo_runner.py                    # Python 控制台版经典推荐算法演示入口
-├── interactive_app.py                # Python 命令行交互式数据检索与推荐系统
-├── generate_mock_data.py             # 随机 mock 数据生成脚本（生成 1500+ 学生，30 种兴趣，100 个活动）
-├── export_graph_to_json.py           # 关系图数据导出器（将 CSV 数据打包并导出为前端静态 JSON 数据库）
-├── test_campus_buddy.py              # Pytest 单元测试（验证 BFS 最短路径、隐私过滤、连通分量等）
-├── test_python_scripts.py            # Pytest 单元测试（验证辅助脚本）
-├── verify_project.py                 # 项目完整性校验运行器
-├── system_verification_report.md     # 自动生成的系统校验报告
-├── requirements.txt                  # Python 依赖库
-├── .gitignore                        # Git 忽略配置
-└── frontend/                         # Vue 3 + TypeScript Sleek Slate & Neon 霓虹感前端
-    ├── package.json                  # 前端依赖与 npm scripts
-    ├── tsconfig.json                 # TypeScript 编译器配置
-    ├── vite.config.ts                # Vite 编译与开发服务器配置
-    ├── index.html                    # 单页应用入口 HTML
-    ├── public/
-    │   └── graph_data.json           # 供前端运行时加载的静态图数据库
-    └── src/
-        ├── main.ts                   # 前端应用入口文件
-        ├── env.d.ts                  # Vue 单文件组件声明
-        ├── App.vue                   # 主页面布局编排组件
-        ├── App.css                   # 主页面局部的布局样式表
-        ├── style.css                 # 全局 Slate & Neon 设计系统样式与变量
-        ├── types/
-        │   └── index.ts              # 统一的 TypeScript 类型与接口定义
-        ├── constants/
-        │   └── interests.ts          # 静态兴趣分类常量表
-        ├── stores/                   # Pinia 状态管理层
-        │   ├── auth.ts               # 个人登录、画像选择与隐私模式状态
-        │   ├── graph.ts              # 图数据结构、增量节点添加、随机种子状态
-        │   ├── log.ts                # 递增的系统操作日志存储
-        │   └── recommendation.ts     # Jaccard 相似度匹配与寻路推荐结果缓存
-        ├── composables/              # Facade 外观适配层（隔离 Vue 响应式 ref 与底层 Service）
-        │   ├── useAuth.ts
-        │   ├── useGraph.ts
-        │   ├── useGraphInsights.ts
-        │   ├── useLogs.ts
-        │   └── useRecommendations.ts
-        ├── services/                 # OOP 领域服务与 Canvas 像素渲染器
-        │   ├── ForceGraphRenderer.ts        # D3.js 仿真物理引擎状态机管理器
-        │   ├── ForceGraphCanvasPainter.ts   # D3 拓扑图 Canvas 像素绘制器
-        │   ├── ForceGraphPhysics.ts         # D3 拓扑物理布局参数配置
-        │   ├── ForceGraphTooltipHelper.ts    # 悬浮节点 Tooltip 细节渲染器
-        │   ├── AdjacencyMatrixRenderer.ts   # 邻接矩阵视口平移与触控手势管理器
-        │   ├── AdjacencyMatrixPainter.ts    # 邻接矩阵 Canvas 像素绘制器
-        │   ├── MatrixLayoutCalculator.ts    # 邻接矩阵坐标网格布局计算器
-        │   ├── MatrixInteractionHandler.ts  # 邻接矩阵双向触控滚动与拖动处理器
-        │   ├── GraphAnalyticsService.ts     # 网页端大屏数据统计与指标分析服务
-        │   ├── ForceGraphDataBuilder.ts     # Ego Network 局部聚焦子图过滤生成器
-        │   └── LoadingParticleEngine.ts     # 登录等待界面的霓虹离子特效引擎
-        ├── utils/                    # Stateless Pure Functions (纯图论算法与辅助工具)
-        │   ├── auth-helpers.ts              # 管理员登录及全能画像“斜杠青年”判定逻辑
-        │   ├── canvasPoster.ts              # Canvas 像素分享海报生成与保存
-        │   ├── graph-algorithms.ts          # 核心 BFS 最短路径与 Jaccard 相似度推荐算法
-        │   ├── graph-metrics.ts             # 拓扑密度、聚类系数、平均路径算法
-        │   ├── graph-metrics-structure.ts   # 极大连通子群算法
-        │   ├── graph-metrics-centrality.ts  # 度中心性与介数中心性算法
-        │   ├── reportGenerator.ts           # 报告文本生成器 (Markdown/HTML/PDF 数据编排与安全过滤)
-        │   └── seeded-shuffle.ts            # 基于种子的伪随机打乱工具（确保 UI 刷新的一致性）
-        └── components/               # Vue UI 纯渲染组件层
-            ├── LoginOverlay.vue             # 登录遮罩层容器
-            ├── AppSidebar.vue               # 侧边栏布局
-            ├── RecommendedActivities.vue    # 活动匹配卡片列表
-            ├── BuddyList.vue                # Jaccard 推荐搭子列表
-            ├── GraphModal.vue               # 全屏拓扑网络模态弹窗
-            ├── AdminDashboard.vue           # 管理员诊断后台大面板
-            ├── AllActivities.vue            # 系统全部活动综合看板 (支持快速报名与兴趣分类筛选)
-            ├── ExportModal.vue              # 多格式个性化匹配报告与社交海报导出模态框
-            ├── auth/                        # 鉴权组件
-            │   ├── StudentLoginForm.vue     # 学生登录表单（兴趣多选）
-            │   ├── AdminLoginForm.vue       # 管理员密码表单
-            │   └── LoginLoadingScreen.vue   # 炫酷的 3 秒多阶段霓虹加载动画
-            ├── buddy/                       # 社交匹配组件
-            │   └── PathFinder.vue           # 六度人脉 BFS 寻路高亮面板
-            ├── admin/                       # 管理员看板的原子诊断卡片
-            │   ├── NetworkMetricsCard.vue   # 网络指标卡片（密度、聚类）
-            │   ├── ThemeCommunitiesCard.vue # 连通圈分类与一键桥接方案
-            │   ├── DegreeCentralityCard.vue # 度中心性（社交达人）列表
-            │   ├── BetweennessCentralityCard.vue # 介数中心性（社交桥梁）列表
-            │   ├── IsolationCard.vue        # 孤立学生诊断卡片
-            │   ├── SystemLogsCard.vue       # 系统操作日志卡片
-            │   ├── PopularActivitiesCard.vue# 热门活动图表
-            │   ├── PopularInterestsCard.vue # 热门兴趣图表
-            │   ├── ActivitySaturationCard.vue# 活动饱和度热力图
-            │   ├── MatrixDiagnosticsCard.vue # 邻接矩阵大小诊断
-            │   ├── CreateActivityModal.vue  # 新建活动弹窗
-            │   ├── CreateInterestModal.vue  # 新建兴趣弹窗
-            │   ├── ActivityPromoPanel.vue   # 定向活动邀请推送面板
-            │   └── BridgePlanPanel.vue      # 人脉桥接详细执行方案
-            └── sidebar/                     # 侧边栏子模块
-                ├── SidebarProfile.vue       # 学生个人信息卡片
-                ├── SidebarInterests.vue     # 个人兴趣标签编辑器
-                ├── SidebarStats.vue         # 个人中心性指标分析
-                ├── SidebarTimeline.vue      # 已报名活动日程时间线
-                ├── SidebarIcebreaker.vue    # 圈子破冰搭子提示
-                └── SidebarAdminControl.vue  # 管理员一键切回入口
-```
+| 层级 | 技术 |
+|------|------|
+| **前端框架** | Vue 3 + TypeScript + Vite 8 |
+| **状态管理** | Pinia 3 |
+| **图可视化** | D3.js 7 (力导向仿真 + 四叉树空间分割) |
+| **数据持久化** | IndexedDB (异步事务) |
+| **测试** | Vitest + Vue Test Utils + Pytest |
+| **后端** | Python 3.11 (数据生成 + 算法验证) |
+| **部署** | GitHub Pages + GitHub Actions CI/CD |
+| **设计系统** | Slate & Neon 双主题 (亮色 / 暗色) |
 
 ---
 
-## 🛠️ 使用手册 & 运行指南
+## ⚡ 性能优化
 
-### 前置条件
-确保您的系统安装了以下环境：
-* **Python 3.8+** (推荐安装 `pytest` 进行测试)
-* **Node.js 18+** 与 **npm** (用于运行网页端)
+| 优化项 | 说明 |
+|--------|------|
+| **四叉树命中检测** | d3.quadtree 空间分割，hover/拖拽检测 O(N) → O(log N) |
+| **IndexedDB 持久化** | 异步事务替代 localStorage 同步阻塞，支持大数据量 |
+| **Ego Network 局部子图** | 仅渲染 2 跳范围 15~35 个节点，避免全局 1500+ 节点卡顿 |
+| **LOD 文字剔除** | 根据缩放比例自动隐藏过小标签，减少 Canvas 重绘开销 |
+| **Session 随机种子** | 页面级稳定种子，刷新不跳变，重置时更新 |
+| **SVG 矢量报告** | 离线 HTML 报告用 SVG 替代 Canvas，支持无损缩放 |
+| **双向触控滚动** | 邻接矩阵支持 X/Y 双向 Touch Pan + Shift+Wheel 横向滚动 |
 
 ---
 
-### 第一步：生成大规模图数据
-在项目根目录下打开终端，运行脚本生成 1,500+ 学生规模的模拟数据集，并导出为 JSON：
+## 🚀 快速开始
+
+### 环境要求
+
+- **Python 3.8+**
+- **Node.js 18+** 与 **npm**
+
+### 1. 生成模拟数据
 
 ```bash
-# 1. 生成模拟 CSV 数据
+# 生成 1500+ 学生的 CSV 数据
 python generate_mock_data.py
 
-# 2. 将 CSV 数据打包并导出为前端可加载的静态 JSON 数据库
+# 导出为前端 JSON 数据库
 python export_graph_to_json.py
 ```
 
----
-
-### 第二步：运行 Python 端测试
-如果您想在控制台验证 Python 算法的正确性：
+### 2. 运行 Python 端
 
 ```bash
-# 1. 运行经典的图遍历路径输出演示
+# 命令行演示
 python demo_runner.py
 
-# 2. 启动命令行下的交互式 Campus Buddy 查询系统
+# 交互式查询系统
 python interactive_app.py
 
-# 3. 运行自动化单元测试（验证 BFS 逻辑、隐私过滤、连通分量等）
+# 单元测试
 pytest test_campus_buddy.py
 ```
 
----
-
-### 第三步：运行并构建 Vue 3 网页端
-进入前端目录，安装依赖并启动本地服务器：
+### 3. 运行前端
 
 ```bash
-# 进入前端文件夹
 cd frontend
 
 # 安装依赖
 npm install
 
-# 启动本地开发服务
+# 启动开发服务器
 npm run dev
 
-# 运行前端单元测试 (Vitest)
+# 运行测试
 npm run test run
 
-# 构建生产包并部署到 GitHub Pages
-npm run deploy
+# 构建部署
+npm run build
 ```
 
 ---
 
-## 🖥️ 网页端交互与功能指南
+## 📁 项目结构
 
-1. **沉浸式登录过渡动画**
-   * 学生填写姓名、选择头像和兴趣标签后，点击「生成画像并登入」。
-   * 系统播放 **3 秒的三段式加载动画**：头像弹出 → 兴趣标签飞入 → 图谱连接线向外生长，最终以极光扫过全屏的效果进入主界面。
+```
+Campus-Buddy/
+├── data/                              # CSV 数据集
+├── campus_buddy.py                    # Python 核心图算法
+├── generate_mock_data.py              # Mock 数据生成器
+├── export_graph_to_json.py            # JSON 导出器
+├── test_campus_buddy.py               # Pytest 单元测试
+├── requirements.txt                   # Python 依赖
+└── frontend/                          # Vue 3 前端
+    ├── src/
+    │   ├── stores/                    # Pinia 状态管理
+    │   ├── composables/               # Facade 适配层
+    │   ├── services/                  # OOP 领域服务 & Canvas 渲染器
+    │   ├── utils/                     # 纯函数算法 & 工具
+    │   ├── components/                # Vue UI 组件
+    │   │   ├── admin/                 # 管理员诊断卡片
+    │   │   ├── auth/                  # 登录认证组件
+    │   │   ├── graph/                 # 拓扑图控制组件
+    │   │   └── sidebar/               # 侧边栏子模块
+    │   ├── constants/                 # 常量定义
+    │   ├── types/                     # TypeScript 类型
+    │   ├── style.css                  # 全局设计系统
+    │   └── App.vue                    # 根组件
+    └── public/
+        └── graph_data.json            # 静态图数据库
+```
 
-2. **分类与按需展示推荐 (Interest Filter)**
-   * 系统顶端会显示您个人的兴趣标签导航栏（例如：`🌟 全部推荐`、`机器学习`、`羽毛球`）。
-   * 点击不同的标签，下方的匹配推荐会即时响应过滤。
-   * 每个兴趣模块默认只展示 **3 个最佳匹配活动**。点击展开可查看全部，点击「一键报名」可即时参与并更新主页卡片。
+---
 
-3. **Jaccard 搭子匹配排序 (Buddy Similarity)**
-   * 搭子推荐面板按 Jaccard 相似度降序排列，展示每位同学的共享兴趣数量和匹配度百分比。
+## 🖥️ 功能一览
 
-4. **管理员大数据诊断看板 (Admin Dashboard)**
-   * **连通圈诊断**：显示校园社交独立小圈子数量，诊断孤立同学，支持一键发送“人脉桥接”方案。
-   * **定向活动推广**：显示冷门活动并可指定特定兴趣圈的学生发送定向报名邀请。
-   * **破冰活动推荐**：分析各活动能连接不同社交圈子的“破冰潜力”，管理员可一键将其在首页置顶推荐。
+### 登录与画像
+- 沉浸式 3 秒三段式加载动画（头像弹出 → 标签飞入 → 图谱生长）
+- 五大社交画像自动判定（运动健将 / 文艺青年 / 科技极客 / 社交达人 / 斜杠青年）
+- 隐私模式与达人模式互斥切换
 
-5. **D3.js 全屏力导向拓扑网络与人脉路径高亮**
-   * 支持关系网的无限缩放与平移，拖拽任意节点可看清与其他关联边的拉力。
-   * 输入两个学生姓名即可执行 BFS 寻路算法，在力导图上高亮显示跨越兴趣圈的人脉路径，形象展示“六度分隔”理论。该寻路面板由于包含潜在的全局人脉网络与隐私分析，目前已限制为仅管理员可见与操作。
+### 拓扑图
+- D3.js 力导向仿真，支持拖拽、缩放、平移
+- 全屏模式下支持 BFS 六度人脉寻路高亮
+- 邻接矩阵三种维度切换（学生×兴趣 / 兴趣×兴趣 / 学生×活动）
 
-6. **多格式匹配报告一键导出 (Multi-format Report)**
-   * 提供面向学生及管理员的多格式报告导出，支持 **Markdown 格式**（快速导入 Notion 等工具）、**离线 HTML 网页格式**（集成炫酷的 Apple Glassmorphism 设计与离线图谱交互）以及 **高清晰度 PDF 格式**（自动应用优化的双栏纸张打印样式，一键唤醒浏览器打印另存为 PDF）。
-   * 报告模块已进行了严格的转义过滤，以确保导出内容不带有 HTML/Markdown 注入安全风险。
+### 管理员看板
+- 3×3 网格仪表盘，实时网络指标诊断
+- 孤立学生一键桥接方案（兴趣圈 / 社交达人 / 热门活动）
+- 冷门活动定向推广、破冰活动置顶推荐
 
-7. **Sleek Neon 主题 Canvas 海报保存 (Canvas Share Poster)**
-   * 支持学生一键渲染生成精美的 Canvas 图片分享海报，内容整合了该生的个人头像、推荐搭子匹配率（Top 10）、活动报名时间线等关键指标，视觉风格与 Slate & Neon 主题高度一致，支持直接下载并发送到移动设备分享。
+### 报告导出
+- Markdown / HTML / PDF / PNG 四种格式
+- HTML 报告集成 SVG 矢量交互图谱
+- Canvas 海报生成极客风格分享图
 
-8. **全部活动综合探索列表 (All Activities Panel)**
-   * 主界面整合了单独的“全部活动列表”检索面板，支持学生实时查看系统所有的活动安排。提供多标签极速分类检索、一键报名机制，且状态同步在 Ego-network 图谱和搭子推荐排序中实时刷新。
+---
+
+## 📋 版本历史
+
+| 版本 | 日期 | 主要更新 |
+|------|------|----------|
+| **v4.0.0** | 2026-05-31 | 全主题适配修复、领域级兜底推荐、UI/UX 全面优化 |
+| v3.0.0 | 2026-05-30 | IndexedDB 持久化、SVG 交互报告、四叉树 Canvas 优化 |
+| v2.1.0 | 2026-05-29 | 视觉打磨、Emoji 矢量化、布局间距对齐 |
+| v2.0.0 | 2026-05-29 | 管理员诊断后台、邻接矩阵、中心性分析 |
+| v1.1.0 | 2026-05-28 | 加载动画、性能重构 |
+| v1.0.0 | 2026-05-28 | 初始稳定版发布 |
+
+---
+
+## 📄 开源协议
+
+MIT License © [bestxby](https://github.com/bestxby)

@@ -28,6 +28,7 @@
   --color-warning:      #D96E48;
   --color-danger:       #B91C1C;
   --color-info:         #0284C7;
+  --color-overlay:      rgba(251, 249, 246, 0.75);
 
   /* Theme-adaptive status variables */
   --color-private-active-bg:     rgba(190, 24, 93, 0.08);
@@ -158,6 +159,7 @@
   --color-warning:      #FACC15;
   --color-danger:       #F87171;
   --color-info:         #38BDF8;
+  --color-overlay:      rgba(2, 6, 23, 0.75);
 
   --color-accent-orange:      #FD971F; /* Stable 2.0 cosmic orange */
   --color-accent-cyan:        #0EA5E9; /* Stable 2.0 cosmic cyan */

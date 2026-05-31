@@ -130,8 +130,10 @@
       </div>
     </template>
 
-    <!-- Export Modal Overlay -->
-    <ExportModal :visible="isExportModalVisible" @close="isExportModalVisible = false" />
+    <!-- Export Modal Overlay (Teleported to body to escape overflow:hidden + transform) -->
+    <Teleport to="body">
+      <ExportModal :visible="isExportModalVisible" @close="isExportModalVisible = false" />
+    </Teleport>
   </div>
 </template>
 

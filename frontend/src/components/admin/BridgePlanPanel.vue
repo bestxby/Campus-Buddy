@@ -2,7 +2,7 @@
   <div class="bridge-plan-box card glow-orange fade-in">
     <div class="bridge-header">
       <h4 style="display: inline-flex; align-items: center;">
-        <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; color: #ffb74d;">
+        <svg class="icon-svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; color: var(--color-accent);">
           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
         </svg>
         人脉拓扑桥接方案
@@ -135,8 +135,8 @@ const applyBridgePlan = () => {
 
 <style scoped>
 .bridge-plan-box {
-  background: linear-gradient(135deg, rgba(253, 151, 31, 0.04) 0%, rgba(18, 24, 38, 0.95) 100%) !important;
-  border: 1px solid rgba(253, 151, 31, 0.2) !important;
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-accent) !important;
   padding: 8px !important;
   flex-shrink: 0;
   border-radius: 8px;
@@ -155,7 +155,7 @@ const applyBridgePlan = () => {
 .bridge-header h4 {
   font-size: 10px;
   margin: 0;
-  color: #ffb74d;
+  color: var(--color-accent);
 }
 .close-promo-btn {
   background: transparent;
@@ -186,18 +186,18 @@ const applyBridgePlan = () => {
   display: flex;
   align-items: center;
   padding: 4px 6px;
-  border: 1px solid rgba(255, 255, 255, 0.02);
-  background-color: rgba(255, 255, 255, 0.005);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface-2);
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
 }
 .bridge-option-item:hover {
-  background-color: rgba(255, 255, 255, 0.015);
+  background-color: var(--color-muted);
 }
 .bridge-option-item.option-checked {
-  background-color: rgba(253, 151, 31, 0.03);
-  border-color: rgba(253, 151, 31, 0.2);
+  background-color: var(--color-accent-light);
+  border-color: var(--color-accent);
 }
 .hidden-radio {
   margin-right: 6px;

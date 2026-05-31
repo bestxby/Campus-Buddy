@@ -32,13 +32,13 @@
         <div class="donut-chart-container">
           <svg class="donut-svg" viewBox="0 0 100 100">
             <!-- Background circle track -->
-            <circle 
-              cx="50" 
-              cy="50" 
-              r="40" 
-              fill="none" 
-              stroke="var(--color-border)" 
-              stroke-width="9" 
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              fill="none"
+              stroke="var(--color-border)"
+              stroke-width="13"
               style="opacity: 0.4;"
             />
             <!-- Donut segments -->
@@ -50,7 +50,7 @@
               cy="50"
               r="40"
               fill="none"
-              stroke-width="9"
+              stroke-width="13"
               :stroke="slice.color"
               :stroke-dasharray="slice.strokeDasharray"
               :stroke-dashoffset="slice.strokeDashoffset"
@@ -169,7 +169,7 @@ const slices = computed(() => {
   box-sizing: border-box;
 }
 .donut-chart-container {
-  flex: 0 0 130px;
+  flex: 0 0 135px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -177,16 +177,16 @@ const slices = computed(() => {
 .donut-svg {
   width: 100%;
   height: auto;
-  max-width: 130px;
+  max-width: 135px;
 }
 .donut-segment {
   cursor: pointer;
-  transition: stroke-width 0.25s ease, filter 0.25s ease;
+  transition: stroke-width 0.25s ease, opacity 0.25s ease;
 }
 .donut-segment:hover,
 .donut-segment.segment-highlighted {
-  stroke-width: 12px;
-  filter: drop-shadow(0 0 6px var(--hover-color));
+  stroke-width: 16px;
+  opacity: 0.9;
 }
 .donut-center-text {
   pointer-events: none;
@@ -196,17 +196,17 @@ const slices = computed(() => {
   font-family: system-ui, -apple-system, sans-serif;
 }
 .center-title {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   fill: var(--color-text);
 }
 .center-value {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: bold;
   fill: var(--color-accent);
 }
 .center-sub {
-  font-size: 5.5px;
+  font-size: 6px;
   fill: var(--color-subtext);
 }
 .donut-legend-list {
@@ -220,10 +220,10 @@ const slices = computed(() => {
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: 6px;
-  padding: 5px 8px;
+  padding: 6px 8px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   cursor: pointer;
   transition: all 0.25s ease;
   text-align: left;
@@ -232,13 +232,12 @@ const slices = computed(() => {
 .legend-item-active {
   background: var(--color-muted);
   border-color: var(--theme-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 .legend-header {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 10px;
+  font-size: 10.5px;
 }
 .legend-dot {
   width: 6px;
@@ -252,17 +251,20 @@ const slices = computed(() => {
 }
 .legend-percentage {
   margin-left: auto;
-  font-family: monospace;
+  font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
   font-weight: 700;
+  font-size: 10.5px;
+  color: var(--color-accent);
 }
 .legend-details {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   font-size: 10px;
   color: var(--color-subtext);
   padding-left: 12px;
 }
 .legend-deg {
-  font-family: monospace;
+  font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+  font-size: 10px;
 }
 </style>

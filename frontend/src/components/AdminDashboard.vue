@@ -134,6 +134,14 @@ watch(() => graph.value.size, (newSize, oldSize) => {
   gap: 16px;
   height: 100%;
   min-height: 0;
+  isolation: isolate;
+}
+.col-1-layout > * {
+  position: relative;
+  z-index: 1;
+}
+.col-1-layout > :nth-child(1) {
+  z-index: 4;
 }
 
 /* Diagnostics card height fits its 3 buttons */

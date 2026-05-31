@@ -171,7 +171,7 @@ const handleSubmit = () => {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(8, 12, 21, 0.75);
+  background: var(--color-overlay);
   backdrop-filter: blur(16px);
   z-index: 1000;
   display: flex;
@@ -182,8 +182,8 @@ const handleSubmit = () => {
 .modal-card {
   width: 100%;
   max-width: 500px;
-  background: linear-gradient(135deg, rgba(18, 24, 38, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%) !important;
-  border: 1px solid rgba(253, 151, 31, 0.25) !important;
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -256,7 +256,7 @@ const handleSubmit = () => {
 }
 
 .form-input {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: 6px;
   color: var(--color-text);
@@ -285,7 +285,7 @@ const handleSubmit = () => {
 }
 
 .domain-btn {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: var(--color-surface-2);
   border: 1px solid var(--color-border);
   color: var(--color-subtext);
   border-radius: 8px;

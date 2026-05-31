@@ -3,6 +3,7 @@ import { ref, reactive } from 'vue'
 import type { BuddyResult, PathResult } from '@/types'
 import { useGraphStore } from './graph'
 import { GraphAlgorithms, nodeKey } from '@/utils/graph-algorithms'
+import { INTEREST_CATEGORIES } from '@/constants/interests'
 
 export const useRecommendationStore = defineStore('recommendation', () => {
   const pathResult = ref<PathResult | null>(null)
@@ -47,8 +48,23 @@ export const useRecommendationStore = defineStore('recommendation', () => {
       Array.from(graphStore.graph.get(oNode) ?? [])
         .filter(n => n.startsWith('interest:'))
     )
+    // Exact interest match
     const match = sInterests.find(x => oInterests.has(x))
-    return match ? match.replace('interest:', '') : ''
+    if (match) return match.replace('interest:', '')
+
+    // Domain-level fallback: find shared domain between student and activity interests
+    const getDomain = (name: string): string | null => {
+      for (const [domain, tags] of Object.entries(INTEREST_CATEGORIES)) {
+        if (tags.includes(name)) return domain
+      }
+      return null
+    }
+    const sDomains = new Set(sInterests.map(i => getDomain(i.replace('interest:', ''))).filter(Boolean))
+    for (const oInt of oInterests) {
+      const oDomain = getDomain(oInt.replace('interest:', ''))
+      if (oDomain && sDomains.has(oDomain)) return `[${oDomain}]`
+    }
+    return ''
   }
 
   function getBuddiesForActivity(studentName: string, activityName: string): string[] {

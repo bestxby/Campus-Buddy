@@ -169,7 +169,7 @@
   border-radius: 6px;
 }
 .zoom-btn {
-  background-color: #FFFFFF;
+  background-color: var(--color-surface-2);
   border: 1px solid var(--color-border);
   color: var(--text-primary);
   width: 32px;
@@ -300,7 +300,7 @@
 }
 .tab-btn:hover {
   color: var(--text-primary);
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--color-muted);
 }
 .tab-btn.active {
   background: var(--color-accent);
@@ -312,7 +312,7 @@
   align-items: center;
 }
 .matrix-select-neon {
-  background: #FFFFFF;
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   color: var(--text-primary);
   font-size: 11px;
@@ -329,7 +329,7 @@
   box-shadow: var(--shadow-sm);
 }
 .matrix-select-neon option {
-  background-color: #FFFFFF;
+  background-color: var(--color-surface);
   color: var(--text-primary);
 }
 

@@ -209,10 +209,10 @@ const handleStudentSubmit = () => {
 .student-form-section {
   text-align: left;
 }
-.section-title { font-size: 12px; color: var(--color-accent); margin: 8px 0 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-.form-split-row { display: flex; gap: 20px; margin-bottom: 8px; }
+.section-title { font-size: 12px; color: var(--color-accent); margin: 6px 0 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-split-row { display: flex; gap: 20px; margin-bottom: 4px; }
 .form-left-col, .form-right-col { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
 .label-bold { font-size: 12.5px; font-weight: bold; line-height: 18px; display: block; }
 .form-group input {
   background-color: var(--color-surface-2);
@@ -242,7 +242,7 @@ const handleStudentSubmit = () => {
 .avatar-picker-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 .avatar-picker-btn:hover { border-color: var(--color-accent); background-color: var(--color-social-active-bg); transform: translateY(-2px); }
 .avatar-active { border-color: var(--color-accent) !important; background-color: var(--color-social-active-bg) !important; box-shadow: 0 0 10px var(--color-social-active-border); transform: scale(1.05); }
-.live-identity-card { background-color: var(--color-admin-active-bg); border: 1px solid var(--color-admin-active-border); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
+.live-identity-card { background-color: var(--color-admin-active-bg); border: 1px solid var(--color-admin-active-border); border-radius: 8px; padding: 8px 14px; margin-bottom: 6px; }
 .live-identity-card h4 { font-size: 11px; margin: 0 0 8px 0; color: var(--color-social-active-text); text-transform: uppercase; letter-spacing: 0.5px; }
 .live-card-body { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .live-avatar-preview { font-size: 32px; background-color: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 8px; padding: 6px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
@@ -252,15 +252,15 @@ const handleStudentSubmit = () => {
 .live-interests-preview { width: 100%; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; border-top: 1px solid var(--color-border); padding-top: 6px; }
 .preview-tag { background-color: var(--color-admin-active-bg); border: 1px solid var(--color-admin-active-border); color: var(--color-admin-active-text); font-size: 10px; padding: 1px 6px; border-radius: 12px; }
 .placeholder-text { font-size: 11px; color: var(--color-subtext); font-style: italic; }
-.interests-picker-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.interests-picker-container { display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px; }
 .picker-section h5 { font-size: 11.5px; color: var(--color-subtext); margin: 0 0 4px 0; border-left: 2px solid var(--color-accent-cyan); padding-left: 6px; }
 .tags-grid { display: flex; flex-wrap: wrap; gap: 6px; }
 .interest-tag { background-color: var(--color-surface-2); border: 1px solid var(--color-border); color: var(--color-subtext); border-radius: 20px; padding: 5px 12px; font-size: 11px; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
 .interest-tag:hover { background-color: var(--color-muted); color: var(--color-text); border-color: var(--color-subtext); transform: translateY(-1.5px); }
 .tag-active { background-color: var(--buddy-node-student-bg) !important; border-color: var(--buddy-node-student-border) !important; color: var(--buddy-node-student-text) !important; box-shadow: 0 4px 12px var(--color-accent-orange-glow); transform: translateY(-1.5px); }
-.warning-text { color: var(--color-danger); font-size: 11px; margin-bottom: 6px; font-weight: bold; }
-.student-form-section .btn-primary { margin-top: 10px; padding: 12px; font-size: 13px; }
-.divider { border: 0; border-top: 1px solid var(--color-border); margin: 12px 0; }
+.warning-text { color: var(--color-danger); font-size: 11px; margin-bottom: 4px; font-weight: bold; }
+.student-form-section .btn-primary { margin-top: 6px; padding: 10px; font-size: 13px; }
+.divider { border: 0; border-top: 1px solid var(--color-border); margin: 6px 0; }
 
 @media (max-width: 640px) {
   .form-split-row {

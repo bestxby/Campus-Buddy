@@ -65,12 +65,6 @@ const tipData = computed(() => {
   padding: 12px;
   flex-shrink: 0;
   box-sizing: border-box;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
-}
-.sidebar-icebreaker-panel:hover {
-  border-color: var(--color-accent);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(217, 110, 72, 0.10), 0 1px 4px rgba(0,0,0,0.05);
 }
 .panel-title {
   font-size: 11.5px;

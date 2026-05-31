@@ -192,7 +192,7 @@ const handleSubmitted = () => {
 }
 .login-card {
   max-width: 100%;
-  padding: 24px 32px;
+  padding: 18px 32px;
   background: var(--color-surface); /* Adaptive card background */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -213,9 +213,9 @@ const handleSubmitted = () => {
 .login-tabs {
   display: flex;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   border-bottom: 1px solid var(--color-border);
-  padding-bottom: 8px;
+  padding-bottom: 6px;
 }
 .login-tab-btn {
   flex: 1;
@@ -223,7 +223,7 @@ const handleSubmitted = () => {
   border: 1px solid var(--color-border);
   color: var(--color-subtext);
   border-radius: 8px;
-  padding: 10px;
+  padding: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -248,8 +248,8 @@ const handleSubmitted = () => {
 }
 /* Redesigned Premium Logo Banner */
 .login-logo-banner {
-  margin-bottom: 20px;
-  padding: 12px 16px;
+  margin-bottom: 10px;
+  padding: 10px 16px;
   background: var(--color-surface-2); /* Adaptive banner background */
   border: 1px solid var(--color-border);
   border-radius: 10px;
@@ -301,9 +301,9 @@ const handleSubmitted = () => {
 
 /* GitHub Card in Login Page */
 .login-github-card {
-  margin-top: 20px;
+  margin-top: 12px;
   border-top: 1px solid var(--color-border);
-  padding-top: 16px;
+  padding-top: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;

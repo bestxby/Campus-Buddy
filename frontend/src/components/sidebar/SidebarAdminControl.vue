@@ -160,13 +160,15 @@
       </div>
     </div>
 
-    <!-- Export Modal Overlay for Admin Mode -->
-    <ExportModal 
-      :visible="isExportModalVisible" 
-      :isAdminMode="true" 
-      :studentName="activeStudent || ''" 
-      @close="isExportModalVisible = false" 
-    />
+    <!-- Export Modal Overlay for Admin Mode (Teleported to body) -->
+    <Teleport to="body">
+      <ExportModal
+        :visible="isExportModalVisible"
+        :isAdminMode="true"
+        :studentName="activeStudent || ''"
+        @close="isExportModalVisible = false"
+      />
+    </Teleport>
   </div>
 </template>
 

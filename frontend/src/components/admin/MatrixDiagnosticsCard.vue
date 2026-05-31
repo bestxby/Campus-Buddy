@@ -95,6 +95,11 @@ const emit = defineEmits<{
   height: 100%;
   background: var(--color-surface);
   padding: 12px 16px !important;
+  position: relative;
+  z-index: 1;
+}
+.dashboard-grid-card:has(.matrix-btn:hover) {
+  z-index: 10;
 }
 .col-header {
   border-bottom: 1px solid var(--color-border);
@@ -128,9 +133,12 @@ const emit = defineEmits<{
   font-weight: 700;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   text-align: left;
+  position: relative;
+  z-index: 1;
 }
 .matrix-btn:hover {
   transform: translateY(-1.5px);
+  z-index: 10;
 }
 .matrix-btn:active {
   transform: translateY(0);

@@ -1,10 +1,19 @@
 import type { PathResult, BuddyResult, NodeKind } from '@/types'
+import { INTEREST_CATEGORIES } from '@/constants/interests'
 
 const SOCIAL_BOOST_FACTOR = 1.3
 const BOOST_LIMIT = 1.0
 
 export function nodeKey(kind: NodeKind, name: string): string {
   return `${kind}:${name}`
+}
+
+/** Get the domain key for an interest tag name */
+function getInterestDomain(interestName: string): string | null {
+  for (const [domain, tags] of Object.entries(INTEREST_CATEGORIES)) {
+    if (tags.includes(interestName)) return domain
+  }
+  return null
 }
 
 export class GraphAlgorithms {
@@ -137,6 +146,33 @@ export class GraphAlgorithms {
     }
 
     rankedBuddies.sort((a, b) => b.jaccard - a.jaccard || a.name.localeCompare(b.name))
+
+    // ── Domain-level fallback for unmatched activities ──
+    // If an activity's interests have no direct match with the student,
+    // but the student shares the same interest domain, still recommend it.
+    const sDomains = new Set<string>()
+    for (const i of sInterests) {
+      const domain = getInterestDomain(i.replace('interest:', ''))
+      if (domain) sDomains.add(domain)
+    }
+
+    // Collect all activities in the graph
+    for (const [node, neighbors] of graph.entries()) {
+      if (!node.startsWith('activity:')) continue
+      const actName = node.replace('activity:', '')
+      if (matchedActivities.has(actName)) continue // already matched by exact interest
+
+      // Check if any of the activity's interests share a domain with the student
+      for (const neighbor of neighbors) {
+        if (!neighbor.startsWith('interest:')) continue
+        const actInterest = neighbor.replace('interest:', '')
+        const actDomain = getInterestDomain(actInterest)
+        if (actDomain && sDomains.has(actDomain)) {
+          matchedActivities.add(actName)
+          break
+        }
+      }
+    }
 
     const sortedActivities = Array.from(matchedActivities).sort((a, b) => {
       const aPromoted = promotedActivities.has(a) ? 1 : 0
